@@ -22,11 +22,9 @@ public class Node extends BaseModel {
 
     private String name;
 
-    private Long preNodeId;
+    private String preNodeId;
 
-    private Long nextNodeId;
-
-    private List<Node> next;
+    private String nextNodeId;
 
     /**
      * 表单

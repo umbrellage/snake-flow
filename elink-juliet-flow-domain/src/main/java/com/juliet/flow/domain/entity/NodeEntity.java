@@ -16,9 +16,9 @@ public class NodeEntity extends BaseEntity {
     @TableId
     private Long id;
 
-    private Long preNodeId;
+    private String preNodeId;
 
-    private Long nextNodeId;
+    private String nextNodeId;
 
     private Long flowId;
 

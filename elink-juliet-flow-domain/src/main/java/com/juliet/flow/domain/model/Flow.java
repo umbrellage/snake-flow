@@ -86,10 +86,10 @@ public class Flow extends BaseModel {
             if (nodeStatusList.contains(node.getStatus())) {
                 output.add(node);
             }
-            if (CollectionUtils.isNotEmpty(node.getNext())) {
-                Collections.reverse(node.getNext());
-                stack.addAll(node.getNext());
-            }
+//            if (CollectionUtils.isNotEmpty(node.getNext())) {
+//                Collections.reverse(node.getNext());
+//                stack.addAll(node.getNext());
+//            }
         }
         return output.stream()
             .distinct()

@@ -21,10 +21,9 @@ public class NodeDTO {
     @NotNull
     private FormDTO form;
 
-    private List<NodeDTO> pre;
+    private String preNodeId;
 
-    @NotEmpty
-    private List<NodeDTO> next;
+    private String nextNodeId;
 
     /**
      * 值参考NodeTypeEnum

@@ -70,7 +70,10 @@ public class FlowEntityFactory {
         }
         List<FormEntity> formEntities = new ArrayList<>();
         for (Node node : nodes) {
-            formEntities.add(toFormEntity(node.getForm(), tenantId, node.getId()));
+            FormEntity formEntity = toFormEntity(node.getForm(), tenantId, node.getId());
+            if (formEntity != null) {
+                formEntities.add(formEntity);
+            }
         }
         return formEntities;
     }

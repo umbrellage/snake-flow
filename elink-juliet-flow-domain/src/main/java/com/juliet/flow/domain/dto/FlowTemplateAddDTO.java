@@ -4,6 +4,7 @@ import com.juliet.flow.client.dto.NodeDTO;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -19,7 +20,7 @@ public class FlowTemplateAddDTO {
     private String code;
 
     @NotNull
-    private NodeDTO node;
+    private List<NodeDTO> nodes;
 
     private Long createBy;
 

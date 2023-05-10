@@ -62,13 +62,13 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     }
 
     private FlowTemplate toFlowTemplate(FlowTemplateAddDTO dto) {
-        BusinessAssert.assertNotNull(dto.getNode(), StatusCode.ILLEGAL_PARAMS, "Node节点不能空!");
+        BusinessAssert.assertNotEmpty(dto.getNodes(), StatusCode.ILLEGAL_PARAMS, "Node节点不能空!");
         Long tenantId = 1L;
         FlowTemplate flowTemplate = new FlowTemplate();
-        Node node = new Node();
         flowTemplate.setId(dto.getId());
-        toNode(node, dto.getNode(), dto.getCreateBy(), dto.getUpdateBy());
-//        flowTemplate.setNode(node);
+        flowTemplate.setNodes(dto.getNodes().stream()
+                .map(nodeDTO -> toNode(nodeDTO, dto.getCreateBy(), dto.getUpdateBy()))
+                .collect(Collectors.toList()));
         flowTemplate.setName(dto.getName());
         flowTemplate.setCode(dto.getCode());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);
@@ -78,11 +78,14 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         return flowTemplate;
     }
 
-    private void toNode(Node node, NodeDTO nodeDTO, Long createBy, Long updateBy) {
+    private Node toNode(NodeDTO nodeDTO, Long createBy, Long updateBy) {
         if (nodeDTO == null) {
-            return;
+            return null;
         }
+        Node node = new Node();
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
+        node.setPreNodeId(nodeDTO.getPreNodeId());
+        node.setNextNodeId(nodeDTO.getNextNodeId());
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeDTO.getType()));
         node.setCreateBy(createBy);
@@ -95,19 +98,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
                     .map(postDTO -> toPost(postDTO, createBy, updateBy))
                     .collect(Collectors.toList()));
         }
-        if (CollectionUtils.isEmpty(nodeDTO.getNext())) {
-            return;
-        }
-        for (NodeDTO subNodeDTO : nodeDTO.getNext()) {
-            Node subNode = new Node();
-            List<Node> list = node.getNext();
-            if (list == null) {
-                list = new ArrayList<>();
-            }
-            list.add(subNode);
-            node.setNext(list);
-            toNode(subNode, subNodeDTO, createBy, updateBy);
-        }
+        return node;
     }
 
     private Form toForm(FormDTO formDTO, Long createBy, Long updateBy) {
