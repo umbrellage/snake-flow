@@ -4,6 +4,7 @@ import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.JulietFlowClient;
+import com.juliet.flow.client.dto.BpmDto;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.common.StatusCode;
@@ -80,6 +81,12 @@ public class FlowExecuteController implements JulietFlowClient {
     @Override
     public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
         return AjaxResult.success(new Flow().isEnd());
+    }
+
+    @Override
+    public AjaxResult<Void> initBmp(BpmDto dto) {
+
+        return null;
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {

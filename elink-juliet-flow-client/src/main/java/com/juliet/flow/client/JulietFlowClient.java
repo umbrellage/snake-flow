@@ -22,4 +22,10 @@ public interface JulietFlowClient {
     @PostMapping("/is/end")
     AjaxResult flowIsEnd(@RequestBody FlowIdDTO dto);
 
+    /**
+     * 发起一个新的流程
+     * @return
+     */
+    AjaxResult<Void> initBmp(BpmDto dto);
+
 }
