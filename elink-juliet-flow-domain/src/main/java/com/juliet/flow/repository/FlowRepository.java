@@ -17,6 +17,8 @@ public interface FlowRepository {
 
     void update(Flow flow);
 
+    void updateTemplate(FlowTemplate flowTemplate);
+
     Flow queryById(Long id);
 
     Flow queryByCode(String code);

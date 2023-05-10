@@ -7,7 +7,7 @@ import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.domain.dto.FieldDTO;
+import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.domain.dto.FlowOpenResultDTO;
 import com.juliet.flow.domain.model.Field;
 import com.juliet.flow.domain.model.Flow;
