@@ -5,9 +5,10 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
-import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.dto.FlowDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
-import com.juliet.flow.client.dto.UserIdDTO;
+import com.juliet.flow.client.dto.TaskDTO;
+import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
@@ -73,12 +74,12 @@ public class FlowExecuteController implements JulietFlowClient {
 
 
     @Override
-    public AjaxResult forward(FlowIdDTO dto) {
+    public AjaxResult forward(FlowDTO dto) {
         return null;
     }
 
     @Override
-    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
+    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto) {
         return AjaxResult.success(new Flow().isEnd());
     }
 
@@ -89,13 +90,18 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
+    public AjaxResult<List<NodeVO>> currentNodeList(FlowDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
         return AjaxResult.success(nodeVOList);
     }
 
     @Override
-    public AjaxResult<Void> claimTask(UserIdDTO dto) {
+    public AjaxResult<Void> claimTask(FlowDTO dto, UserDTO userDTO) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<Void> task(FlowDTO dto, UserDTO userDTO) {
         return null;
     }
 

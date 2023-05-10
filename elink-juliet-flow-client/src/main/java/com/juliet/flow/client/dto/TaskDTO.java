@@ -11,7 +11,8 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class UserIdDTO {
-
+public class TaskDTO {
+    private Long flowId;
+    private Long nodeId;
     private Long userId;
 }

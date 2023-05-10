@@ -7,6 +7,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -67,7 +68,8 @@ public class Flow {
     }
 
     /**
-     * N 叉树遍历，获取节点
+     * 图遍历，获取节点
+     * todo 待测试
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
@@ -88,6 +90,8 @@ public class Flow {
                 stack.addAll(node.getNext());
             }
         }
-        return output;
+        return output.stream()
+            .distinct()
+            .collect(Collectors.toList());
     }
 }

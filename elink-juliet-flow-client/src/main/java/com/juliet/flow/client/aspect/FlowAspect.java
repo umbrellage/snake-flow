@@ -6,7 +6,7 @@ import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
-import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.dto.FlowDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -72,7 +72,7 @@ public class FlowAspect {
         Object result = point.proceed();
         if (responseIsSuccess(result)) {
             log.info("juliet flow forward by flow id:{}", longJulietFlowId);
-            FlowIdDTO flowIdDTO = new FlowIdDTO();
+            FlowDTO flowIdDTO = new FlowDTO();
             flowIdDTO.setFlowId(longJulietFlowId);
             AjaxResult ajaxResult = julietFlowClient.forward(flowIdDTO);
             if (ajaxResult.getCode().intValue() != 200) {
@@ -100,7 +100,7 @@ public class FlowAspect {
     }
 
     private Boolean getCurrentFlowIsEnd(Long flowId) {
-        FlowIdDTO flowIdDTO = new FlowIdDTO();
+        FlowDTO flowIdDTO = new FlowDTO();
         flowIdDTO.setFlowId(flowId);
         AjaxResult<Boolean> ajaxResult = julietFlowClient.flowIsEnd(flowIdDTO);
         if (ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode().intValue() == 200) {

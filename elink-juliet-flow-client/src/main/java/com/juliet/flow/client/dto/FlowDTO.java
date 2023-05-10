@@ -7,7 +7,8 @@ import lombok.Data;
  * @date 2023-05-06
  */
 @Data
-public class FlowIdDTO {
+public class FlowDTO {
 
     private Long flowId;
+    private Long nodeId;
 }
