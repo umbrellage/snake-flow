@@ -16,10 +16,11 @@ public class FlowTemplateEntity extends BaseEntity {
     @TableId
     private Long id;
 
-    @TableField(value = "template_name")
+    @TableField(value = "flow_template_name")
     private String name;
 
     private String code;
 
+    @TableField(value = "flow_template_status")
     private Integer status;
 }

@@ -30,7 +30,7 @@ public class FlowEntityFactory {
         flowEntity.setId(flow.getId());
         flowEntity.setName(flow.getName());
         flowEntity.setParentId(flow.getParentId());
-        flowEntity.setTemplateId(flow.getTemplateId());
+        flowEntity.setFlowTemplateId(flow.getFlowTemplateId());
         flowEntity.setStatus(flow.getStatus().getCode());
         return flowEntity;
     }
@@ -55,7 +55,9 @@ public class FlowEntityFactory {
             return;
         }
         FormEntity entity = toFormEntity(node.getForm(), tenantId, node.getId());
-        formEntities.add(entity);
+        if (entity != null) {
+            formEntities.add(entity);
+        }
         if (CollectionUtils.isEmpty(node.getNext())) {
             return;
         }
@@ -65,6 +67,12 @@ public class FlowEntityFactory {
     }
 
     private static FormEntity toFormEntity(Form form, Long tenantId, Long nodeId) {
+        if (form == null) {
+            return null;
+        }
+        if (form.getCode() == null) {
+            return null;
+        }
         FormEntity entity = new FormEntity();
         entity.setNodeId(nodeId);
         entity.setName(form.getName());
@@ -78,12 +86,11 @@ public class FlowEntityFactory {
         if (node == null) {
             return;
         }
-        if (CollectionUtils.isEmpty(node.getForm().getFields())) {
-            return;
-        }
-        for (Field field : node.getForm().getFields()) {
-            FieldEntity entity = toFieldEntity(field, tenantId, node.getForm().getId());
-            fieldEntities.add(entity);
+        if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
+            for (Field field : node.getForm().getFields()) {
+                FieldEntity entity = toFieldEntity(field, tenantId, node.getForm().getId());
+                fieldEntities.add(entity);
+            }
         }
         if (CollectionUtils.isEmpty(node.getNext())) {
             return;
@@ -107,11 +114,10 @@ public class FlowEntityFactory {
         if (node == null) {
             return;
         }
-        if (CollectionUtils.isEmpty(node.getBindPosts())) {
-            return;
-        }
-        for (Post post : node.getBindPosts()) {
-            postEntities.add(toPostEntity(post, tenantId, node.getId()));
+        if (!CollectionUtils.isEmpty(node.getBindPosts())) {
+            for (Post post : node.getBindPosts()) {
+                postEntities.add(toPostEntity(post, tenantId, node.getId()));
+            }
         }
         if (CollectionUtils.isEmpty(node.getNext())) {
             return;
@@ -123,7 +129,7 @@ public class FlowEntityFactory {
 
     private static PostEntity toPostEntity(Post post, Long tenantId, Long nodeId) {
         PostEntity entity = new PostEntity();
-        entity.setId(post.getPostId() == null ? IdGenerator.getId() : post.getId());
+        entity.setId(post.getId() == null ? IdGenerator.getId() : post.getId());
         entity.setPostId(post.getPostId());
         entity.setPostName(post.getPostName());
         entity.setNodeId(nodeId);

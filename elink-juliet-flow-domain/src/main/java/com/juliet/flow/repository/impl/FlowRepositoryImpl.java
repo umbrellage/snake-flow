@@ -79,7 +79,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     public void addTemplate(FlowTemplate flowTemplate) {
         FlowTemplateEntity entity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         flowTemplateDao.insert(entity);
-        addNodes(flowTemplate.getNode(), flowTemplate.getTenantId(), 0L, flowTemplate.getId());
+        addNodes(flowTemplate.getNode(), flowTemplate.getTenantId(), 0L, entity.getId());
     }
 
     @Transactional(rollbackFor = Exception.class)

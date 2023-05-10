@@ -23,7 +23,7 @@ public class FlowEntity extends BaseEntity {
 
     private Long parentId;
 
-    private String templateId;
+    private Long flowTemplateId;
 
     private Integer status;
 }

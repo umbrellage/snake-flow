@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -17,6 +18,7 @@ public class FieldEntity extends BaseEntity {
 
     private Long formId;
 
+    @TableField(value = "field_name")
     private String name;
 
     private String code;
