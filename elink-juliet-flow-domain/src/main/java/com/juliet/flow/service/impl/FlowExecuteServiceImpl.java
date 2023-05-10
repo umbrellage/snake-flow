@@ -69,7 +69,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .collect(Collectors.toList());
         return flow.getNodeByNodeStatus(nodeStatusEnumList)
             .stream()
-            .map(Node::toNodeVo)
+            .map(node -> node.toNodeVo(flowId))
             .collect(Collectors.toList());
     }
 }

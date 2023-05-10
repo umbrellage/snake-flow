@@ -67,9 +67,10 @@ public class Node {
         return false;
     }
 
-    public NodeVO toNodeVo() {
+    public NodeVO toNodeVo(Long flowId) {
         NodeVO data = new NodeVO();
         data.setId(id);
+        data.setFlowId(flowId);
         data.setForm(form.toForm());
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {

@@ -15,6 +15,9 @@ import lombok.Setter;
 public class NodeVO {
 
     private Long id;
+
+    private Long flowId;
+
     /**
      * 表单
      */

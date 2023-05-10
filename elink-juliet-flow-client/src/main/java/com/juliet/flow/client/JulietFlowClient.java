@@ -56,4 +56,13 @@ public interface JulietFlowClient {
      */
     AjaxResult<Void> task(FlowDTO dto, UserDTO userDTO);
 
+
+    /**
+     * 获取所有的待办
+     * @param dto 必填
+     *
+     * @return
+     */
+    AjaxResult<List<NodeVO>> currentNodeList(UserDTO dto);
+
 }
