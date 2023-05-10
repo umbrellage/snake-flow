@@ -1,0 +1,27 @@
+# Tomcat
+server:
+  port: 9601
+
+# Spring
+spring:
+  application:
+    # 应用名称
+    name: elink-juliet-flow
+  profiles:
+    active: dev
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        #server-addr: 172.16.1.151:8848
+        namespace: ${spring.profiles.active}
+      config:
+        # 配置中心地址
+        #server-addr: 172.16.1.151:8848
+        # 配置文件格式
+        file-extension: yml
+        namespace: ${spring.profiles.active}
+        # 共享配置
+        shared-configs:
+          - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+

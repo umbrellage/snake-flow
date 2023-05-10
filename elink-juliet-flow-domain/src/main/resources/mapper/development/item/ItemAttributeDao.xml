@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.juliet.development.item.center.dao.ItemAttributeDao">
+
+
+    <resultMap id="ItemAttributeBaseResultMap" type="com.juliet.flow.domain.entity.ItemAttributeEntity">
+        <id column="id" property="id" />
+        <result column="del_flag" property="delFlag" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+        <result column="rep_time" property="repTime" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="item_id" property="itemId" />
+        <result column="attr_name" property="attrName" />
+        <result column="attr_value" property="attrValue" />
+        <result column="filter_flag" property="filterFlag" />
+        <result column="ext" property="ext" />
+    </resultMap>
+
+    <sql id="allFieldList">id, tenant_id, item_id, attr_name, attr_value, filter_flag, ext, del_flag, create_time, update_time, create_by, update_by, rep_time</sql>
+    <sql id="tableName">product_item_attribute</sql>
+    <select id="selectByItemId" resultMap="ItemAttributeBaseResultMap">
+        select <include refid="allFieldList" />
+        from <include refid="tableName" />
+        where item_id = #{itemId}
+    </select>
+
+    <select id="selectByItemIds" resultMap="ItemAttributeBaseResultMap">
+        select <include refid="allFieldList" />
+        from <include refid="tableName" />
+        where item_id in
+        <foreach item="itemId" collection="itemIds" separator="," open="(" close=")" index="">
+            #{itemId, jdbcType=NUMERIC}
+        </foreach>
+    </select>
+
+    <insert id="insertBatch"  parameterType="com.juliet.flow.domain.entity.ItemAttributeEntity">
+        INSERT INTO <include refid="tableName" /> (
+        tenant_id, item_id, attr_name, attr_value, filter_flag, ext, create_by, update_by
+        )
+        values
+        <foreach collection="itemAttributeEntities" item="entity" separator=",">
+            (#{entity.tenantId}, #{entity.itemId}, #{entity.attrName},#{entity.attrValue},#{entity.filterFlag},#{entity.ext},#{entity.createBy},#{entity.updateBy})
+        </foreach>
+    </insert>
+
+    <delete id="deleteBatch"  parameterType="com.juliet.flow.domain.entity.ItemAttributeEntity">
+        DELETE FROM <include refid="tableName" />
+        <where>
+            <foreach collection="itemAttributeEntities" item="entity" separator="OR">
+                (item_id = #{entity.itemId} AND attr_name = #{entity.attrName})
+            </foreach>
+        </where>
+
+    </delete>
+
+
+</mapper>
