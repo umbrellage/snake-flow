@@ -10,7 +10,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum FlowTemplateStatusEnum {
-
+    /**
+     *
+     */
     IN_PROGRESS(1, "编辑中"),
     ABNORMAL(2, "已启用"),
     END(3, "已禁用"),

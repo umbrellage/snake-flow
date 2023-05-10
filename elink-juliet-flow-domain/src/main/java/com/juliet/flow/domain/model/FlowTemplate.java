@@ -1,8 +1,10 @@
 package com.juliet.flow.domain.model;
 
-import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.domain.entity.FlowTemplateEntity;
+import java.util.Date;
+import java.util.Optional;
 import lombok.Data;
 import org.apache.commons.compress.utils.Lists;
 

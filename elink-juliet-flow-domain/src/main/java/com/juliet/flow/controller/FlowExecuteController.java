@@ -3,6 +3,7 @@ package com.juliet.flow.controller;
 import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.common.security.utils.SecurityUtils;
+import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.common.StatusCode;
@@ -27,13 +28,13 @@ import java.util.stream.Collectors;
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
-public class FlowExecuteController {
+public class FlowExecuteController implements JulietFlowClient {
 
     @Autowired
     private FlowExecuteService flowExecuteService;
 
     /**
-     * 流程还没创建，做预创建时的查询
+     * 流程实例还没创建，做预创建时的查询
      */
     @PostMapping("/open")
     public AjaxResult open(FlowOpenDTO dto) {
@@ -70,12 +71,13 @@ public class FlowExecuteController {
         return AjaxResult.success();
     }
 
-    /**
-     * 获取某个流程是否已经结束
-     * @param dto
-     * @return
-     */
-    @PostMapping("/is/end")
+
+    @Override
+    public AjaxResult forward(FlowIdDTO dto) {
+        return null;
+    }
+
+    @Override
     public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
         return AjaxResult.success(new Flow().isEnd());
     }
