@@ -35,12 +35,20 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void add(FlowTemplateAddDTO flowTemplateAddDTO) {
+        flowTemplateAddDTO.setCreateBy(1L);
+        flowTemplateAddDTO.setUpdateBy(1L);
         flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Override
     public void update(FlowTemplateAddDTO flowTemplateAddDTO) {
+        flowTemplateAddDTO.setUpdateBy(2L);
         flowRepository.updateTemplate(toFlowTemplate(flowTemplateAddDTO));
+    }
+
+    @Override
+    public FlowTemplate queryById(Long id) {
+        return flowRepository.queryTemplateById(id);
     }
 
     @Override
@@ -59,27 +67,33 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         FlowTemplate flowTemplate = new FlowTemplate();
         Node node = new Node();
         flowTemplate.setId(dto.getId());
-        toNode(node, dto.getNode());
+        toNode(node, dto.getNode(), dto.getCreateBy(), dto.getUpdateBy());
         flowTemplate.setNode(node);
         flowTemplate.setName(dto.getName());
+        flowTemplate.setCode(dto.getCode());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);
         flowTemplate.setTenantId(tenantId);
+        flowTemplate.setCreateBy(dto.getCreateBy());
+        flowTemplate.setUpdateBy(dto.getUpdateBy());
         return flowTemplate;
     }
 
-    private void toNode(Node node, NodeDTO nodeDTO) {
+    private void toNode(Node node, NodeDTO nodeDTO, Long createBy, Long updateBy) {
         if (nodeDTO == null) {
             return;
         }
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeDTO.getType()));
+        node.setCreateBy(createBy);
+        node.setUpdateBy(updateBy);
         if (nodeDTO.getForm() != null) {
-            node.setForm(toForm(nodeDTO.getForm()));
+            node.setForm(toForm(nodeDTO.getForm(), createBy, updateBy));
         }
         if (!CollectionUtils.isEmpty(nodeDTO.getBindPosts())) {
             node.setBindPosts(nodeDTO.getBindPosts().stream()
-                    .map(this::toPost).collect(Collectors.toList()));
+                    .map(postDTO -> toPost(postDTO, createBy, updateBy))
+                    .collect(Collectors.toList()));
         }
         if (CollectionUtils.isEmpty(nodeDTO.getNext())) {
             return;
@@ -92,37 +106,43 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
             }
             list.add(subNode);
             node.setNext(list);
-            toNode(subNode, subNodeDTO);
+            toNode(subNode, subNodeDTO, createBy, updateBy);
         }
     }
 
-    private Form toForm(FormDTO formDTO) {
+    private Form toForm(FormDTO formDTO, Long createBy, Long updateBy) {
         Form form = new Form();
         form.setId(formDTO.getId() == null ? null : Long.valueOf(formDTO.getId()));
         form.setName(formDTO.getName());
         form.setPath(formDTO.getPath());
         form.setCode(formDTO.getCode());
+        form.setCreateBy(createBy);
+        form.setUpdateBy(updateBy);
         if (!CollectionUtils.isEmpty(formDTO.getFields())) {
             form.setFields(formDTO.getFields().stream()
-                    .map(this::toField)
+                    .map(fieldDTO -> toField(fieldDTO, createBy, updateBy))
                     .collect(Collectors.toList()));
         }
         return form;
     }
 
-    private Field toField(FieldDTO fieldDTO) {
+    private Field toField(FieldDTO fieldDTO, Long createBy, Long updateBy) {
         Field field = new Field();
         field.setId(fieldDTO.getId() == null ? null : Long.valueOf(fieldDTO.getId()));
         field.setName(fieldDTO.getName());
         field.setCode(fieldDTO.getCode());
+        field.setCreateBy(createBy);
+        field.setUpdateBy(updateBy);
         return field;
     }
 
-    private Post toPost(PostDTO postDTO) {
+    private Post toPost(PostDTO postDTO, Long createBy, Long updateBy) {
         Post post = new Post();
         post.setId(postDTO.getId() == null ? null : Long.valueOf(postDTO.getId()));
         post.setPostId(postDTO.getPostId());
         post.setPostName(postDTO.getPostName());
+        post.setCreateBy(createBy);
+        post.setUpdateBy(updateBy);
         return post;
     }
 }

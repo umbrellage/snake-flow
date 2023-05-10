@@ -9,7 +9,7 @@ import java.util.List;
  * @date 2023-05-06
  */
 @Data
-public class Form {
+public class Form extends BaseModel {
 
     private Long id;
 

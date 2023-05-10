@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2023-05-06
  */
 @Data
-public class Todo {
+public class Todo extends BaseModel {
 
     private Long id;
 

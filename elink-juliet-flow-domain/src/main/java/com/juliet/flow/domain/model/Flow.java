@@ -18,7 +18,7 @@ import java.util.List;
  * @date 2023-05-06
  */
 @Data
-public class Flow {
+public class Flow extends BaseModel {
 
     private Long id;
 

@@ -13,7 +13,7 @@ import java.util.List;
  * @date 2023-05-06
  */
 @Data
-public class Node {
+public class Node extends BaseModel {
 
     private Long id;
 

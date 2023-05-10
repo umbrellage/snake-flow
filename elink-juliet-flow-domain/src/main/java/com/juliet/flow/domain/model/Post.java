@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2023-05-09
  */
 @Data
-public class Post {
+public class Post extends BaseModel {
 
     private Long id;
 
