@@ -2,10 +2,14 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
+import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
-import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -60,5 +64,30 @@ public class Flow {
 
     public void validate() {
         BusinessAssert.assertNotNull(this.node, StatusCode.SERVICE_ERROR, "不能没有节点信息!");
+    }
+
+    /**
+     * N 叉树遍历，获取节点
+     * @param nodeStatusList 节点状态
+     * @return 节点列表
+     */
+    public List<Node> getNodeByNodeStatus(List<NodeStatusEnum> nodeStatusList) {
+        if (CollectionUtils.isEmpty(nodeStatusList)) {
+            return Collections.emptyList();
+        }
+        List<Node> output = new ArrayList<>();
+        LinkedList<Node> stack = new LinkedList<>();
+        stack.add(this.node);
+        while (!stack.isEmpty()) {
+            Node node = stack.pollLast();
+            if (nodeStatusList.contains(node.getStatus())) {
+                output.add(node);
+            }
+            if (CollectionUtils.isNotEmpty(node.getNext())) {
+                Collections.reverse(node.getNext());
+                stack.addAll(node.getNext());
+            }
+        }
+        return output;
     }
 }

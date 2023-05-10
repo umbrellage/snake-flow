@@ -1,10 +1,13 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.client.vo.NodeVO;
+import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import java.util.stream.Collectors;
 import lombok.Data;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -62,5 +65,19 @@ public class Node {
             }
         }
         return false;
+    }
+
+    public NodeVO toNodeVo() {
+        NodeVO data = new NodeVO();
+        data.setId(id);
+        data.setForm(form.toForm());
+        data.setProcessedBy(processedBy);
+        if (CollectionUtils.isNotEmpty(bindPosts)) {
+            List<PostVO> postVOList = bindPosts.stream()
+                .map(Post::toPost)
+                .collect(Collectors.toList());
+            data.setBindPosts(postVOList);
+        }
+        return data;
     }
 }

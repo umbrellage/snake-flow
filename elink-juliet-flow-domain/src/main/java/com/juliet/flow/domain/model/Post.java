@@ -1,6 +1,8 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.client.vo.PostVO;
 import lombok.Data;
+import org.springframework.beans.BeanUtils;
 
 /**
  *
@@ -17,4 +19,10 @@ public class Post {
     private String postId;
 
     private String postName;
+
+    public PostVO toPost() {
+        PostVO data = new PostVO();
+        BeanUtils.copyProperties(this, data);
+        return data;
+    }
 }

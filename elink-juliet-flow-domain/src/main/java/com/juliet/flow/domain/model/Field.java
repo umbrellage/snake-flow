@@ -1,9 +1,11 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.client.vo.FieldVO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author xujianjie
@@ -20,4 +22,10 @@ public class Field {
     private String code;
 
     private String name;
+
+    public FieldVO toField() {
+        FieldVO data = new FieldVO();
+        BeanUtils.copyProperties(this, data);
+        return data;
+    }
 }

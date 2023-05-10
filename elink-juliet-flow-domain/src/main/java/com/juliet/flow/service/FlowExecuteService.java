@@ -1,6 +1,8 @@
 package com.juliet.flow.service;
 
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.Node;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -10,7 +12,10 @@ public interface FlowExecuteService {
 
     Node queryStartNodeByCode(Long tenantId, String templateCode);
 
-    void startFlow(Long templateId);
+    Long startFlow(Long templateId);
 
     void forward(Long flowId);
+
+    List<NodeVO> currentNodeList(Long flowId);
+
 }

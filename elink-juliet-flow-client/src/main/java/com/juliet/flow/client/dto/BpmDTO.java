@@ -11,11 +11,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class BpmDto {
-    /**
-     * 数据 id
-     */
-    private Long dataId;
+public class BpmDTO {
     /**
      * 流程模版 id
      */

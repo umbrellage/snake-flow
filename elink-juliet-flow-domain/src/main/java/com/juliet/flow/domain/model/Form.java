@@ -1,8 +1,12 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.client.vo.FieldVO;
+import com.juliet.flow.client.vo.FormVO;
+import java.util.stream.Collectors;
 import lombok.Data;
 
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @author xujianjie
@@ -20,4 +24,19 @@ public class Form {
     private String path;
 
     private List<Field> fields;
+
+
+    public FormVO toForm() {
+        FormVO data = new FormVO();
+        data.setId(id);
+        data.setName(name);
+        data.setPath(path);
+        if (CollectionUtils.isNotEmpty(fields)) {
+            List<FieldVO> fieldVOList = fields.stream()
+                .map(Field::toField)
+                .collect(Collectors.toList());
+            data.setFields(fieldVOList);
+        }
+        return data;
+    }
 }

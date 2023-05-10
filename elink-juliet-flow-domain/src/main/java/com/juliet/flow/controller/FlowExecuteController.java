@@ -4,9 +4,11 @@ import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.JulietFlowClient;
-import com.juliet.flow.client.dto.BpmDto;
+import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.UserIdDTO;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FieldDTO;
@@ -16,6 +18,7 @@ import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -55,10 +58,6 @@ public class FlowExecuteController implements JulietFlowClient {
         Long tenantId = sysUser.getTenantId();
         Long userId = sysUser.getUserId();
 
-
-
-
-
         return AjaxResult.success();
     }
 
@@ -84,8 +83,19 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult<Void> initBmp(BpmDto dto) {
+    public AjaxResult<Long> initBmp(BpmDTO dto) {
+        Long flowId = flowExecuteService.startFlow(dto.getTemplateId());
+        return AjaxResult.success(flowId);
+    }
 
+    @Override
+    public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
+        List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
+        return AjaxResult.success(nodeVOList);
+    }
+
+    @Override
+    public AjaxResult<Void> claimTask(UserIdDTO dto) {
         return null;
     }
 
