@@ -49,6 +49,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Transactional
     @Override
     public void add(Flow flow) {
+        FlowEntityFactory.cleanFlowId(flow);
         FlowEntity entity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.insert(entity);
         addNodes(flow.getNode(), flow.getTenantId(), flow.getId(), 0L);
@@ -129,9 +130,17 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Override
     public FlowTemplate queryTemplateById(Long id) {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectById(id);
+        if (flowTemplateEntity == null) {
+            return null;
+        }
         FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
         flowTemplate.setNode(getTemplateStartNode(flowTemplateEntity.getId()));
         return flowTemplate;
+    }
+
+    @Override
+    public FlowTemplate queryTemplateByCode(String code) {
+        return null;
     }
 
     @Override
@@ -190,9 +199,9 @@ public class FlowRepositoryImpl implements FlowRepository {
             return null;
         }
         // 填充表单信息
-        List<Long> ids = nodeEntities.stream().map(NodeEntity::getId).collect(Collectors.toList());
+        List<Long> nodeIds = nodeEntities.stream().map(NodeEntity::getId).collect(Collectors.toList());
         List<FormEntity> formEntities = formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
-                .in(FormEntity::getId, ids));
+                .in(FormEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodeForm(node, formEntities);
         // 填充字段信息
         List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
@@ -200,7 +209,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntityFactory.fillNodeField(node, fieldEntities);
         // 填充岗位信息
         List<PostEntity> postEntities = postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
-                .in(PostEntity::getNodeId, ids));
+                .in(PostEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodePost(node, postEntities);
         return node;
     }

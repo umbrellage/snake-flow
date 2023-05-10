@@ -7,7 +7,7 @@ import lombok.Data;
  * @date 2023-05-06
  */
 @Data
-public class Role {
+public class Role extends BaseModel {
 
     private String code;
 

@@ -1,6 +1,7 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
+import com.juliet.flow.domain.model.FlowTemplate;
 
 /**
  * @author xujianjie
@@ -10,6 +11,8 @@ public interface FlowTemplateService {
     void add(FlowTemplateAddDTO flowTemplateAddDTO);
 
     void update(FlowTemplateAddDTO flowTemplateAddDTO);
+
+    FlowTemplate queryById(Long id);
 
     void publish(Long flowTemplateId);
 

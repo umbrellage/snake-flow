@@ -20,4 +20,10 @@ public class FlowTemplateAddDTO {
 
     @NotNull
     private NodeDTO node;
+
+    private Long createBy;
+
+    private Long updateBy;
+
+    private Long tenantId;
 }

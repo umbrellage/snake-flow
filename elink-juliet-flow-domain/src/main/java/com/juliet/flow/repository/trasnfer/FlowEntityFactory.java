@@ -25,6 +25,30 @@ public class FlowEntityFactory {
         return flow;
     }
 
+    public static void cleanFlowId(Flow flow) {
+        flow.setId(null);
+        cleanNodeId(flow.getNode());
+    }
+
+    public static void cleanNodeId(Node node) {
+        node.setId(null);
+        if (node.getForm() != null) {
+            node.getForm().setId(null);
+            if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
+                for (Field field : node.getForm().getFields()) {
+                    field.setId(null);
+                }
+            }
+        }
+        if (CollectionUtils.isEmpty(node.getNext())) {
+            return;
+        }
+        for (Node subNode : node.getNext()) {
+            cleanNodeId(subNode);
+        }
+    }
+
+
     public static FlowEntity toFlowEntity(Flow flow) {
         FlowEntity flowEntity = new FlowEntity();
         flowEntity.setId(flow.getId());
@@ -32,6 +56,9 @@ public class FlowEntityFactory {
         flowEntity.setParentId(flow.getParentId());
         flowEntity.setFlowTemplateId(flow.getFlowTemplateId());
         flowEntity.setStatus(flow.getStatus().getCode());
+        flowEntity.setCreateBy(flow.getCreateBy());
+        flowEntity.setUpdateBy(flow.getUpdateBy());
+        flowEntity.setTenantId(flow.getTenantId());
         return flowEntity;
     }
 
@@ -39,6 +66,8 @@ public class FlowEntityFactory {
         FlowTemplateEntity flowTemplateEntity = new FlowTemplateEntity();
         flowTemplateEntity.setId(flowTemplate.getId() == null ? IdGenerator.getId() : flowTemplate.getId());
         flowTemplateEntity.setName(flowTemplate.getName());
+        flowTemplateEntity.setCode(flowTemplate.getCode());
+        flowTemplateEntity.setTenantId(flowTemplate.getTenantId());
         if (flowTemplate.getNode() != null) {
             Node node = flowTemplate.getNode();
             if (node.getId() == null) {
@@ -74,11 +103,17 @@ public class FlowEntityFactory {
             return null;
         }
         FormEntity entity = new FormEntity();
+        if (form.getId() == null) {
+            form.setId(IdGenerator.getId());
+        }
+        entity.setId(form.getId());
         entity.setNodeId(nodeId);
         entity.setName(form.getName());
         entity.setCode(form.getCode());
         entity.setPath(form.getPath());
         entity.setTenantId(tenantId);
+        entity.setCreateBy(form.getCreateBy());
+        entity.setUpdateBy(form.getUpdateBy());
         return entity;
     }
 
@@ -102,11 +137,16 @@ public class FlowEntityFactory {
 
     private static FieldEntity toFieldEntity(Field field, Long tenantId, Long formId) {
         FieldEntity entity = new FieldEntity();
-        entity.setId(field.getId() == null ? IdGenerator.getId() : field.getId());
+        if (field.getId() == null) {
+            field.setId(IdGenerator.getId());
+        }
+        entity.setId(field.getId());
         entity.setFormId(formId);
         entity.setTenantId(tenantId);
         entity.setName(field.getName());
         entity.setCode(field.getCode());
+        entity.setCreateBy(field.getCreateBy());
+        entity.setUpdateBy(field.getUpdateBy());
         return entity;
     }
 
@@ -129,11 +169,16 @@ public class FlowEntityFactory {
 
     private static PostEntity toPostEntity(Post post, Long tenantId, Long nodeId) {
         PostEntity entity = new PostEntity();
-        entity.setId(post.getId() == null ? IdGenerator.getId() : post.getId());
+        if (post.getId() == null) {
+            post.setId(IdGenerator.getId());
+        }
+        entity.setId(post.getId());
         entity.setPostId(post.getPostId());
         entity.setPostName(post.getPostName());
         entity.setNodeId(nodeId);
         entity.setTenantId(tenantId);
+        entity.setCreateBy(post.getCreateBy());
+        entity.setUpdateBy(post.getUpdateBy());
         return entity;
     }
 
@@ -155,14 +200,19 @@ public class FlowEntityFactory {
 
     private static NodeEntity toNodeEntity(Node node, Long tenantId, Long parentId, Long flowId, Long flowTemplateId) {
         NodeEntity nodeEntity = new NodeEntity();
-        nodeEntity.setId(node.getId() == null ? IdGenerator.getId() : node.getId());
+        if (node.getId() == null) {
+            node.setId(IdGenerator.getId());
+        }
+        nodeEntity.setId(node.getId());
         nodeEntity.setParentId(parentId);
         nodeEntity.setTenantId(tenantId);
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
-        nodeEntity.setNodeType(node.getType().getCode());
+        nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
         nodeEntity.setProcessedBy(node.getProcessedBy());
+        nodeEntity.setCreateBy(node.getCreateBy());
+        nodeEntity.setUpdateBy(node.getUpdateBy());
         return nodeEntity;
     }
 
@@ -173,6 +223,8 @@ public class FlowEntityFactory {
         flowTemplate.setCode(flowTemplateEntity.getCode());
         flowTemplate.setStatus(FlowTemplateStatusEnum.byCode(flowTemplateEntity.getStatus()));
         flowTemplate.setTenantId(flowTemplateEntity.getTenantId());
+        flowTemplate.setCreateBy(flowTemplateEntity.getCreateBy());
+        flowTemplate.setUpdateBy(flowTemplateEntity.getUpdateBy());
         return flowTemplate;
     }
 
@@ -199,7 +251,11 @@ public class FlowEntityFactory {
         Node node = new Node();
         node.setId(nodeEntity.getId());
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
+        node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
         node.setProcessedBy(node.getProcessedBy());
+        node.setCreateBy(nodeEntity.getCreateBy());
+        node.setUpdateBy(nodeEntity.getUpdateBy());
+        node.setTenantId(nodeEntity.getTenantId());
         return node;
     }
 
@@ -219,16 +275,15 @@ public class FlowEntityFactory {
     }
 
     public static void fillNodeField(Node node, List<FieldEntity> fieldEntities) {
-        if (node == null || node.getForm() == null) {
-            return;
-        }
         if (CollectionUtils.isEmpty(fieldEntities)) {
             return;
         }
-        List<FieldEntity> matchedFieldEntities = fieldEntities.stream()
-                .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
-                .collect(Collectors.toList());
-        node.getForm().setFields(matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+        if (node != null && node.getForm() != null) {
+            List<FieldEntity> matchedFieldEntities = fieldEntities.stream()
+                    .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
+                    .collect(Collectors.toList());
+            node.getForm().setFields(matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+        }
         if (CollectionUtils.isEmpty(node.getNext())) {
             return;
         }
@@ -242,6 +297,9 @@ public class FlowEntityFactory {
         field.setId(fieldEntity.getId());
         field.setName(fieldEntity.getName());
         field.setCode(fieldEntity.getCode());
+        field.setCreateBy(fieldEntity.getCreateBy());
+        field.setUpdateBy(fieldEntity.getUpdateBy());
+        field.setTenantId(fieldEntity.getTenantId());
         return field;
     }
 
@@ -269,6 +327,9 @@ public class FlowEntityFactory {
         form.setName(formEntity.getName());
         form.setCode(formEntity.getCode());
         form.setPath(formEntity.getPath());
+        form.setCreateBy(formEntity.getCreateBy());
+        form.setUpdateBy(formEntity.getUpdateBy());
+        form.setTenantId(formEntity.getTenantId());
         return form;
     }
 
@@ -295,6 +356,9 @@ public class FlowEntityFactory {
         post.setId(postEntity.getId());
         post.setPostId(postEntity.getPostId());
         post.setPostName(postEntity.getPostName());
+        post.setCreateBy(postEntity.getCreateBy());
+        post.setUpdateBy(postEntity.getUpdateBy());
+        post.setTenantId(postEntity.getTenantId());
         return post;
     }
 

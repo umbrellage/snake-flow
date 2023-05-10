@@ -17,7 +17,7 @@ import java.util.List;
  * @date 2023-05-09
  */
 @Data
-public class FlowTemplate {
+public class FlowTemplate extends BaseModel {
 
     private Long id;
 
@@ -28,8 +28,6 @@ public class FlowTemplate {
     private Node node;
 
     private FlowTemplateStatusEnum status;
-
-    private Long tenantId;
 
     public Flow initTouYangFlow() {
         Flow flow = new Flow();

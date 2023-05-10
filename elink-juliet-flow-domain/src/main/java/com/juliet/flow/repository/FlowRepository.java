@@ -27,5 +27,7 @@ public interface FlowRepository {
 
     FlowTemplate queryTemplateById(Long id);
 
+    FlowTemplate queryTemplateByCode(String code);
+
     void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id);
 }

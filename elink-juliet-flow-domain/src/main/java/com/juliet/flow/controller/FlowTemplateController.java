@@ -37,6 +37,11 @@ public class FlowTemplateController {
         return AjaxResult.success();
     }
 
+    @GetMapping("/detail")
+    public AjaxResult detail(@RequestParam("id") Long id) {
+        return AjaxResult.success(flowTemplateService.queryById(id));
+    }
+
     @PostMapping("/disable")
     public AjaxResult disable(@RequestBody String body) {
         return AjaxResult.success();

@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -12,6 +13,7 @@ import lombok.Data;
 @TableName("juliet_flow_node")
 public class NodeEntity extends BaseEntity {
 
+    @TableId
     private Long id;
 
     private Long parentId;
@@ -23,7 +25,8 @@ public class NodeEntity extends BaseEntity {
     @TableField(value = "node_status")
     private Integer status;
 
-    private Integer nodeType;
+    @TableField(value = "node_type")
+    private Integer type;
 
     private Long processedBy;
 }

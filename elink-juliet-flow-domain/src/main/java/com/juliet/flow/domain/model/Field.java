@@ -15,7 +15,7 @@ import org.springframework.beans.BeanUtils;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Field {
+public class Field extends BaseModel {
 
     private Long id;
 
