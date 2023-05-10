@@ -63,6 +63,6 @@ public interface JulietFlowClient {
      *
      * @return
      */
-    AjaxResult<List<NodeVO>> currentNodeList(UserDTO dto);
+    AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto);
 
 }
