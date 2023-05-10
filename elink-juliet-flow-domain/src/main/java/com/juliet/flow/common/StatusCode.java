@@ -8,6 +8,7 @@ public enum StatusCode {
 
     SERVICE_SUCCESS(200, "操作成功"),
     SERVICE_ERROR(501, "错误:%s"),
+    ILLEGAL_PARAMS(502, "illegal params:%s"),
 
 
     ;

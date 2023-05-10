@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.dto;
 
+import com.juliet.flow.client.dto.FieldDTO;
 import lombok.Data;
 
 import java.util.List;

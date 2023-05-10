@@ -14,8 +14,8 @@ public enum FlowTemplateStatusEnum {
      *
      */
     IN_PROGRESS(1, "编辑中"),
-    ABNORMAL(2, "已启用"),
-    END(3, "已禁用"),
+    ENABLE(2, "已启用"),
+    DISABLE(3, "已禁用"),
             ;
 
     private Integer code;

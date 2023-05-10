@@ -47,4 +47,13 @@ public enum NodeTypeEnum {
         }
         throw new IllegalArgumentException("[NodeTypeEnum]msg is invalid");
     }
+
+    public static NodeTypeEnum byCode(Integer code) {
+        for (NodeTypeEnum statusEnum : NodeTypeEnum.values()) {
+            if (statusEnum.getCode().equals(code)) {
+                return statusEnum;
+            }
+        }
+        throw new IllegalArgumentException("[NodeTypeEnum]code is invalid");
+    }
 }

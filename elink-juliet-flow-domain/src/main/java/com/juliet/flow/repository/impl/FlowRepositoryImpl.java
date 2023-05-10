@@ -3,8 +3,10 @@ package com.juliet.flow.repository.impl;
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
+import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.dao.*;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -90,6 +92,16 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public void updateTemplate(FlowTemplate flowTemplate) {
+        FlowTemplateEntity flowTemplateEntity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
+        FlowTemplate flowTemplateOld = queryTemplateById(flowTemplate.getId());
+        BusinessAssert.assertNotNull(flowTemplateOld, StatusCode.ILLEGAL_PARAMS, "找不到模板，id：" + flowTemplate.getId());
+        flowTemplateDao.updateById(flowTemplateEntity);
+        deleteNodes(flowTemplateOld.getNode());
+        addNodes(flowTemplate.getNode(), flowTemplate.getTenantId(), 0L, flowTemplate.getId());
+    }
+
+    @Override
     public Flow queryById(Long id) {
         FlowEntity flowEntity = flowDao.selectById(id);
         Flow flow = FlowEntityFactory.toFlow(flowEntity);
@@ -108,7 +120,10 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public void updateStatusById(FlowStatusEnum status, Long id) {
-
+        FlowEntity flowEntity = new FlowEntity();
+        flowEntity.setId(id);
+        flowEntity.setStatus(status.getCode());
+        flowDao.updateById(flowEntity);
     }
 
     @Override
@@ -121,7 +136,10 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id) {
-        flowTemplateDao.selectById(id);
+        FlowTemplateEntity flowTemplateEntity = new FlowTemplateEntity();
+        flowTemplateEntity.setId(id);
+        flowTemplateEntity.setStatus(status.getCode());
+        flowTemplateDao.updateById(flowTemplateEntity);
     }
 
     private void deleteNodes(Node node) {
