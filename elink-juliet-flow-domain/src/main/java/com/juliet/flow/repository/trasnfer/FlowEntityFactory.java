@@ -8,9 +8,13 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
+import org.apache.commons.compress.utils.Lists;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -27,25 +31,6 @@ public class FlowEntityFactory {
 
     public static void cleanFlowId(Flow flow) {
         flow.setId(null);
-        cleanNodeId(flow.getNode());
-    }
-
-    public static void cleanNodeId(Node node) {
-        node.setId(null);
-        if (node.getForm() != null) {
-            node.getForm().setId(null);
-            if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
-                for (Field field : node.getForm().getFields()) {
-                    field.setId(null);
-                }
-            }
-        }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node subNode : node.getNext()) {
-            cleanNodeId(subNode);
-        }
     }
 
 
@@ -68,31 +53,26 @@ public class FlowEntityFactory {
         flowTemplateEntity.setName(flowTemplate.getName());
         flowTemplateEntity.setCode(flowTemplate.getCode());
         flowTemplateEntity.setTenantId(flowTemplate.getTenantId());
-        if (flowTemplate.getNode() != null) {
-            Node node = flowTemplate.getNode();
-            if (node.getId() == null) {
-                node.setId(IdGenerator.getId());
-            }
-        }
+//        if (flowTemplate.getNode() != null) {
+//            Node node = flowTemplate.getNode();
+//            if (node.getId() == null) {
+//                node.setId(IdGenerator.getId());
+//            }
+//        }
         flowTemplateEntity.setCode(flowTemplate.getCode());
         flowTemplateEntity.setStatus(flowTemplate.getStatus().getCode());
         return flowTemplateEntity;
     }
 
-    public static void transferFormEntities(List<FormEntity> formEntities, Node node, Long tenantId) {
-        if (node == null) {
-            return;
+    public static List<FormEntity> transferFormEntities(List<Node> nodes, Long tenantId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Lists.newArrayList();
         }
-        FormEntity entity = toFormEntity(node.getForm(), tenantId, node.getId());
-        if (entity != null) {
-            formEntities.add(entity);
+        List<FormEntity> formEntities = new ArrayList<>();
+        for (Node node : nodes) {
+            formEntities.add(toFormEntity(node.getForm(), tenantId, node.getId()));
         }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node nextNode : node.getNext()) {
-            transferFormEntities(formEntities, nextNode, tenantId);
-        }
+        return formEntities;
     }
 
     private static FormEntity toFormEntity(Form form, Long tenantId, Long nodeId) {
@@ -117,22 +97,20 @@ public class FlowEntityFactory {
         return entity;
     }
 
-    public static void transferFieldEntities(List<FieldEntity> fieldEntities, Node node, Long tenantId) {
-        if (node == null) {
-            return;
+    public static List<FieldEntity> transferFieldEntities(List<Node> nodes, Long tenantId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Lists.newArrayList();
         }
-        if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
-            for (Field field : node.getForm().getFields()) {
-                FieldEntity entity = toFieldEntity(field, tenantId, node.getForm().getId());
-                fieldEntities.add(entity);
+        List<FieldEntity> fieldEntities = new ArrayList<>();
+        for (Node node : nodes) {
+            if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
+                for (Field field : node.getForm().getFields()) {
+                    FieldEntity entity = toFieldEntity(field, tenantId, node.getForm().getId());
+                    fieldEntities.add(entity);
+                }
             }
         }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node nextNode : node.getNext()) {
-            transferFieldEntities(fieldEntities, nextNode, tenantId);
-        }
+        return fieldEntities;
     }
 
     private static FieldEntity toFieldEntity(Field field, Long tenantId, Long formId) {
@@ -150,21 +128,19 @@ public class FlowEntityFactory {
         return entity;
     }
 
-    public static void transferPostEntity(List<PostEntity> postEntities, Node node, Long tenantId) {
-        if (node == null) {
-            return;
+    public static List<PostEntity> transferPostEntity(List<Node> nodes, Long tenantId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Lists.newArrayList();
         }
-        if (!CollectionUtils.isEmpty(node.getBindPosts())) {
-            for (Post post : node.getBindPosts()) {
-                postEntities.add(toPostEntity(post, tenantId, node.getId()));
+        List<PostEntity> postEntities = new ArrayList<>();
+        for (Node node : nodes) {
+            if (!CollectionUtils.isEmpty(node.getBindPosts())) {
+                for (Post post : node.getBindPosts()) {
+                    postEntities.add(toPostEntity(post, tenantId, node.getId()));
+                }
             }
         }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node nextNode : node.getNext()) {
-            transferPostEntity(postEntities, nextNode, tenantId);
-        }
+        return postEntities;
     }
 
     private static PostEntity toPostEntity(Post post, Long tenantId, Long nodeId) {
@@ -182,29 +158,26 @@ public class FlowEntityFactory {
         return entity;
     }
 
-    public static void transferNodeEntities(List<NodeEntity> nodeEntities, Node node, Long tenantId, Long parentNodeId, Long flowId, Long flowTemplateId) {
-        if (node == null) {
-            return;
+    public static List<NodeEntity> transferNodeEntities(List<Node> nodes,
+                                                        Long tenantId,
+                                                        Long flowId,
+                                                        Long flowTemplateId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Lists.newArrayList();
         }
-        NodeEntity nodeEntity = toNodeEntity(node, tenantId, parentNodeId, flowId, flowTemplateId);
-        if (nodeEntity != null) {
-            nodeEntities.add(nodeEntity);
-        }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node nextNode : node.getNext()) {
-            transferNodeEntities(nodeEntities, nextNode, tenantId, nodeEntity.getId(), flowId, flowTemplateId);
-        }
+        return nodes.stream().map(node -> toNodeEntity(node, tenantId, flowId, flowTemplateId))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private static NodeEntity toNodeEntity(Node node, Long tenantId, Long parentId, Long flowId, Long flowTemplateId) {
+    private static NodeEntity toNodeEntity(Node node, Long tenantId, Long flowId, Long flowTemplateId) {
         NodeEntity nodeEntity = new NodeEntity();
         if (node.getId() == null) {
             node.setId(IdGenerator.getId());
         }
         nodeEntity.setId(node.getId());
-        nodeEntity.setParentId(parentId);
+        nodeEntity.setPreNodeId(node.getPreNodeId());
+        nodeEntity.setNextNodeId(node.getNextNodeId());
         nodeEntity.setTenantId(tenantId);
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
@@ -228,28 +201,18 @@ public class FlowEntityFactory {
         return flowTemplate;
     }
 
-    public static Node toNode(List<NodeEntity> nodeEntities) {
+    public static List<Node> toNodes(List<NodeEntity> nodeEntities) {
         if (CollectionUtils.isEmpty(nodeEntities)) {
-            return null;
+            return Lists.newArrayList();
         }
-        Node rootNode = findRootNode(nodeEntities);
-        BusinessAssert.assertNotNull(rootNode, StatusCode.SERVICE_ERROR, "找不到根节点!");
-        fillSubNodes(rootNode, nodeEntities);
-        return rootNode;
-    }
-
-    private static Node findRootNode(List<NodeEntity> nodeEntities) {
-        for (NodeEntity nodeEntity : nodeEntities) {
-            if (nodeEntity.getParentId() == null || nodeEntity.getParentId() == 0L) {
-                return toSingleNode(nodeEntity);
-            }
-        }
-        return null;
+        return nodeEntities.stream().map(nodeEntity -> toSingleNode(nodeEntity)).collect(Collectors.toList());
     }
 
     private static Node toSingleNode(NodeEntity nodeEntity) {
         Node node = new Node();
         node.setId(nodeEntity.getId());
+        node.setPreNodeId(node.getPreNodeId());
+        node.setNextNodeId(nodeEntity.getNextNodeId());
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
         node.setProcessedBy(node.getProcessedBy());
@@ -259,36 +222,17 @@ public class FlowEntityFactory {
         return node;
     }
 
-    private static void fillSubNodes(Node node, List<NodeEntity> nodeEntities) {
-        List<NodeEntity> subNodes = nodeEntities.stream()
-                .filter(nodeEntity -> nodeEntity.getParentId().equals(node.getId()))
-                .collect(Collectors.toList());
-
-        if (CollectionUtils.isEmpty(subNodes)) {
-            return;
-        }
-        node.setNext(subNodes.stream().map(FlowEntityFactory::toSingleNode).collect(Collectors.toList()));
-
-        for (Node subNode : node.getNext()) {
-            fillSubNodes(subNode, nodeEntities);
-        }
-    }
-
-    public static void fillNodeField(Node node, List<FieldEntity> fieldEntities) {
+    public static void fillNodeField(List<Node> nodes, List<FieldEntity> fieldEntities) {
         if (CollectionUtils.isEmpty(fieldEntities)) {
             return;
         }
-        if (node != null && node.getForm() != null) {
-            List<FieldEntity> matchedFieldEntities = fieldEntities.stream()
-                    .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
-                    .collect(Collectors.toList());
-            node.getForm().setFields(matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
-        }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node subNode : node.getNext()) {
-            fillNodeField(subNode, fieldEntities);
+        for (Node node : nodes) {
+            if (node != null && node.getForm() != null) {
+                List<FieldEntity> matchedFieldEntities = fieldEntities.stream()
+                        .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
+                        .collect(Collectors.toList());
+                node.getForm().setFields(matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+            }
         }
     }
 
@@ -303,21 +247,17 @@ public class FlowEntityFactory {
         return field;
     }
 
-    public static void fillNodeForm(Node node, List<FormEntity> formEntities) {
-        if (node == null) {
+    public static void fillNodeForm(List<Node> nodes, List<FormEntity> formEntities) {
+        if (CollectionUtils.isEmpty(nodes)) {
             return;
         }
-        for (FormEntity formEntity : formEntities) {
-            if (formEntity.getNodeId().equals(node.getId())) {
-                node.setForm(toForm(formEntity));
-                break;
+        for (Node node : nodes) {
+            List<FormEntity> matchFormEntities = formEntities.stream()
+                    .filter(formEntity -> formEntity.getNodeId().equals(node.getId()))
+                    .collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(matchFormEntities)) {
+                node.setForm(toForm(matchFormEntities.get(0)));
             }
-        }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node subNode : node.getNext()) {
-            fillNodeForm(subNode, formEntities);
         }
     }
 
@@ -333,21 +273,17 @@ public class FlowEntityFactory {
         return form;
     }
 
-    public static void fillNodePost(Node node, List<PostEntity> postEntities) {
-        if (node == null) {
+    public static void fillNodePost(List<Node> nodes, List<PostEntity> postEntities) {
+        if (CollectionUtils.isEmpty(nodes)) {
             return;
         }
-        List<PostEntity> bindPostEntities = postEntities.stream()
-                .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
-                .collect(Collectors.toList());
-        if (!CollectionUtils.isEmpty(bindPostEntities)) {
-            node.setBindPosts(bindPostEntities.stream().map(FlowEntityFactory::toPost).collect(Collectors.toList()));
-        }
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        for (Node subNode : node.getNext()) {
-            fillNodePost(subNode, postEntities);
+        for (Node node : nodes) {
+            List<PostEntity> bindPostEntities = postEntities.stream()
+                    .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
+                    .collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(bindPostEntities)) {
+                node.setBindPosts(bindPostEntities.stream().map(FlowEntityFactory::toPost).collect(Collectors.toList()));
+            }
         }
     }
 
@@ -360,27 +296,5 @@ public class FlowEntityFactory {
         post.setUpdateBy(postEntity.getUpdateBy());
         post.setTenantId(postEntity.getTenantId());
         return post;
-    }
-
-    public static void getAllNodeId(List<Long> ids, Node node) {
-        if (node == null) {
-            return;
-        }
-        ids.add(node.getId());
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        getAllNodeId(ids, node);
-    }
-
-    public static void getAllFormId(List<Long> ids, Node node) {
-        if (node == null || node.getForm() == null) {
-            return;
-        }
-        ids.add(node.getForm().getId());
-        if (CollectionUtils.isEmpty(node.getNext())) {
-            return;
-        }
-        getAllFormId(ids, node);
     }
 }

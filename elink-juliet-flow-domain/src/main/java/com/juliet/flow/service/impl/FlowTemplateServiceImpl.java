@@ -68,7 +68,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         Node node = new Node();
         flowTemplate.setId(dto.getId());
         toNode(node, dto.getNode(), dto.getCreateBy(), dto.getUpdateBy());
-        flowTemplate.setNode(node);
+//        flowTemplate.setNode(node);
         flowTemplate.setName(dto.getName());
         flowTemplate.setCode(dto.getCode());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);

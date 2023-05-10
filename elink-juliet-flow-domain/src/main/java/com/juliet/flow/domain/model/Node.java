@@ -20,7 +20,11 @@ public class Node extends BaseModel {
 
     private Long id;
 
-    private List<Node> pre;
+    private String name;
+
+    private Long preNodeId;
+
+    private Long nextNodeId;
 
     private List<Node> next;
 
