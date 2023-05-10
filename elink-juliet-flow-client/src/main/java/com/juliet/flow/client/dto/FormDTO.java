@@ -17,21 +17,17 @@ public class FormDTO {
     /**
      * 表单中文名称
      */
-    @NotNull
     private String name;
 
     /**
      * 表单的标识，英文名
      */
-    @NotNull
     private String code;
 
     /**
      * 跳转路径
      */
-    @NotNull
     private String path;
 
-    @NotNull
     private List<FieldDTO> fields;
 }

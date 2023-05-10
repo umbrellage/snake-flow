@@ -28,7 +28,7 @@ public class Flow {
      */
     private Long parentId;
 
-    private String templateId;
+    private Long flowTemplateId;
 
     private Node node;
 

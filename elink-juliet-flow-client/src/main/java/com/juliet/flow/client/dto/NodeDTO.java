@@ -21,7 +21,6 @@ public class NodeDTO {
     @NotNull
     private FormDTO form;
 
-    @NotEmpty
     private List<NodeDTO> pre;
 
     @NotEmpty
@@ -33,7 +32,6 @@ public class NodeDTO {
     @NotNull
     private Integer type;
 
-    @NotEmpty
     private List<PostDTO> bindPosts;
 
     @NotNull
