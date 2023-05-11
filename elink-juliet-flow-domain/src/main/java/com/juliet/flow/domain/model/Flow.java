@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -53,7 +54,10 @@ public class Flow extends BaseModel {
      * 当前流程是否已经结束
      */
     public boolean isEnd() {
-        return true;
+        if (CollectionUtils.isEmpty(nodes)) {
+            throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
+        }
+        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
     }
 
     /**
@@ -69,30 +73,29 @@ public class Flow extends BaseModel {
 
     /**
      * 图遍历，获取节点
-     * todo 待测试
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
     public List<Node> getNodeByNodeStatus(List<NodeStatusEnum> nodeStatusList) {
-        if (CollectionUtils.isEmpty(nodeStatusList)) {
+        if (CollectionUtils.isEmpty(nodeStatusList) || CollectionUtils.isEmpty(nodes)) {
             return Collections.emptyList();
         }
-        List<Node> output = new ArrayList<>();
-        LinkedList<Node> stack = new LinkedList<>();
-//        stack.add(this.node);
-        // TODO node删掉换成nodes
-        while (!stack.isEmpty()) {
-            Node node = stack.pollLast();
-            if (nodeStatusList.contains(node.getStatus())) {
-                output.add(node);
-            }
-//            if (CollectionUtils.isNotEmpty(node.getNext())) {
-//                Collections.reverse(node.getNext());
-//                stack.addAll(node.getNext());
-//            }
-        }
-        return output.stream()
-            .distinct()
+        return nodes.stream()
+            .filter(node -> nodeStatusList.contains(node.getStatus()))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * 给节点分配一个待办人
+     * @param nodeId
+     * @param userId
+     */
+    public void claimNode(Long nodeId, Long userId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        nodes.stream()
+            .filter(node -> node.getId().equals(nodeId))
+            .forEach(node -> node.setProcessedBy(userId));
     }
 }

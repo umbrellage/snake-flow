@@ -23,7 +23,7 @@ public interface JulietFlowClient {
      * @param dto flowId 必填
      */
     @PostMapping("/is/end")
-    AjaxResult flowIsEnd(@RequestBody FlowDTO dto);
+    AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto);
 
     /**
      * 发起一个新的流程
