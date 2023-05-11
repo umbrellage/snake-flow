@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -84,8 +82,10 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         }
         Node node = new Node();
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
-        node.setPreNodeId(nodeDTO.getPreNodeId());
-        node.setNextNodeId(nodeDTO.getNextNodeId());
+        node.setTitle(nodeDTO.getTitle());
+        node.setName(nodeDTO.getName());
+        node.setPreName(nodeDTO.getPreName());
+        node.setNextName(nodeDTO.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeDTO.getType()));
         node.setCreateBy(createBy);

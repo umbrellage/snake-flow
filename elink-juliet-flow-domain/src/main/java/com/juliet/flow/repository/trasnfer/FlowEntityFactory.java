@@ -1,10 +1,8 @@
 package com.juliet.flow.repository.trasnfer;
 
-import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -13,7 +11,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -179,8 +176,10 @@ public class FlowEntityFactory {
             node.setId(IdGenerator.getId());
         }
         nodeEntity.setId(node.getId());
-        nodeEntity.setPreNodeId(node.getPreNodeId());
-        nodeEntity.setNextNodeId(node.getNextNodeId());
+        nodeEntity.setTitle(node.getTitle());
+        nodeEntity.setName(node.getName());
+        nodeEntity.setPreName(node.getPreName());
+        nodeEntity.setNextName(node.getNextName());
         nodeEntity.setTenantId(tenantId);
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
@@ -214,8 +213,10 @@ public class FlowEntityFactory {
     private static Node toSingleNode(NodeEntity nodeEntity) {
         Node node = new Node();
         node.setId(nodeEntity.getId());
-        node.setPreNodeId(node.getPreNodeId());
-        node.setNextNodeId(nodeEntity.getNextNodeId());
+        node.setTitle(nodeEntity.getTitle());
+        node.setName(nodeEntity.getName());
+        node.setPreName(nodeEntity.getPreName());
+        node.setNextName(nodeEntity.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
         node.setProcessedBy(node.getProcessedBy());

@@ -18,4 +18,10 @@ public interface FlowExecuteService {
 
     List<NodeVO> currentNodeList(Long flowId);
 
+    void claimTask(Long flowId, Long nodeId, Long userId);
+
+    List<NodeVO> todoNodeList(Long tenantId, Long userId);
+
+    void task(Long flowId, Long nodeId, Long userId);
+
 }

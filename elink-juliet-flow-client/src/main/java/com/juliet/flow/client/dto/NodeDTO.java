@@ -2,7 +2,6 @@ package com.juliet.flow.client.dto;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
@@ -15,15 +14,19 @@ public class NodeDTO {
 
     private String id;
 
+    private String title;
+
     @NotNull
     private String name;
 
     @NotNull
     private FormDTO form;
 
-    private String preNodeId;
+    @NotNull
+    private String preName;
 
-    private String nextNodeId;
+    @NotNull
+    private String nextName;
 
     /**
      * 值参考NodeTypeEnum
