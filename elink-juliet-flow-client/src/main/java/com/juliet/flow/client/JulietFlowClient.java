@@ -16,14 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface JulietFlowClient {
 
     @PostMapping("/forward")
-    AjaxResult forward(@RequestBody FlowDTO dto);
+    AjaxResult<Void> forward(@RequestBody FlowDTO dto);
 
     /**
      * 判断当前流程是否已经结束
      * @param dto flowId 必填
      */
     @PostMapping("/is/end")
-    AjaxResult flowIsEnd(@RequestBody FlowDTO dto);
+    AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto);
 
     /**
      * 发起一个新的流程
