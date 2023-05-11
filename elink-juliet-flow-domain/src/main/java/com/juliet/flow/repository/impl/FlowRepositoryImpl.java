@@ -110,6 +110,22 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public List<Flow> listFlowByParentId(Long id) {
+        List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+                .eq(FlowEntity::getParentId, id));
+        if (CollectionUtils.isEmpty(flowEntities)) {
+            return Lists.newArrayList();
+        }
+        // 不会很多
+        List<Flow> flows = flowEntities.stream().map(FlowEntityFactory::toFlow).collect(Collectors.toList());
+        flows.stream().forEach(flow -> {
+            List<Node> nodes = getNodes(flow.getId());
+            flow.setNodes(nodes);
+        });
+        return flows;
+    }
+
+    @Override
     public Flow queryByCode(String code) {
         FlowEntity flowEntity = flowDao.selectOne(Wrappers.<FlowEntity>lambdaQuery()
                 .eq(FlowEntity::getId, code)

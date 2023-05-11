@@ -5,6 +5,8 @@ import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 
+import java.util.List;
+
 /**
  * @author xujianjie
  * @date 2023-05-06
@@ -20,6 +22,8 @@ public interface FlowRepository {
     void updateTemplate(FlowTemplate flowTemplate);
 
     Flow queryById(Long id);
+
+    List<Flow> listFlowByParentId(Long id);
 
     Flow queryByCode(String code);
 
