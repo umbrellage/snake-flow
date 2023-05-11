@@ -53,6 +53,10 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
 
+    public boolean isProcessed() {
+        return status == NodeStatusEnum.PROCESSED;
+    }
+
     /**
      * 通过岗位判断当前用户是否可以操作
      */

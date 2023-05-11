@@ -1,5 +1,6 @@
 package com.juliet.flow.service;
 
+import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.Node;
 import java.util.List;
@@ -18,4 +19,11 @@ public interface FlowExecuteService {
 
     List<NodeVO> currentNodeList(Long flowId);
 
+    void claimTask(Long flowId, Long nodeId, Long userId);
+
+    List<NodeVO> todoNodeList(Long userId);
+
+    void task(Long flowId, Long nodeId, Long userId);
+
+    FlowVO flow(Long flowId);
 }
