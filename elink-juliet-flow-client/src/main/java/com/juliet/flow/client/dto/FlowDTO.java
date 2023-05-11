@@ -10,5 +10,4 @@ import lombok.Data;
 public class FlowDTO {
 
     private Long flowId;
-    private Long nodeId;
 }

@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
-public class FlowExecuteController {
+public class FlowExecuteController implements JulietFlowClient{
 
     @Autowired
     private FlowExecuteService flowExecuteService;
@@ -73,42 +73,42 @@ public class FlowExecuteController {
     }
 
 
-//    @Override
-//    public AjaxResult forward(FlowDTO dto) {
-//        return null;
-//    }
-//
-//    @Override
-//    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto) {
-//        return AjaxResult.success(new Flow().isEnd());
-//    }
+    @Override
+    public AjaxResult forward(FlowDTO dto) {
+        return null;
+    }
 
-//    @Override
-//    public AjaxResult<Long> initBmp(BpmDTO dto) {
-//        Long flowId = flowExecuteService.startFlow(dto.getTemplateId());
-//        return AjaxResult.success(flowId);
-//    }
-//
-//    @Override
-//    public AjaxResult<List<NodeVO>> currentNodeList(FlowDTO dto) {
-//        List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
-//        return AjaxResult.success(nodeVOList);
-//    }
-//
-//    @Override
-//    public AjaxResult<Void> claimTask(FlowDTO dto, UserDTO userDTO) {
-//        return null;
-//    }
-//
-//    @Override
-//    public AjaxResult<Void> task(FlowDTO dto, UserDTO userDTO) {
-//        return null;
-//    }
-//
-//    @Override
-//    public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
-//        return null;
-//    }
+    @Override
+    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto) {
+        return AjaxResult.success(new Flow().isEnd());
+    }
+
+    @Override
+    public AjaxResult<Long> initBmp(BpmDTO dto) {
+        Long flowId = flowExecuteService.startFlow(dto.getTemplateId());
+        return AjaxResult.success(flowId);
+    }
+
+    @Override
+    public AjaxResult<List<NodeVO>> currentNodeList(FlowDTO dto) {
+        List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
+        return AjaxResult.success(nodeVOList);
+    }
+
+    @Override
+    public AjaxResult<Void> claimTask(TaskDTO dto) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<Void> task(TaskDTO dto) {
+        return null;
+    }
+
+    @Override
+    public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
+        return null;
+    }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
