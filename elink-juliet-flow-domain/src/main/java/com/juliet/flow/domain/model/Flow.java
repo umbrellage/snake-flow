@@ -17,6 +17,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import java.util.Collection;
 import java.util.List;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 流程
@@ -51,6 +52,10 @@ public class Flow extends BaseModel {
         return new Todo();
     }
 
+    public boolean isFlowEnd() {
+        return status == FlowStatusEnum.END || isEnd();
+    }
+
     /**
      * 当前流程是否已经结束
      */
@@ -58,7 +63,11 @@ public class Flow extends BaseModel {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
-        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        boolean end = nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        if (end) {
+            this.status = FlowStatusEnum.END;
+        }
+        return end;
     }
 
     /**
@@ -126,5 +135,48 @@ public class Flow extends BaseModel {
         }
 
         return data;
+    }
+
+    public Flow subFlow(Node node) {
+        Flow flow = new Flow();
+        // TODO: 2023/5/11
+        flow.setId(null);
+        flow.setName(name);
+        flow.setFlowTemplateId(flowTemplateId);
+        flow.setParentId(id);
+        List<Node> nodeList = nodes.stream()
+            .map(Node::copyNode)
+            .collect(Collectors.toList());
+        flow.setNodes(nodeList);
+        flow.setStatus(status);
+        flow.setTenantId(tenantId);
+        return flow;
+    }
+
+    /**
+     * 递归修改已处理节点的状态，修改为已认领
+     *
+     */
+    public void modifyNodeStatus(Node errorNode) {
+        List<Node> toBeProcessedNodeList = new ArrayList<>();
+        nodes.forEach(node -> {
+            //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为已认领
+            if (errorNode.getNextName().equals(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
+                node.setStatus(NodeStatusEnum.ACTIVE);
+                toBeProcessedNodeList.add(node);
+            }
+        });
+        toBeProcessedNodeList.forEach(this::modifyNodeStatus);
+    }
+
+    /**
+     * 完成某个节点的处理
+     * @param nodeId
+     */
+    public void finishNode(Long nodeId) {
+        nodes.stream()
+            .filter(node -> node.getId().equals(nodeId))
+            .forEach(node -> node.setStatus(NodeStatusEnum.PROCESSED));
+
     }
 }

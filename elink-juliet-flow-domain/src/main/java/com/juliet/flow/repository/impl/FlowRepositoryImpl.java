@@ -165,17 +165,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowTemplateDao.updateById(flowTemplateEntity);
     }
 
-    @Override
-    public List<Flow> querySubFlowById(Long id) {
-        // TODO: 2023/5/11  
-        return null;
-    }
-
-    @Override
-    public void addSubFlow(Long flowId, Long nodeId) {
-
-    }
-
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;

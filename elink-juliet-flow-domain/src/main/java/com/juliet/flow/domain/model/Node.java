@@ -4,6 +4,8 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.utils.IdGenerator;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -89,4 +91,25 @@ public class Node extends BaseModel {
         }
         return data;
     }
+
+    public Node copyNode() {
+//        public Node copyNode(Map<Long, Long> nodeIdMap) {
+        Node node = new Node();
+        node.id = IdGenerator.getId();
+        node.title = title;
+        node.name = name;
+        node.preName = preName;
+        node.nextName = nextName;
+        node.form = form;
+        node.status = status;
+        node.type = type;
+        node.bindPosts = bindPosts;
+        node.accessRule = accessRule;
+        node.submitRule = submitRule;
+        node.processedBy = processedBy;
+        return node;
+
+//        nodeIdMap.put(id, node.id);
+    }
+
 }

@@ -2,7 +2,6 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import lombok.Data;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
