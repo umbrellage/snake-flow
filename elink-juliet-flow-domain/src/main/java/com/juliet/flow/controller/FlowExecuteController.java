@@ -102,11 +102,6 @@ public class FlowExecuteController implements JulietFlowClient{
         return AjaxResult.success();
     }
 
-    /**
-     *
-     * @param dto 必填
-     * @return
-     */
     @Override
     public AjaxResult<Void> task(TaskDTO dto) {
         flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
@@ -115,7 +110,7 @@ public class FlowExecuteController implements JulietFlowClient{
 
     @Override
     public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
-        List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto.getTenantId(), dto.getUserId());
+        List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto.getUserId());
         return AjaxResult.success(nodeVOList);
     }
 

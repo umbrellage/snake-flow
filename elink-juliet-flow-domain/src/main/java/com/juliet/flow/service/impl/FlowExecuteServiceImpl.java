@@ -87,7 +87,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
-    public List<NodeVO> todoNodeList(Long tenantId, Long userId) {
+    public List<NodeVO> todoNodeList(Long userId) {
         // TODO: 2023/5/11  
         return null;
     }
@@ -103,6 +103,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      */
     @Override
     public void task(Long flowId, Long nodeId, Long userId) {
+        // 是否存在异常流程
+        List<Flow> exFlowList = flowRepository.querySubFlowById(flowId);
+        if (CollectionUtils.isNotEmpty(exFlowList)) {
+            // TODO: 2023/5/11
+        }
+        Flow flow = flowRepository.queryById(flowId);
+        if (flow == null) {
+            return;
+        }
+        Node node = flow.findNode(nodeId);
+        if (node.isProcessed()) {
+            // 该节点已经处理，则说明这是个对过去的节点进行修改，需要新建一个流程处理
+            flowRepository.addSubFlow(flowId, nodeId);
+        }
 
     }
 

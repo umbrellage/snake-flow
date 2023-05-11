@@ -87,6 +87,15 @@ public class Flow extends BaseModel {
             .collect(Collectors.toList());
     }
 
+    public Node findNode(Long nodeId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getId().equals(nodeId)).findAny()
+            .orElse(null);
+    }
+
     /**
      * 给节点分配一个待办人
      *

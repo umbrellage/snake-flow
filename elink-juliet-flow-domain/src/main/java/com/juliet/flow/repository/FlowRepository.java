@@ -4,6 +4,7 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -30,4 +31,20 @@ public interface FlowRepository {
     FlowTemplate queryTemplateByCode(String code);
 
     void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id);
+
+    /**
+     * todo
+     * 查询子流程
+     * @param id
+     * @return
+     */
+    List<Flow> querySubFlowById(Long id);
+
+    /**
+     * todo 创建一个子流程，将nodeId 设置为已处理，nodeId 后的所有已处理的node 装态设置为已认领
+     * 创建一个子流程
+     * @param flowId 流程id
+     * @param nodeId 节点id
+     */
+    void addSubFlow(Long flowId, Long nodeId);
 }

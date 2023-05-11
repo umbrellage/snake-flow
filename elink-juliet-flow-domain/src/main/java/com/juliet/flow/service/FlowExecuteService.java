@@ -21,7 +21,7 @@ public interface FlowExecuteService {
 
     void claimTask(Long flowId, Long nodeId, Long userId);
 
-    List<NodeVO> todoNodeList(Long tenantId, Long userId);
+    List<NodeVO> todoNodeList(Long userId);
 
     void task(Long flowId, Long nodeId, Long userId);
 
