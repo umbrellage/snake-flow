@@ -5,10 +5,11 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
-import com.juliet.flow.client.dto.FlowDTO;
+import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
+import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
@@ -42,7 +43,7 @@ public class FlowExecuteController implements JulietFlowClient{
      * 流程实例还没创建，做预创建时的查询
      */
     @PostMapping("/open")
-    public AjaxResult open(FlowOpenDTO dto) {
+    public AjaxResult<FlowOpenResultDTO> open(FlowOpenDTO dto) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long tenantId = sysUser.getTenantId();
         Long userId = sysUser.getUserId();
@@ -54,7 +55,7 @@ public class FlowExecuteController implements JulietFlowClient{
     }
 
     @PostMapping("/start")
-    public AjaxResult start(FlowOpenDTO dto) {
+    public AjaxResult<Void> start(FlowOpenDTO dto) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long tenantId = sysUser.getTenantId();
         Long userId = sysUser.getUserId();
@@ -65,7 +66,7 @@ public class FlowExecuteController implements JulietFlowClient{
 
 
     @PostMapping("/forward")
-    public AjaxResult forward(@RequestParam("julietProcessId") String processId,
+    public AjaxResult<Void> forward(@RequestParam("julietProcessId") String processId,
                               @RequestBody String body) {
         System.out.println(processId);
         System.out.println(body);
@@ -74,12 +75,12 @@ public class FlowExecuteController implements JulietFlowClient{
 
 
     @Override
-    public AjaxResult forward(FlowDTO dto) {
+    public AjaxResult forward(FlowIdDTO dto) {
         return null;
     }
 
     @Override
-    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto) {
+    public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
         return AjaxResult.success(new Flow().isEnd());
     }
 
@@ -90,7 +91,7 @@ public class FlowExecuteController implements JulietFlowClient{
     }
 
     @Override
-    public AjaxResult<List<NodeVO>> currentNodeList(FlowDTO dto) {
+    public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
         return AjaxResult.success(nodeVOList);
     }
@@ -102,8 +103,7 @@ public class FlowExecuteController implements JulietFlowClient{
     }
 
     /**
-     * todo 1. 当前节点结束，判断是否能走到下一个节点A，通过获取下一个节点A，判断A的前置节点是否都完成，如果都完成才能走到下一个节点
-     * todo 2. 判断
+     *
      * @param dto 必填
      * @return
      */
@@ -117,6 +117,12 @@ public class FlowExecuteController implements JulietFlowClient{
     public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto.getTenantId(), dto.getUserId());
         return AjaxResult.success(nodeVOList);
+    }
+
+    @Override
+    public AjaxResult<FlowVO> flow(FlowIdDTO dto) {
+        FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
+        return AjaxResult.success(flowVO);
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
@@ -134,9 +140,5 @@ public class FlowExecuteController implements JulietFlowClient{
         fieldDTO.setCode(field.getCode());
         return fieldDTO;
     }
-
-
-
-
 
 }

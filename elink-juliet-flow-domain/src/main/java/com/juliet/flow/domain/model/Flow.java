@@ -1,6 +1,8 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.vo.FlowVO;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -17,7 +19,6 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- *
  * 流程
  *
  * @author xujianjie
@@ -73,6 +74,7 @@ public class Flow extends BaseModel {
 
     /**
      * 图遍历，获取节点
+     *
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
@@ -87,6 +89,7 @@ public class Flow extends BaseModel {
 
     /**
      * 给节点分配一个待办人
+     *
      * @param nodeId
      * @param userId
      */
@@ -97,5 +100,22 @@ public class Flow extends BaseModel {
         nodes.stream()
             .filter(node -> node.getId().equals(nodeId))
             .forEach(node -> node.setProcessedBy(userId));
+    }
+
+    public FlowVO flowVO() {
+        FlowVO data = new FlowVO();
+        data.setId(id);
+        data.setName(name);
+        data.setParentId(parentId);
+        data.setFlowTemplateId(flowTemplateId);
+        data.setTenantId(tenantId);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            List<NodeVO> nodeVOList = nodes.stream()
+                .map(e -> e.toNodeVo(id))
+                .collect(Collectors.toList());
+            data.setNodes(nodeVOList);
+        }
+
+        return data;
     }
 }

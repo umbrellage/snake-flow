@@ -1,5 +1,6 @@
 package com.juliet.flow.service.impl;
 
+import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -91,8 +92,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         return null;
     }
 
+    /**
+     * todo 注意点
+     * 1. 当前节点结束，判断是否能走到下一个节点A，通过获取下一个节点A，判断A的前置节点是否都完成，如果都完成才能走到下一个节点
+     * 2. 判断该节点是否为待办节点，如果非待办节点，则有可能是异常节点，异常节点需要重新起一个流程来处理
+     * 3. 判断是否已经存在过异常后新建的流程，如果存在，需要判断流程节点的状态，过程，是否需要合并
+     * @param flowId
+     * @param nodeId
+     * @param userId
+     */
     @Override
     public void task(Long flowId, Long nodeId, Long userId) {
 
+    }
+
+    @Override
+    public FlowVO flow(Long flowId) {
+        Flow flow = flowRepository.queryById(flowId);
+        if (flow == null) {
+            return null;
+        }
+        return flow.flowVO();
     }
 }

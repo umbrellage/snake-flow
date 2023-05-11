@@ -2,6 +2,7 @@ package com.juliet.flow.client;
 
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.*;
+import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -16,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface JulietFlowClient {
 
     @PostMapping("/bpm/forward")
-    AjaxResult forward(@RequestBody FlowDTO dto);
+    AjaxResult forward(@RequestBody FlowIdDTO dto);
 
     /**
      * 判断当前流程是否已经结束
      * @param dto flowId 必填
      */
     @PostMapping("/is/end")
-    AjaxResult<Boolean> flowIsEnd(@RequestBody FlowDTO dto);
+    AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto);
 
     /**
      * 发起一个新的流程
@@ -40,7 +41,7 @@ public interface JulietFlowClient {
      * @return
      */
     @PostMapping("/current/node")
-    AjaxResult<List<NodeVO>> currentNodeList(@RequestBody FlowDTO dto);
+    AjaxResult<List<NodeVO>> currentNodeList(@RequestBody FlowIdDTO dto);
 
     /**
      * 认领待办任务、修改待办人、分配一个待办人
@@ -67,5 +68,13 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/backlog")
     AjaxResult<List<NodeVO>> todoNodeList(@RequestBody UserDTO dto);
+
+    /**
+     * 获取流程信息
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/flow")
+    AjaxResult<FlowVO> flow(FlowIdDTO dto);
 
 }
