@@ -35,7 +35,7 @@ public class Flow extends BaseModel {
 
     private Long flowTemplateId;
 
-    private Node node;
+    private List<Node> nodes;
 
     private FlowStatusEnum status;
 
@@ -64,7 +64,7 @@ public class Flow extends BaseModel {
     }
 
     public void validate() {
-        BusinessAssert.assertNotNull(this.node, StatusCode.SERVICE_ERROR, "不能没有节点信息!");
+        BusinessAssert.assertNotEmpty(this.nodes, StatusCode.SERVICE_ERROR, "不能没有节点信息!");
     }
 
     /**
@@ -79,16 +79,17 @@ public class Flow extends BaseModel {
         }
         List<Node> output = new ArrayList<>();
         LinkedList<Node> stack = new LinkedList<>();
-        stack.add(this.node);
+//        stack.add(this.node);
+        // TODO node删掉换成nodes
         while (!stack.isEmpty()) {
             Node node = stack.pollLast();
             if (nodeStatusList.contains(node.getStatus())) {
                 output.add(node);
             }
-            if (CollectionUtils.isNotEmpty(node.getNext())) {
-                Collections.reverse(node.getNext());
-                stack.addAll(node.getNext());
-            }
+//            if (CollectionUtils.isNotEmpty(node.getNext())) {
+//                Collections.reverse(node.getNext());
+//                stack.addAll(node.getNext());
+//            }
         }
         return output.stream()
             .distinct()

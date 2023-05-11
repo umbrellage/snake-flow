@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "elink-juliet-flow", path = "/juliet/flow/execute")
 public interface JulietFlowClient {
 
-    @PostMapping("/forward")
-    AjaxResult<Void> forward(@RequestBody FlowDTO dto);
+    @PostMapping("/bpm/forward")
+    AjaxResult forward(@RequestBody FlowDTO dto);
 
     /**
      * 判断当前流程是否已经结束
@@ -27,10 +27,11 @@ public interface JulietFlowClient {
 
     /**
      * 发起一个新的流程
-     * @param dto flowId 必填
+     * @param dto templateId 必填
      * @return 流程实例id
      */
-    AjaxResult<Long> initBmp(BpmDTO dto);
+    @PostMapping("/init/bpm")
+    AjaxResult<Long> initBmp(@RequestBody BpmDTO dto);
 
     /**
      * 获取当前所在的节点
@@ -38,23 +39,24 @@ public interface JulietFlowClient {
      *
      * @return
      */
-    AjaxResult<List<NodeVO>> currentNodeList(FlowDTO dto);
+    @PostMapping("/current/node")
+    AjaxResult<List<NodeVO>> currentNodeList(@RequestBody FlowDTO dto);
 
     /**
      * 认领待办任务、修改待办人、分配一个待办人
-     * @param dto flowId 必填， nodeId必填
-     * @param userDTO userId 必填
+     * @param dto
      * @return
      */
-    AjaxResult<Void> claimTask(FlowDTO dto, UserDTO userDTO);
+    @PostMapping("/claim/task")
+    AjaxResult<Void> claimTask(@RequestBody TaskDTO dto);
 
     /**
      * 执行一个节点任务
      * @param dto 必填
-     * @param userDTO userId 必填
      * @return
      */
-    AjaxResult<Void> task(FlowDTO dto, UserDTO userDTO);
+    @PostMapping("/bpm/task")
+    AjaxResult<Void> task(@RequestBody TaskDTO dto);
 
 
     /**
@@ -63,6 +65,7 @@ public interface JulietFlowClient {
      *
      * @return
      */
-    AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto);
+    @PostMapping("/bpm/backlog")
+    AjaxResult<List<NodeVO>> todoNodeList(@RequestBody UserDTO dto);
 
 }

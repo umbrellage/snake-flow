@@ -44,7 +44,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public Long startFlow(Long templateId) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
-        Flow flow = flowTemplate.initTouYangFlow();
+        Flow flow = flowTemplate.toFlowInstance();
         flow.validate();
         flowRepository.add(flow);
         return flow.getId();

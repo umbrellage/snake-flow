@@ -7,6 +7,7 @@ import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
-public class FlowExecuteController implements JulietFlowClient {
+public class FlowExecuteController implements JulietFlowClient{
 
     @Autowired
     private FlowExecuteService flowExecuteService;
@@ -95,7 +96,7 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult<Void> claimTask(FlowDTO dto, UserDTO userDTO) {
+    public AjaxResult<Void> claimTask(TaskDTO dto) {
         return null;
     }
 
@@ -103,12 +104,10 @@ public class FlowExecuteController implements JulietFlowClient {
      * todo 1. 当前节点结束，判断是否能走到下一个节点A，通过获取下一个节点A，判断A的前置节点是否都完成，如果都完成才能走到下一个节点
      * todo 2. 判断
      * @param dto 必填
-     * @param userDTO userId 必填
      * @return
      */
     @Override
-    public AjaxResult<Void> task(FlowDTO dto, UserDTO userDTO) {
-
+    public AjaxResult<Void> task(TaskDTO dto) {
         return null;
     }
 

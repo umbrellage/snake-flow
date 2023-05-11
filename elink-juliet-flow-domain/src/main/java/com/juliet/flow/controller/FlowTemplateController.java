@@ -26,7 +26,6 @@ public class FlowTemplateController {
 
     @PostMapping("/add")
     public AjaxResult add(@RequestBody FlowTemplateAddDTO dto) {
-        checkNodeParams(dto.getNode());
         flowTemplateService.add(dto);
         return AjaxResult.success();
     }
@@ -66,12 +65,5 @@ public class FlowTemplateController {
                 }
             }
         }
-        if (CollectionUtils.isEmpty(nodeDTO.getNext())) {
-            return;
-        }
-        for (NodeDTO subNodeDTO : nodeDTO.getNext()) {
-            checkNodeParams(subNodeDTO);
-        }
-
     }
 }
