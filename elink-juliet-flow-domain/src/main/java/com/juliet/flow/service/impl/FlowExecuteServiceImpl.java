@@ -94,60 +94,81 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     /**
-     * TODO: 2023/5/11 注意点
-     * 1. 当前节点结束，判断是否能走到下一个节点A，通过获取下一个节点A，判断A的前置节点是否都完成，如果都完成才能走到下一个节点
-     * 2. 判断该节点是否为待办节点，如果非待办节点，则有可能是异常节点，异常节点需要重新起一个流程来处理
-     * 3. 判断是否已经存在过异常后新建的流程，如果存在，需要判断流程节点的状态，过程，是否需要合并
      *
      * 该方法主要分4种情况
+     * 待处理的节点主要分为两种节点:
+     * 一. 主流程中的节点
      * 1. 当前要处理的节点为异常节点，且存在异常流程并未结 ------>抛出异常
-     * 2. 当前处理的节点为异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程） -------> 创建一条异常流程
-     * 3. 当前节点为非异常节点，且存在异常流程并未结 --------> 按照处理异常流程和正常流程的方式处理
-     * 4. 当前节点为非异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程）---------> 正常处理节点的逻辑走
+     * 2. 当前要处理的节点为异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程） -------> 创建一条异常流程
+     * 3. 当前要处理的节点为非异常节点 ---------> 正常处理节点的逻辑走
+     * 二. 异常流程中的节点
+     * 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理, 是否需要合并
      * TODO: 2023/5/11  当前认为只有一条异常流程存在，如果后面要做多条再修改
      * @param flowId
      * @param nodeId
+     * @param nodeName
      * @param userId
      */
     @Override
-    public void task(Long flowId, Long nodeId, Long userId) {
+    public void task(Long flowId, Long nodeId, String nodeName, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null) {
             return;
         }
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
-        // 获取要处理的节点信息
+        // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
-        // 判断 存在异常流程，且异常流程已全部结束
-        boolean existsAnomalyFlowsAndFlowsEnd = CollectionUtils.isNotEmpty(exFlowList) && exFlowList.stream().allMatch(Flow::isFlowEnd);
-        // 判断 存在异常流程，且异常流程没有结束
-        boolean existsAnomalyFlowsAndFlowsNotEnd = CollectionUtils.isNotEmpty(exFlowList) && !exFlowList.stream().allMatch(Flow::isFlowEnd);
-        // 当节点是异常节点时
-        if (node.isProcessed()) {
-            if (existsAnomalyFlowsAndFlowsNotEnd) {
-                throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
+        // 如果是主流程的节点
+        if (node != null) {
+            // 判断 存在异常流程，且异常流程已全部结束
+            boolean existsAnomalyFlowsAndFlowsEnd = CollectionUtils.isNotEmpty(exFlowList) && exFlowList.stream().allMatch(Flow::isFlowEnd);
+            // 判断 存在异常流程，且异常流程没有结束
+            boolean existsAnomalyFlowsAndFlowsNotEnd = CollectionUtils.isNotEmpty(exFlowList) && !exFlowList.stream().allMatch(Flow::isFlowEnd);
+            // 当节点是异常节点时
+            if (node.isProcessed()) {
+                if (existsAnomalyFlowsAndFlowsNotEnd) {
+                    throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
+                }
+                if (existsAnomalyFlowsAndFlowsEnd || CollectionUtils.isEmpty(exFlowList)) {
+                    // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
+                    Flow subFlow = flow.subFlow();
+                    subFlow.modifyNodeStatus(node);
+                    flowRepository.update(subFlow);
+                    return;
+                }
             }
-            if (existsAnomalyFlowsAndFlowsEnd || CollectionUtils.isEmpty(exFlowList)) {
-                // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
-                Flow subFlow = flow.subFlow(node);
-                subFlow.modifyNodeStatus(node);
-                flowRepository.update(subFlow);
-                return;
-            }
-        }
-        // 当节点是非异常节点时
-        if (!node.isProcessed()) {
-            if (existsAnomalyFlowsAndFlowsNotEnd) {
-                // TODO: 2023/5/11 当前认为只有一条异常流程存在，如果后面要做多条只需要在这个方法里修改就好
+            // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
+            // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
+            if (!node.isProcessed()) {
+                if (existsAnomalyFlowsAndFlowsNotEnd) {
+                    // TODO: 2023/5/11 当前认为只有一条异常流程存在，如果后面要做多条只需要在这个方法里修改就好
+                    Flow errorFlow = exFlowList.stream().filter(exFlow -> !exFlow.isEnd())
+                        .findAny()
+                        .orElse(null);
 
+
+
+
+
+                }
+                if (existsAnomalyFlowsAndFlowsEnd && CollectionUtils.isEmpty(exFlowList)) {
+                    flow.finishNode(nodeId);
+                    flow.isEnd();
+                    flowRepository.update(flow);
+                }
             }
-            if (existsAnomalyFlowsAndFlowsEnd && CollectionUtils.isEmpty(exFlowList)) {
-                flow.finishNode(nodeId);
-                flow.isEnd();
-                flowRepository.update(flow);
-            }
+        } else {
+            // 如果是异常流程的节点
+
         }
+
+
+
+
+
+
+
     }
 
     @Override

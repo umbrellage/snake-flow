@@ -23,7 +23,7 @@ public interface FlowExecuteService {
 
     List<NodeVO> todoNodeList(Long userId);
 
-    void task(Long flowId, Long nodeId, Long userId);
+    void task(Long flowId, Long nodeId, String nodeName, Long userId);
 
     FlowVO flow(Long flowId);
 }

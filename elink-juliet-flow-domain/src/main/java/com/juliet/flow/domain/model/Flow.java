@@ -137,7 +137,7 @@ public class Flow extends BaseModel {
         return data;
     }
 
-    public Flow subFlow(Node node) {
+    public Flow subFlow() {
         Flow flow = new Flow();
         // TODO: 2023/5/11
         flow.setId(null);
@@ -148,7 +148,7 @@ public class Flow extends BaseModel {
             .map(Node::copyNode)
             .collect(Collectors.toList());
         flow.setNodes(nodeList);
-        flow.setStatus(status);
+        flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
         return flow;
     }
@@ -166,7 +166,9 @@ public class Flow extends BaseModel {
                 toBeProcessedNodeList.add(node);
             }
         });
-        toBeProcessedNodeList.forEach(this::modifyNodeStatus);
+        for (Node node: toBeProcessedNodeList) {
+            modifyNodeStatus(node);
+        }
     }
 
     /**
