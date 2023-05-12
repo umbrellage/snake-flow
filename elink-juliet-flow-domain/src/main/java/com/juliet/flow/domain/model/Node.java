@@ -59,6 +59,14 @@ public class Node extends BaseModel {
     }
 
     /**
+     * 判断节点是否是一个可被执行的
+     * @return
+     */
+    public boolean isExecutable() {
+        return status == NodeStatusEnum.PROCESSED || status == NodeStatusEnum.ACTIVE;
+    }
+
+    /**
      * 通过岗位判断当前用户是否可以操作
      */
     public boolean isOperator(Long[] postIds) {

@@ -98,7 +98,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      * 该方法主要分4种情况
      * 待处理的节点主要分为两种节点:
      * 一. 主流程中的节点
-     * 1. 当前要处理的节点为异常节点，且存在异常流程并未结 ------>抛出异常
+     * 1. 当前要处理的节点为异常节点，且存在异常流程并未结 ------>抛出异常 TODO: 2023/5/11 后面如果支持多条异常流程则把 1的处理删除
      * 2. 当前要处理的节点为异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程） -------> 创建一条异常流程
      * 3. 当前要处理的节点为非异常节点 ---------> 正常处理节点的逻辑走
      * 二. 异常流程中的节点
@@ -121,6 +121,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Node node = flow.findNode(nodeId);
         // 如果是主流程的节点
         if (node != null) {
+            if (!node.isExecutable()) {
+                throw new ServiceException("该节点未被认领");
+            }
             // 判断 存在异常流程，且异常流程已全部结束
             boolean existsAnomalyFlowsAndFlowsEnd = CollectionUtils.isNotEmpty(exFlowList) && exFlowList.stream().allMatch(Flow::isFlowEnd);
             // 判断 存在异常流程，且异常流程没有结束
@@ -141,29 +144,27 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                if (existsAnomalyFlowsAndFlowsNotEnd) {
-                    // TODO: 2023/5/11 当前认为只有一条异常流程存在，如果后面要做多条只需要在这个方法里修改就好
-                    Flow errorFlow = exFlowList.stream().filter(exFlow -> !exFlow.isEnd())
-                        .findAny()
-                        .orElse(null);
-
-
-
-
-
-                }
-                if (existsAnomalyFlowsAndFlowsEnd && CollectionUtils.isEmpty(exFlowList)) {
-                    flow.finishNode(nodeId);
-                    flow.isEnd();
-                    flowRepository.update(flow);
-                }
+                flow.finishNode(nodeId);
+                flow.isEnd();
+                flowRepository.update(flow);
             }
         } else {
             // 如果是异常流程的节点
+            Flow errorFlow = exFlowList.stream()
+                .filter(exFlow -> exFlow.findNode(nodeId) != null)
+                .findAny().orElse(null);
+            if (errorFlow == null) {
+                return;
+            }
+            Node errorNode = errorFlow.findNode(nodeId);
+            if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
+                throw new ServiceException("该节点未被认领");
+            }
+            errorFlow.finishNode(nodeId);
+
+
 
         }
-
-
 
 
 
