@@ -8,8 +8,10 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -17,6 +19,7 @@ import org.apache.commons.compress.utils.Lists;
 
 import java.util.Collection;
 import java.util.List;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 流程
@@ -51,6 +54,10 @@ public class Flow extends BaseModel {
         return new Todo();
     }
 
+    public boolean isFlowEnd() {
+        return status == FlowStatusEnum.END || isEnd();
+    }
+
     /**
      * 当前流程是否已经结束
      */
@@ -62,19 +69,56 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 返回当前流程中处理的节点
+     * 根据可填写的字段查找节点
+     *
+     * @param body
+     * @return
      */
-    private Node getCurrentActiveNode() {
-        return new Node();
+    public Node findNode(Map<String, ?> body) {
+        return nodes.stream().filter(node -> {
+                Form form = node.getForm();
+                List<String> codeList = form.getFields().stream()
+                    .map(Field::getCode)
+                    .collect(Collectors.toList());
+
+                return codeList.containsAll(body.keySet()) && body.size() == codeList.size();
+            })
+            .findAny()
+            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
     }
+
+    public Node findNode(Long nodeId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getId().equals(nodeId)).findAny()
+            .orElse(null);
+    }
+
+    public Node findNode(String name) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getName().equals(name)).findAny()
+            .orElse(null);
+    }
+
+    public boolean ifPreNodeIsHandle(String name) {
+        Node node = findNode(name);
+        if (node == null) {
+            throw new ServiceException("找不到节点");
+        }
+        return Arrays.stream(node.getPreName().split(",")).map(this::findNode).allMatch(Node::isProcessed);
+    }
+
 
     public void validate() {
         BusinessAssert.assertNotEmpty(this.nodes, StatusCode.SERVICE_ERROR, "不能没有节点信息!");
     }
 
     /**
-     * 图遍历，获取节点
-     *
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
@@ -85,15 +129,6 @@ public class Flow extends BaseModel {
         return nodes.stream()
             .filter(node -> nodeStatusList.contains(node.getStatus()))
             .collect(Collectors.toList());
-    }
-
-    public Node findNode(Long nodeId) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return null;
-        }
-        return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElse(null);
     }
 
     /**
@@ -128,6 +163,49 @@ public class Flow extends BaseModel {
         return data;
     }
 
-    public Flow creaateSubFlow() {
+    public Flow subFlow() {
+        Flow flow = new Flow();
+        // TODO: 2023/5/11
+        flow.setId(null);
+        flow.setName(name);
+        flow.setFlowTemplateId(flowTemplateId);
+        flow.setParentId(id);
+        List<Node> nodeList = nodes.stream()
+            .map(Node::copyNode)
+            .collect(Collectors.toList());
+        flow.setNodes(nodeList);
+        flow.setStatus(FlowStatusEnum.ABNORMAL);
+        flow.setTenantId(tenantId);
+        return flow;
+    }
+
+    /**
+     * 递归修改已处理节点的状态，修改为已认领
+     */
+    public void modifyNodeStatus(Node errorNode) {
+        List<String> nextNameList = Arrays.stream(errorNode.getNextName().split(",")).collect(Collectors.toList());
+        List<Node> toBeProcessedNodeList = new ArrayList<>();
+        nodes.forEach(node -> {
+            //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为已认领
+            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
+                node.setStatus(NodeStatusEnum.ACTIVE);
+                toBeProcessedNodeList.add(node);
+            }
+        });
+        for (Node node : toBeProcessedNodeList) {
+            modifyNodeStatus(node);
+        }
+    }
+
+    /**
+     * 完成某个节点的处理
+     *
+     * @param nodeId
+     */
+    public void finishNode(Long nodeId) {
+        nodes.stream()
+            .filter(node -> node.getId().equals(nodeId))
+            .forEach(node -> node.setStatus(NodeStatusEnum.PROCESSED));
+
     }
 }

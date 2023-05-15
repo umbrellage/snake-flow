@@ -4,6 +4,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.utils.IdGenerator;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -53,8 +54,20 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
 
+    /**
+     * 节点是否已处理
+     * @return
+     */
     public boolean isProcessed() {
         return status == NodeStatusEnum.PROCESSED;
+    }
+
+    /**
+     * 判断节点是否是一个可被执行的
+     * @return
+     */
+    public boolean isExecutable() {
+        return status == NodeStatusEnum.PROCESSED || status == NodeStatusEnum.ACTIVE;
     }
 
     /**
@@ -78,7 +91,10 @@ public class Node extends BaseModel {
     public NodeVO toNodeVo(Long flowId) {
         NodeVO data = new NodeVO();
         data.setId(id);
+        data.setName(name);
         data.setFlowId(flowId);
+        data.setPreName(preName);
+        data.setNextName(nextName);
         data.setForm(form.toForm());
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
@@ -89,4 +105,25 @@ public class Node extends BaseModel {
         }
         return data;
     }
+
+    public Node copyNode() {
+//        public Node copyNode(Map<Long, Long> nodeIdMap) {
+        Node node = new Node();
+        node.id = IdGenerator.getId();
+        node.title = title;
+        node.name = name;
+        node.preName = preName;
+        node.nextName = nextName;
+        node.form = form;
+        node.status = status;
+        node.type = type;
+        node.bindPosts = bindPosts;
+        node.accessRule = accessRule;
+        node.submitRule = submitRule;
+        node.processedBy = processedBy;
+        return node;
+
+//        nodeIdMap.put(id, node.id);
+    }
+
 }

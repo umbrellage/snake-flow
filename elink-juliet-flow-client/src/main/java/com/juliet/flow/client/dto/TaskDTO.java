@@ -14,5 +14,6 @@ import lombok.Setter;
 public class TaskDTO {
     private Long flowId;
     private Long nodeId;
+    private String nodeName;
     private Long userId;
 }

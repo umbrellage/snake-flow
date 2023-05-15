@@ -14,13 +14,14 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FieldDTO;
-import com.juliet.flow.domain.dto.FlowOpenResultDTO;
+import com.juliet.flow.client.dto.FlowOpenResultDTO;
 import com.juliet.flow.domain.model.Field;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
-public class FlowExecuteController implements JulietFlowClient{
+public class FlowExecuteController implements JulietFlowClient {
 
     @Autowired
     private FlowExecuteService flowExecuteService;
@@ -42,41 +43,20 @@ public class FlowExecuteController implements JulietFlowClient{
     /**
      * 流程实例还没创建，做预创建时的查询
      */
-    @PostMapping("/open")
-    public AjaxResult<FlowOpenResultDTO> open(FlowOpenDTO dto) {
+    @Override
+    public AjaxResult<NodeVO> open(FlowOpenDTO dto) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long tenantId = sysUser.getTenantId();
         Long userId = sysUser.getUserId();
-        Node node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
+        NodeVO node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
         BusinessAssert.assertNotNull(node, StatusCode.SERVICE_ERROR, "can not find node by code:" + dto.getCode());
-        BusinessAssert.assertTrue(node.isOperator(sysUser.getPostIds()),
-                StatusCode.SERVICE_ERROR, "user:" + userId +" can not handle current node!");
-        return AjaxResult.success(toFlowOpenResultDTO(node));
+        return AjaxResult.success(node);
     }
-
-    @PostMapping("/start")
-    public AjaxResult<Void> start(FlowOpenDTO dto) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        Long tenantId = sysUser.getTenantId();
-        Long userId = sysUser.getUserId();
-
-        return AjaxResult.success();
-    }
-
-
-
-    @PostMapping("/forward")
-    public AjaxResult<Void> forward(@RequestParam("julietProcessId") String processId,
-                              @RequestBody String body) {
-        System.out.println(processId);
-        System.out.println(body);
-        return AjaxResult.success();
-    }
-
 
     @Override
-    public AjaxResult forward(FlowIdDTO dto) {
-        return null;
+    public AjaxResult<Long> forward(FlowIdDTO dto, Map<String, ?> map) {
+        Long flowId = flowExecuteService.forward(dto.getFlowId(), map);
+        return AjaxResult.success(flowId);
     }
 
     @Override
@@ -104,7 +84,7 @@ public class FlowExecuteController implements JulietFlowClient{
 
     @Override
     public AjaxResult<Void> task(TaskDTO dto) {
-        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
+        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getNodeName(), dto.getUserId());
         return AjaxResult.success();
     }
 
@@ -124,7 +104,7 @@ public class FlowExecuteController implements JulietFlowClient{
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
         if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
             dto.setAllowFields(node.getForm().getFields().stream().map(FlowExecuteController::toFieldDTO)
-                    .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
         }
         return dto;
     }

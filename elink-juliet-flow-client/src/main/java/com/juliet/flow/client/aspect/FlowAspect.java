@@ -7,6 +7,9 @@ import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.utils.ServletUtils;
+import java.lang.reflect.Type;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -49,6 +52,7 @@ public class FlowAspect {
         }
         HttpServletRequest request = sra.getRequest();
         String julietFlowId = request.getParameter("julietFlowId");
+
         if (julietFlowId == null || julietFlowId.length() == 0) {
             throw new RuntimeException("By use annotation of JulietFlowSubmit, Required request parameter 'julietFlowId'");
         }
@@ -74,11 +78,15 @@ public class FlowAspect {
             log.info("juliet flow forward by flow id:{}", longJulietFlowId);
             FlowIdDTO flowIdDTO = new FlowIdDTO();
             flowIdDTO.setFlowId(longJulietFlowId);
-            AjaxResult ajaxResult = julietFlowClient.forward(flowIdDTO);
+
+            String bodyStr = ServletUtils.readBody(request);
+            Map<String, ?> map = JSON.parseObject(bodyStr, Map.class);
+            AjaxResult<Long> ajaxResult = julietFlowClient.forward(flowIdDTO, map);
             if (ajaxResult.getCode().intValue() != 200) {
                 log.error("data saved but flow error:{}", ajaxResult);
                 throw new RuntimeException("数据已保存，但是流程异常:" + JSON.toJSONString(ajaxResult));
             }
+            request.setAttribute("flowId", ajaxResult.getData());
         } else {
             log.info("data saved error, flow abort! flow id:{}", longJulietFlowId);
         }
@@ -112,4 +120,6 @@ public class FlowAspect {
         }
         return null;
     }
+
+
 }

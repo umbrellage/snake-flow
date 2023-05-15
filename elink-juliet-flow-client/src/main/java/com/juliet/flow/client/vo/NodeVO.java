@@ -16,6 +16,13 @@ public class NodeVO {
 
     private Long id;
 
+    private String name;
+
+    private String preName;
+
+    private String nextName;
+
+
     private Long flowId;
 
     /**
@@ -24,6 +31,7 @@ public class NodeVO {
     private FormVO form;
 
     private List<PostVO> bindPosts;
+
     /**
      * 处理人
      */
