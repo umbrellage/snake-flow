@@ -54,6 +54,10 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
 
+    /**
+     * 节点是否已处理
+     * @return
+     */
     public boolean isProcessed() {
         return status == NodeStatusEnum.PROCESSED;
     }

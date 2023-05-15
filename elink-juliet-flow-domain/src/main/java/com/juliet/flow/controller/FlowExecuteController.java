@@ -21,6 +21,7 @@ import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
 import java.util.List;
+import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,7 @@ import java.util.stream.Collectors;
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
-public class FlowExecuteController implements JulietFlowClient{
+public class FlowExecuteController implements JulietFlowClient {
 
     @Autowired
     private FlowExecuteService flowExecuteService;
@@ -50,7 +51,7 @@ public class FlowExecuteController implements JulietFlowClient{
         Node node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
         BusinessAssert.assertNotNull(node, StatusCode.SERVICE_ERROR, "can not find node by code:" + dto.getCode());
         BusinessAssert.assertTrue(node.isOperator(sysUser.getPostIds()),
-                StatusCode.SERVICE_ERROR, "user:" + userId +" can not handle current node!");
+            StatusCode.SERVICE_ERROR, "user:" + userId + " can not handle current node!");
         return AjaxResult.success(toFlowOpenResultDTO(node));
     }
 
@@ -64,10 +65,9 @@ public class FlowExecuteController implements JulietFlowClient{
     }
 
 
-
     @PostMapping("/forward")
     public AjaxResult<Void> forward(@RequestParam("julietProcessId") String processId,
-                              @RequestBody String body) {
+        @RequestBody String body) {
         System.out.println(processId);
         System.out.println(body);
         return AjaxResult.success();
@@ -75,8 +75,9 @@ public class FlowExecuteController implements JulietFlowClient{
 
 
     @Override
-    public AjaxResult forward(FlowIdDTO dto) {
-        return null;
+    public AjaxResult forward(FlowIdDTO dto, Map<String, ?> map) {
+        flowExecuteService.forward(dto.getFlowId(), map);
+        return AjaxResult.success();
     }
 
     @Override
@@ -124,7 +125,7 @@ public class FlowExecuteController implements JulietFlowClient{
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
         if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
             dto.setAllowFields(node.getForm().getFields().stream().map(FlowExecuteController::toFieldDTO)
-                    .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
         }
         return dto;
     }

@@ -4,6 +4,7 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
+import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
@@ -16,6 +17,7 @@ import com.juliet.flow.service.TodoService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -57,12 +59,29 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
-    public void forward(Long flowId) {
+    @Transactional(rollbackFor = Exception.class)
+    public void forward(Long flowId, Map<String, ?> map) {
+        // 判断哪个节点需要被执行
+        List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(flowId);
-
-        flow.forward();
-//        List<Role> todoRoles = flow.get();
-//        todoService.sendTodo(todoRoles, flow.getCurrentTodo());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
+        Node mainNode = flow.findNode(map);
+        if (CollectionUtils.isEmpty(subFlowList)) {
+            if (mainNode.isExecutable()) {
+                executableNode.add(mainNode);
+            } else {
+                log.info("[node code, is not executable] {}", mainNode.getName());
+                throw new ServiceException("当前节点不可被执行");
+            }
+        }else {
+            subFlowList.stream()
+                .filter(subFlow -> {
+                    Node node = subFlow.findNode(map);
+                    return node.isExecutable() && subFlow.findNode(node.getPreName()).isProcessed();
+                })
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(map)));
+        }
+        executableNode.forEach(node -> task(flowId, mainNode.getId(), mainNode.getName(), mainNode.getProcessedBy()));
     }
 
     @Override
@@ -110,6 +129,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      * @param userId
      */
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void task(Long flowId, Long nodeId, String nodeName, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null) {
@@ -145,7 +165,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
                 flow.finishNode(nodeId);
-                flow.isEnd();
+                if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream().allMatch(Flow::isEnd))) {
+                    flow.setStatus(FlowStatusEnum.END);
+                }
                 flowRepository.update(flow);
             }
         } else {
@@ -161,14 +183,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 throw new ServiceException("该节点未被认领");
             }
             errorFlow.finishNode(nodeId);
-
-
-
+            if (errorFlow.isEnd()) {
+                errorFlow.setStatus(FlowStatusEnum.END);
+                // 如果子流程都结束了，那么主流程也肯定结束了
+                flow.setStatus(FlowStatusEnum.END);
+                flowRepository.update(flow);
+            }
+            flowRepository.update(errorFlow);
         }
-
-
-
-
 
     }
 

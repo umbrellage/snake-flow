@@ -5,9 +5,11 @@ import com.juliet.flow.client.dto.*;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
+import java.util.Map;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author xujianjie
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface JulietFlowClient {
 
     @PostMapping("/bpm/forward")
-    AjaxResult forward(@RequestBody FlowIdDTO dto);
+    AjaxResult forward(@RequestBody FlowIdDTO dto, @RequestParam("map") Map<String, ?>  map);
 
     /**
      * 判断当前流程是否已经结束

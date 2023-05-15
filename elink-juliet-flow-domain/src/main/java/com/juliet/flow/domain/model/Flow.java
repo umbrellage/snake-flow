@@ -10,6 +10,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -63,11 +64,7 @@ public class Flow extends BaseModel {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
-        boolean end = nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
-        if (end) {
-            this.status = FlowStatusEnum.END;
-        }
-        return end;
+        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
     }
 
     /**
@@ -77,13 +74,49 @@ public class Flow extends BaseModel {
         return new Node();
     }
 
+    /**
+     * 根据可填写的字段查找节点
+     * @param body
+     * @return
+     */
+    public Node findNode(Map<String, ?> body) {
+        return nodes.stream().filter(node -> {
+                Form form = node.getForm();
+                List<String> codeList = form.getFields().stream()
+                    .map(Field::getCode)
+                    .collect(Collectors.toList());
+
+                return codeList.containsAll(body.keySet()) && body.size() == codeList.size();
+            })
+            .findAny()
+            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+    }
+
+    public Node findNode(Long nodeId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getId().equals(nodeId)).findAny()
+            .orElse(null);
+    }
+
+    public Node findNode(String name) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getName().equals(name)).findAny()
+            .orElse(null);
+    }
+
+
+
     public void validate() {
         BusinessAssert.assertNotEmpty(this.nodes, StatusCode.SERVICE_ERROR, "不能没有节点信息!");
     }
 
     /**
-     * 图遍历，获取节点
-     *
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
@@ -94,15 +127,6 @@ public class Flow extends BaseModel {
         return nodes.stream()
             .filter(node -> nodeStatusList.contains(node.getStatus()))
             .collect(Collectors.toList());
-    }
-
-    public Node findNode(Long nodeId) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return null;
-        }
-        return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElse(null);
     }
 
     /**
@@ -155,7 +179,6 @@ public class Flow extends BaseModel {
 
     /**
      * 递归修改已处理节点的状态，修改为已认领
-     *
      */
     public void modifyNodeStatus(Node errorNode) {
         List<Node> toBeProcessedNodeList = new ArrayList<>();
@@ -166,13 +189,14 @@ public class Flow extends BaseModel {
                 toBeProcessedNodeList.add(node);
             }
         });
-        for (Node node: toBeProcessedNodeList) {
+        for (Node node : toBeProcessedNodeList) {
             modifyNodeStatus(node);
         }
     }
 
     /**
      * 完成某个节点的处理
+     *
      * @param nodeId
      */
     public void finishNode(Long nodeId) {

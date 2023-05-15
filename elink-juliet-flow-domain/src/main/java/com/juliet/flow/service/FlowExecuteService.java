@@ -4,6 +4,7 @@ import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.Node;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author xujianjie
@@ -15,7 +16,7 @@ public interface FlowExecuteService {
 
     Long startFlow(Long templateId);
 
-    void forward(Long flowId);
+    void forward(Long flowId, Map<String, ?> map);
 
     List<NodeVO> currentNodeList(Long flowId);
 
