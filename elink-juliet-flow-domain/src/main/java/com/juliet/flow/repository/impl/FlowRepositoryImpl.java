@@ -58,7 +58,7 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     private void addNodes(List<Node> nodes, Long tenantId, Long flowId, Long flowTemplateId) {
         List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes,
-                tenantId, flowId, flowTemplateId);
+            tenantId, flowId, flowTemplateId);
         nodeEntities.forEach(nodeEntity -> nodeDao.insert(nodeEntity));
 
         List<FormEntity> formEntities = FlowEntityFactory.transferFormEntities(nodes, tenantId);
@@ -112,7 +112,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Override
     public List<Flow> listFlowByParentId(Long id) {
         List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
-                .eq(FlowEntity::getParentId, id));
+            .eq(FlowEntity::getParentId, id));
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
@@ -128,8 +128,8 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Override
     public Flow queryByCode(String code) {
         FlowEntity flowEntity = flowDao.selectOne(Wrappers.<FlowEntity>lambdaQuery()
-                .eq(FlowEntity::getId, code)
-                .last("limit 1"));
+            .eq(FlowEntity::getId, code)
+            .last("limit 1"));
         return FlowEntityFactory.toFlow(flowEntity);
     }
 
@@ -154,7 +154,15 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public FlowTemplate queryTemplateByCode(String code) {
-        return null;
+        FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(
+            Wrappers.<FlowTemplateEntity>lambdaQuery().eq(FlowTemplateEntity::getCode, code)
+                .last("limit 1"));
+        if (flowTemplateEntity == null) {
+            return null;
+        }
+        FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
+        flowTemplate.setNodes(getTemplateStartNodes(flowTemplateEntity.getId()));
+        return flowTemplate;
     }
 
     @Override
@@ -172,19 +180,19 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<Long> nodeIds = nodes.stream().map(Node::getId).collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(nodeIds)) {
             nodeDao.delete(Wrappers.<NodeEntity>lambdaUpdate()
-                    .in(NodeEntity::getId, nodeIds));
+                .in(NodeEntity::getId, nodeIds));
             postDao.delete(Wrappers.<PostEntity>lambdaUpdate()
-                    .in(PostEntity::getNodeId, nodeIds));
+                .in(PostEntity::getNodeId, nodeIds));
             formDao.delete(Wrappers.<FormEntity>lambdaUpdate()
-                    .in(FormEntity::getNodeId, nodeIds));
+                .in(FormEntity::getNodeId, nodeIds));
         }
         List<Long> formIds = nodes.stream()
-                .filter(node -> node.getForm() != null)
-                .map(node -> node.getForm().getId())
-                .collect(Collectors.toList());
+            .filter(node -> node.getForm() != null)
+            .map(node -> node.getForm().getId())
+            .collect(Collectors.toList());
         if (!CollectionUtils.isEmpty(formIds)) {
             fieldDao.delete(Wrappers.<FieldEntity>lambdaQuery()
-                    .in(FieldEntity::getFormId, formIds));
+                .in(FieldEntity::getFormId, formIds));
         }
     }
 
@@ -193,7 +201,7 @@ public class FlowRepositoryImpl implements FlowRepository {
      */
     private List<Node> getTemplateStartNodes(Long templateFlowId) {
         List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaUpdate()
-                .eq(NodeEntity::getFlowTemplateId, templateFlowId));
+            .eq(NodeEntity::getFlowTemplateId, templateFlowId));
         return assembleNode(nodeEntities);
     }
 
@@ -202,7 +210,7 @@ public class FlowRepositoryImpl implements FlowRepository {
      */
     private List<Node> getNodes(Long flowId) {
         List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
-                .eq(NodeEntity::getFlowId, flowId));
+            .eq(NodeEntity::getFlowId, flowId));
         return assembleNode(nodeEntities);
     }
 
@@ -217,15 +225,16 @@ public class FlowRepositoryImpl implements FlowRepository {
         // 填充表单信息
         List<Long> nodeIds = nodeEntities.stream().map(NodeEntity::getId).collect(Collectors.toList());
         List<FormEntity> formEntities = formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
-                .in(FormEntity::getNodeId, nodeIds));
+            .in(FormEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodeForm(nodes, formEntities);
         // 填充字段信息
         List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
-                .in(FieldEntity::getFormId, formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())));
+            .in(FieldEntity::getFormId,
+                formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())));
         FlowEntityFactory.fillNodeField(nodes, fieldEntities);
         // 填充岗位信息
         List<PostEntity> postEntities = postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
-                .in(PostEntity::getNodeId, nodeIds));
+            .in(PostEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodePost(nodes, postEntities);
         return nodes;
     }

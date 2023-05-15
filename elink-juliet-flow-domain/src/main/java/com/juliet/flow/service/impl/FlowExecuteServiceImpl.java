@@ -44,8 +44,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     private TodoService todoService;
 
     @Override
-    public Node queryStartNodeByCode(Long tenantId, String templateCode) {
-        return null;
+    public NodeVO queryStartNodeByCode(Long tenantId, String templateCode) {
+        FlowTemplate template = flowRepository.queryTemplateByCode(templateCode);
+        return template.getNodes().stream()
+            .filter(node -> StringUtils.isBlank(node.getPreName()))
+            .findAny()
+            .map(e -> e.toNodeVo(null))
+            .orElseThrow(()-> new ServiceException("找不到开始节点"));
     }
 
     @Transactional(rollbackFor = Exception.class)

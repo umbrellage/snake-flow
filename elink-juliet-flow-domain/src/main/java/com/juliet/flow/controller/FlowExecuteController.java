@@ -14,7 +14,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FieldDTO;
-import com.juliet.flow.domain.dto.FlowOpenResultDTO;
+import com.juliet.flow.client.dto.FlowOpenResultDTO;
 import com.juliet.flow.domain.model.Field;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
@@ -43,39 +43,18 @@ public class FlowExecuteController implements JulietFlowClient {
     /**
      * 流程实例还没创建，做预创建时的查询
      */
-    @PostMapping("/open")
-    public AjaxResult<FlowOpenResultDTO> open(FlowOpenDTO dto) {
+    @Override
+    public AjaxResult<NodeVO> open(FlowOpenDTO dto) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         Long tenantId = sysUser.getTenantId();
         Long userId = sysUser.getUserId();
-        Node node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
+        NodeVO node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
         BusinessAssert.assertNotNull(node, StatusCode.SERVICE_ERROR, "can not find node by code:" + dto.getCode());
-        BusinessAssert.assertTrue(node.isOperator(sysUser.getPostIds()),
-            StatusCode.SERVICE_ERROR, "user:" + userId + " can not handle current node!");
-        return AjaxResult.success(toFlowOpenResultDTO(node));
+        return AjaxResult.success(node);
     }
-
-    @PostMapping("/start")
-    public AjaxResult<Void> start(FlowOpenDTO dto) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        Long tenantId = sysUser.getTenantId();
-        Long userId = sysUser.getUserId();
-
-        return AjaxResult.success();
-    }
-
-
-    @PostMapping("/forward")
-    public AjaxResult<Void> forward(@RequestParam("julietProcessId") String processId,
-        @RequestBody String body) {
-        System.out.println(processId);
-        System.out.println(body);
-        return AjaxResult.success();
-    }
-
 
     @Override
-    public AjaxResult forward(FlowIdDTO dto, Map<String, ?> map) {
+    public AjaxResult<Void> forward(FlowIdDTO dto, Map<String, ?> map) {
         flowExecuteService.forward(dto.getFlowId(), map);
         return AjaxResult.success();
     }

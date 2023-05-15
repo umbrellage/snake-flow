@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "elink-juliet-flow", path = "/juliet/flow/execute")
 public interface JulietFlowClient {
 
+    @PostMapping("/open")
+    AjaxResult<NodeVO> open(@RequestBody FlowOpenDTO dto);
+
     @PostMapping("/bpm/forward")
-    AjaxResult forward(@RequestBody FlowIdDTO dto, @RequestParam("map") Map<String, ?>  map);
+    AjaxResult<Void> forward(@RequestBody FlowIdDTO dto, @RequestParam("map") Map<String, ?>  map);
 
     /**
      * 判断当前流程是否已经结束
