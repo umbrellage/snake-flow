@@ -91,7 +91,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             subFlowList.stream()
                 .filter(subFlow -> {
                     Node node = subFlow.findNode(map);
-                    return node.isExecutable() && subFlow.findNode(node.getPreName()).isProcessed();
+                    return node.isExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(map)));
         }

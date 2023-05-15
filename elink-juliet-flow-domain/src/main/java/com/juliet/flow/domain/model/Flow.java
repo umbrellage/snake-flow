@@ -8,6 +8,7 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
@@ -68,14 +69,8 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 返回当前流程中处理的节点
-     */
-    private Node getCurrentActiveNode() {
-        return new Node();
-    }
-
-    /**
      * 根据可填写的字段查找节点
+     *
      * @param body
      * @return
      */
@@ -110,6 +105,13 @@ public class Flow extends BaseModel {
             .orElse(null);
     }
 
+    public boolean ifPreNodeIsHandle(String name) {
+        Node node = findNode(name);
+        if (node == null) {
+            throw new ServiceException("找不到节点");
+        }
+        return Arrays.stream(node.getPreName().split(",")).map(this::findNode).allMatch(Node::isProcessed);
+    }
 
 
     public void validate() {
@@ -181,10 +183,11 @@ public class Flow extends BaseModel {
      * 递归修改已处理节点的状态，修改为已认领
      */
     public void modifyNodeStatus(Node errorNode) {
+        List<String> nextNameList = Arrays.stream(errorNode.getNextName().split(",")).collect(Collectors.toList());
         List<Node> toBeProcessedNodeList = new ArrayList<>();
         nodes.forEach(node -> {
             //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为已认领
-            if (errorNode.getNextName().equals(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
+            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
                 node.setStatus(NodeStatusEnum.ACTIVE);
                 toBeProcessedNodeList.add(node);
             }
