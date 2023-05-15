@@ -103,6 +103,9 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Override
     public Flow queryById(Long id) {
         FlowEntity flowEntity = flowDao.selectById(id);
+        if (flowEntity == null) {
+            return null;
+        }
         Flow flow = FlowEntityFactory.toFlow(flowEntity);
         List<Node> nodes = getNodes(flowEntity.getId());
         flow.setNodes(nodes);

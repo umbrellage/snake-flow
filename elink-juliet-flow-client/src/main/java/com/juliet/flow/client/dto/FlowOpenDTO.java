@@ -11,7 +11,6 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class FlowOpenDTO {
 
-    @NotBlank(message = "流程标识不能为空")
     private String code;
 
     /**

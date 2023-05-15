@@ -12,7 +12,7 @@ import java.util.Map;
  */
 public interface FlowExecuteService {
 
-    NodeVO queryStartNodeByCode(Long tenantId, String templateCode);
+    NodeVO queryStartNodeById(Long templateId);
 
     Long startFlow(Long templateId);
 

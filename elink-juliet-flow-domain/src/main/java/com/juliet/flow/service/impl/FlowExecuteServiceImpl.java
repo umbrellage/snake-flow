@@ -45,8 +45,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     private TodoService todoService;
 
     @Override
-    public NodeVO queryStartNodeByCode(Long tenantId, String templateCode) {
-        FlowTemplate template = flowRepository.queryTemplateByCode(templateCode);
+    public NodeVO queryStartNodeById(Long templateId) {
+        FlowTemplate template = flowRepository.queryTemplateById(templateId);
+        if (template == null) {
+            return null;
+        }
         return template.getNodes().stream()
             .filter(node -> StringUtils.isBlank(node.getPreName()))
             .findAny()
@@ -58,6 +61,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public Long startFlow(Long templateId) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
+        if (flowTemplate == null) {
+            throw new ServiceException("流程模版不存在");
+        }
         Flow flow = flowTemplate.toFlowInstance();
         flow.validate();
         flowRepository.add(flow);
