@@ -6,6 +6,7 @@ import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
+import java.util.Optional;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.util.CollectionUtils;
 
@@ -55,7 +56,7 @@ public class FlowEntityFactory {
         flowEntity.setName(flow.getName());
         flowEntity.setParentId(flow.getParentId());
         flowEntity.setFlowTemplateId(flow.getFlowTemplateId());
-        flowEntity.setStatus(flow.getStatus().getCode());
+        Optional.ofNullable(flow.getStatus()).ifPresent(status -> flowEntity.setStatus(status.getCode()));
         flowEntity.setCreateBy(flow.getCreateBy());
         flowEntity.setUpdateBy(flow.getUpdateBy());
         flowEntity.setTenantId(flow.getTenantId());

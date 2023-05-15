@@ -52,10 +52,10 @@
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>-->
+<!--        </dependency>-->
         <!-- Elink Common DataSource -->
         <dependency>
             <groupId>com.juliet.common.datasource</groupId>
@@ -65,6 +65,10 @@
         <dependency>
             <groupId>com.juliet.common.datascope</groupId>
             <artifactId>elink-common-datascope</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.juliet.common.swagger</groupId>
+            <artifactId>elink-common-swagger</artifactId>
         </dependency>
     </dependencies>
 

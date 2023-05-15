@@ -20,6 +20,7 @@ import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,57 +44,63 @@ public class FlowExecuteController implements JulietFlowClient {
     /**
      * 流程实例还没创建，做预创建时的查询
      */
+    @ApiOperation("获取流程模版的开始节点")
     @Override
     public AjaxResult<NodeVO> open(FlowOpenDTO dto) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        Long tenantId = sysUser.getTenantId();
-        Long userId = sysUser.getUserId();
-        NodeVO node = flowExecuteService.queryStartNodeByCode(tenantId, dto.getCode());
+        NodeVO node = flowExecuteService.queryStartNodeById(dto.getTemplateId());
         BusinessAssert.assertNotNull(node, StatusCode.SERVICE_ERROR, "can not find node by code:" + dto.getCode());
         return AjaxResult.success(node);
     }
 
+    @ApiOperation("通过表单字段查询节点，并执行")
     @Override
     public AjaxResult<Long> forward(FlowIdDTO dto, Map<String, ?> map) {
         Long flowId = flowExecuteService.forward(dto.getFlowId(), map);
         return AjaxResult.success(flowId);
     }
 
+    @ApiOperation("流程是否结束")
     @Override
     public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
         return AjaxResult.success(new Flow().isEnd());
     }
 
+    @ApiOperation("初始化一个流程")
     @Override
     public AjaxResult<Long> initBmp(BpmDTO dto) {
         Long flowId = flowExecuteService.startFlow(dto.getTemplateId());
         return AjaxResult.success(flowId);
     }
 
+    @ApiOperation("获取当前流程的待执行的节点")
     @Override
     public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());
         return AjaxResult.success(nodeVOList);
     }
 
+    @ApiOperation("认领待办任务、修改待办人、分配一个待办人")
     @Override
     public AjaxResult<Void> claimTask(TaskDTO dto) {
         flowExecuteService.claimTask(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
         return AjaxResult.success();
     }
 
+    @ApiOperation("执行一个节点任务")
     @Override
     public AjaxResult<Void> task(TaskDTO dto) {
         flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getNodeName(), dto.getUserId());
         return AjaxResult.success();
     }
 
+    @ApiOperation("获取所有的待办")
     @Override
     public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto.getUserId());
         return AjaxResult.success(nodeVOList);
     }
 
+    @ApiOperation("获取流程")
     @Override
     public AjaxResult<FlowVO> flow(FlowIdDTO dto) {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());

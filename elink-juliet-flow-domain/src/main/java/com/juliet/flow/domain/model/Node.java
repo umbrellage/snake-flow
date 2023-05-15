@@ -5,6 +5,7 @@ import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -95,7 +96,7 @@ public class Node extends BaseModel {
         data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
-        data.setForm(form.toForm());
+        Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
             List<PostVO> postVOList = bindPosts.stream()
