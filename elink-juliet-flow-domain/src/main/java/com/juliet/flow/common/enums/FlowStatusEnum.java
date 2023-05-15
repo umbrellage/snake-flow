@@ -11,6 +11,9 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum FlowStatusEnum {
 
+    /**
+     *
+     */
     IN_PROGRESS(1, "进行中"),
     ABNORMAL(2, "异常中"),
     END(3, "已结束"),
@@ -29,6 +32,15 @@ public enum FlowStatusEnum {
         for (FlowStatusEnum statusEnum : FlowStatusEnum.values()) {
             if (statusEnum.getCode().equals(code)) {
                 return statusEnum.getMsg();
+            }
+        }
+        throw new IllegalArgumentException("[NodeStatusEnum]code is invalid");
+    }
+
+    public static FlowStatusEnum findByCode(Integer code) {
+        for (FlowStatusEnum statusEnum : FlowStatusEnum.values()) {
+            if (statusEnum.getCode().equals(code)) {
+                return statusEnum;
             }
         }
         throw new IllegalArgumentException("[NodeStatusEnum]code is invalid");

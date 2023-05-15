@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -58,6 +59,7 @@ public class Flow extends BaseModel {
         return status == FlowStatusEnum.END || isEnd();
     }
 
+
     /**
      * 当前流程是否已经结束
      */
@@ -94,6 +96,15 @@ public class Flow extends BaseModel {
         return nodes.stream()
             .filter(node -> node.getId().equals(nodeId)).findAny()
             .orElse(null);
+    }
+
+    public Node findNodeThrow(Long nodeId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getId().equals(nodeId)).findAny()
+            .orElseThrow(() -> new ServiceException("找不到节点"));
     }
 
     public Node findNode(String name) {
@@ -141,9 +152,16 @@ public class Flow extends BaseModel {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
         }
-        nodes.stream()
-            .filter(node -> node.getId().equals(nodeId))
-            .forEach(node -> node.setProcessedBy(userId));
+        Node currentNode = findNodeThrow(nodeId);
+        List<String> preNameList = currentNode.preNameList();
+        boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+            currentNode.setProcessedBy(userId);
+            currentNode.setStatus(NodeStatusEnum.ACTIVE);
+        } else {
+            throw new ServiceException("流程未走到当前节点");
+        }
     }
 
     public FlowVO flowVO() {
@@ -180,21 +198,59 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 递归修改已处理节点的状态，修改为已认领
+     * 新建一条错误流程时 递归修改已处理节点的状态，修改为已认领
      */
     public void modifyNodeStatus(Node errorNode) {
         List<String> nextNameList = Arrays.stream(errorNode.getNextName().split(",")).collect(Collectors.toList());
         List<Node> toBeProcessedNodeList = new ArrayList<>();
         nodes.forEach(node -> {
-            //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为已认领
+            //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为未激活
             if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
-                node.setStatus(NodeStatusEnum.ACTIVE);
+                node.setStatus(NodeStatusEnum.NOT_ACTIVE);
                 toBeProcessedNodeList.add(node);
             }
         });
         for (Node node : toBeProcessedNodeList) {
             modifyNodeStatus(node);
         }
+    }
+
+    /**
+     * 完成某一节点的处理，并且修改下一节点的状态从待激活到待认领，如果处理人不为null则修改为已认领
+     *
+     * @param nodeId
+     */
+    public void modifyNextNodeStatus(Long nodeId) {
+        Node currentNode = findNode(nodeId);
+        if (currentNode == null) {
+            return;
+        }
+
+        List<String> nextNameList = currentNode.nextNameList();
+        nodes.forEach(node -> {
+            if (node.getId().equals(nodeId)) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
+        });
+
+
+        nodes.forEach(node -> {
+            if (nextNameList.contains(node.getName())) {
+
+                List<String> preNameList = node.preNameList();
+                boolean preHandled = nodes.stream().filter(handledNode -> preNameList.contains(handledNode.getName()))
+                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED);
+                // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
+                if (preHandled) {
+                    if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                        node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                    }
+                    if (node.getStatus() == NodeStatusEnum.PROCESSED) {
+                        node.setStatus(NodeStatusEnum.ACTIVE);
+                    }
+                }
+            }
+        });
     }
 
     /**

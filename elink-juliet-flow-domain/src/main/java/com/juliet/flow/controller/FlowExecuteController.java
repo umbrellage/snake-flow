@@ -1,8 +1,6 @@
 package com.juliet.flow.controller;
 
-import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
@@ -16,7 +14,6 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.FlowOpenResultDTO;
 import com.juliet.flow.domain.model.Field;
-import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
@@ -62,7 +59,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("流程是否结束")
     @Override
     public AjaxResult<Boolean> flowIsEnd(@RequestBody FlowIdDTO dto) {
-        return AjaxResult.success(new Flow().isEnd());
+        return AjaxResult.success(flowExecuteService.flowEnd(dto.getFlowId()));
     }
 
     @ApiOperation("初始化一个流程")
@@ -72,7 +69,7 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(flowId);
     }
 
-    @ApiOperation("获取当前流程的待执行的节点")
+    @ApiOperation("获取当前流程所在的节点")
     @Override
     public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
         List<NodeVO> nodeVOList = flowExecuteService.currentNodeList(dto.getFlowId());

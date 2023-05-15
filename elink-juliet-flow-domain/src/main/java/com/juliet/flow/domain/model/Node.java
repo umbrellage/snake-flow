@@ -5,6 +5,8 @@ import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -12,6 +14,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author xujianjie
@@ -56,7 +59,32 @@ public class Node extends BaseModel {
     private Long processedBy;
 
     /**
+     * 获取前置节点列表
+     * @return
+     */
+    public List<String> preNameList() {
+        if (StringUtils.isBlank(preName)) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(preName.split(","))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 获取后置节点列表
+     * @return
+     */
+    public List<String> nextNameList() {
+        if (StringUtils.isBlank(nextName)) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(nextName.split(","))
+            .collect(Collectors.toList());
+    }
+
+    /**
      * 节点是否已处理
+     *
      * @return
      */
     public boolean isProcessed() {
@@ -65,6 +93,7 @@ public class Node extends BaseModel {
 
     /**
      * 判断节点是否是一个可被执行的
+     *
      * @return
      */
     public boolean isExecutable() {
@@ -96,6 +125,9 @@ public class Node extends BaseModel {
         data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
+        if (status != null) {
+            data.setStatus(status.getCode());
+        }
         Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
@@ -108,7 +140,6 @@ public class Node extends BaseModel {
     }
 
     public Node copyNode() {
-//        public Node copyNode(Map<Long, Long> nodeIdMap) {
         Node node = new Node();
         node.id = IdGenerator.getId();
         node.title = title;
@@ -123,8 +154,6 @@ public class Node extends BaseModel {
         node.submitRule = submitRule;
         node.processedBy = processedBy;
         return node;
-
-//        nodeIdMap.put(id, node.id);
     }
 
 }

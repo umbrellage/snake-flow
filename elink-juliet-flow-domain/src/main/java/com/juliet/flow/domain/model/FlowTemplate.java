@@ -1,6 +1,12 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
+import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.common.enums.NodeTypeEnum;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 import lombok.Data;
 
 import java.util.List;
@@ -28,8 +34,23 @@ public class FlowTemplate extends BaseModel {
     public Flow toFlowInstance() {
         Flow flow = new Flow();
         flow.setFlowTemplateId(this.id);
-        flow.setNodes(this.nodes);
+
+        Node start = nodes.stream()
+            .filter(node -> node.getType().equals(NodeTypeEnum.START))
+            .findAny()
+            .orElseThrow(() -> new ServiceException("找不到开始节点"));
+        List<String> nextNameList = Arrays.stream(start.getNextName().split(",")).collect(Collectors.toList());
+        nodes.forEach(node -> {
+                if (nextNameList.contains(node.getName())) {
+                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                }
+                if (node.getType().equals(NodeTypeEnum.START)) {
+                    node.setStatus(NodeStatusEnum.PROCESSED);
+                }
+            });
+        flow.setNodes(nodes);
         flow.setTenantId(getTenantId());
+        flow.setStatus(FlowStatusEnum.IN_PROGRESS);
         cleanFlowId(flow);
         return flow;
     }

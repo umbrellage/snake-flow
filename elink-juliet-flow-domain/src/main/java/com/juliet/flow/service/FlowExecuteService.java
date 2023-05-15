@@ -16,6 +16,8 @@ public interface FlowExecuteService {
 
     Long startFlow(Long templateId);
 
+    boolean flowEnd(Long flowId);
+
     Long forward(Long flowId, Map<String, ?> map);
 
     List<NodeVO> currentNodeList(Long flowId);

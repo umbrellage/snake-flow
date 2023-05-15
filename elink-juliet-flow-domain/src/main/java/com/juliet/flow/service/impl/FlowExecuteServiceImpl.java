@@ -71,6 +71,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
+    public boolean flowEnd(Long flowId) {
+        Flow flow = flowRepository.queryById(flowId);
+        if (flow == null) {
+            throw new ServiceException("流程不存在");
+        }
+        return flow.isFlowEnd();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public Long forward(Long flowId, Map<String, ?> map) {
         if (flowId == null) {
@@ -152,7 +161,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void task(Long flowId, Long nodeId, String nodeName, Long userId) {
+    public synchronized void task(Long flowId, Long nodeId, String nodeName, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null) {
             return;
@@ -179,14 +188,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
                     Flow subFlow = flow.subFlow();
                     subFlow.modifyNodeStatus(node);
-                    flowRepository.update(subFlow);
+                    subFlow.modifyNextNodeStatus(nodeId);
+                    flowRepository.add(subFlow);
                     return;
                 }
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                flow.finishNode(nodeId);
+                flow.modifyNextNodeStatus(nodeId);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream().allMatch(Flow::isEnd))) {
                     flow.setStatus(FlowStatusEnum.END);
                 }
@@ -204,7 +214,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
                 throw new ServiceException("该节点未被认领");
             }
-            errorFlow.finishNode(nodeId);
+            errorFlow.modifyNextNodeStatus(nodeId);
             if (errorFlow.isEnd()) {
                 errorFlow.setStatus(FlowStatusEnum.END);
                 // 如果子流程都结束了，那么主流程也肯定结束了

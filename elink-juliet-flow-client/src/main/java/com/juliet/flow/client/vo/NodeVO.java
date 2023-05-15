@@ -22,6 +22,7 @@ public class NodeVO {
 
     private String nextName;
 
+    private Integer status;
 
     private Long flowId;
 

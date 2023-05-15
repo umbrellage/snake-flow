@@ -1,11 +1,14 @@
 package com.juliet.flow.repository.trasnfer;
 
+import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
+import java.util.Arrays;
 import java.util.Optional;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.util.CollectionUtils;
@@ -24,6 +27,8 @@ public class FlowEntityFactory {
     public static Flow toFlow(FlowEntity flowEntity) {
         Flow flow = new Flow();
         flow.setId(flowEntity.getId());
+        flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));
+        flow.setFlowTemplateId(flowEntity.getFlowTemplateId());
         return flow;
     }
 
@@ -52,7 +57,11 @@ public class FlowEntityFactory {
 
     public static FlowEntity toFlowEntity(Flow flow) {
         FlowEntity flowEntity = new FlowEntity();
-        flowEntity.setId(flow.getId());
+        if (flow.getId() == null) {
+            flowEntity.setId(IdGenerator.getId());
+        } else {
+            flowEntity.setId(flow.getId());
+        }
         flowEntity.setName(flow.getName());
         flowEntity.setParentId(flow.getParentId());
         flowEntity.setFlowTemplateId(flow.getFlowTemplateId());
@@ -178,15 +187,16 @@ public class FlowEntityFactory {
     }
 
     public static List<NodeEntity> transferNodeEntities(List<Node> nodes,
-                                                        Long tenantId,
-                                                        Long flowId,
-                                                        Long flowTemplateId) {
+        Long tenantId,
+        Long flowId,
+        Long flowTemplateId) {
         if (CollectionUtils.isEmpty(nodes)) {
             return Lists.newArrayList();
         }
-        return nodes.stream().map(node -> toNodeEntity(node, tenantId, flowId, flowTemplateId))
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
+
+        return nodes.stream()
+            .map(node -> toNodeEntity(node, tenantId, flowId, flowTemplateId))
+            .collect(Collectors.toList());
     }
 
     private static NodeEntity toNodeEntity(Node node, Long tenantId, Long flowId, Long flowTemplateId) {
@@ -238,7 +248,7 @@ public class FlowEntityFactory {
         node.setNextName(nodeEntity.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
-        node.setProcessedBy(node.getProcessedBy());
+        node.setProcessedBy(nodeEntity.getProcessedBy());
         node.setCreateBy(nodeEntity.getCreateBy());
         node.setUpdateBy(nodeEntity.getUpdateBy());
         node.setTenantId(nodeEntity.getTenantId());
@@ -252,9 +262,10 @@ public class FlowEntityFactory {
         for (Node node : nodes) {
             if (node != null && node.getForm() != null) {
                 List<FieldEntity> matchedFieldEntities = fieldEntities.stream()
-                        .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
-                        .collect(Collectors.toList());
-                node.getForm().setFields(matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+                    .filter(fieldEntity -> fieldEntity.getFormId().equals(node.getForm().getId()))
+                    .collect(Collectors.toList());
+                node.getForm().setFields(
+                    matchedFieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
             }
         }
     }
@@ -276,8 +287,8 @@ public class FlowEntityFactory {
         }
         for (Node node : nodes) {
             List<FormEntity> matchFormEntities = formEntities.stream()
-                    .filter(formEntity -> formEntity.getNodeId().equals(node.getId()))
-                    .collect(Collectors.toList());
+                .filter(formEntity -> formEntity.getNodeId().equals(node.getId()))
+                .collect(Collectors.toList());
             if (!CollectionUtils.isEmpty(matchFormEntities)) {
                 node.setForm(toForm(matchFormEntities.get(0)));
             }
@@ -302,10 +313,11 @@ public class FlowEntityFactory {
         }
         for (Node node : nodes) {
             List<PostEntity> bindPostEntities = postEntities.stream()
-                    .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
-                    .collect(Collectors.toList());
+                .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
+                .collect(Collectors.toList());
             if (CollectionUtils.isEmpty(bindPostEntities)) {
-                node.setBindPosts(bindPostEntities.stream().map(FlowEntityFactory::toPost).collect(Collectors.toList()));
+                node.setBindPosts(
+                    bindPostEntities.stream().map(FlowEntityFactory::toPost).collect(Collectors.toList()));
             }
         }
     }

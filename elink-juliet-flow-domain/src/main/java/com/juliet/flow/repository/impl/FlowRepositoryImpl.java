@@ -47,13 +47,13 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Autowired
     private FlowTemplateDao flowTemplateDao;
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void add(Flow flow) {
         FlowEntityFactory.cleanFlowId(flow);
         FlowEntity entity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.insert(entity);
-        addNodes(flow.getNodes(), flow.getTenantId(), flow.getId(), 0L);
+        addNodes(flow.getNodes(), flow.getTenantId(), entity.getId(), 0L);
     }
 
     private void addNodes(List<Node> nodes, Long tenantId, Long flowId, Long flowTemplateId) {
@@ -241,29 +241,4 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntityFactory.fillNodePost(nodes, postEntities);
         return nodes;
     }
-
-//    private void fillNodePre(Node node, Node pre) {
-//        if (node.getPre() == null) {
-//            node.setPre(Lists.newArrayList());
-//        }
-//        if (pre != null) {
-//            boolean preNodeExist = false;
-//            for (Node nodeInPre : node.getPre()) {
-//                if (nodeInPre.getId().equals(pre.getId())) {
-//                    preNodeExist = true;
-//                    break;
-//                }
-//            }
-//            if (!preNodeExist) {
-//                node.getPre().add(pre);
-//            }
-//        }
-//        if (CollectionUtils.isEmpty(node.getNext())) {
-//            return;
-//        }
-//        for (Node subNode : node.getNext()) {
-//            // 子节点的pre就是当前node
-//            fillNodePre(subNode, node);
-//        }
-//    }
 }
