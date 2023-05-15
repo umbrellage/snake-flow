@@ -28,6 +28,24 @@ public class FlowEntityFactory {
 
     public static void cleanFlowId(Flow flow) {
         flow.setId(null);
+        if (!CollectionUtils.isEmpty(flow.getNodes())) {
+            flow.getNodes().forEach(node -> {
+                node.setId(null);
+                if (node.getForm() != null) {
+                    node.getForm().setId(null);
+                    if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
+                        for (Field field : node.getForm().getFields()) {
+                            field.setId(null);
+                        }
+                    }
+                }
+                if (!CollectionUtils.isEmpty(node.getBindPosts())) {
+                    for (Post bindPost : node.getBindPosts()) {
+                        bindPost.setId(null);
+                    }
+                }
+            });
+        }
     }
 
 
