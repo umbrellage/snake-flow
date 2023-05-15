@@ -58,7 +58,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public void forward(Long flowId) {
         Flow flow = flowRepository.queryById(flowId);
-
         flow.forward();
 //        List<Role> todoRoles = flow.get();
 //        todoService.sendTodo(todoRoles, flow.getCurrentTodo());
