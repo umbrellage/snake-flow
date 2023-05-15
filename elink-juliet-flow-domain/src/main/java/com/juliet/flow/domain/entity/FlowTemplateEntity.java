@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2023-05-09
  */
 @Data
-@TableName(value = "juliet_flow_template")
+@TableName(value = "jbpm_flow_template")
 public class FlowTemplateEntity extends BaseEntity {
 
     @TableId

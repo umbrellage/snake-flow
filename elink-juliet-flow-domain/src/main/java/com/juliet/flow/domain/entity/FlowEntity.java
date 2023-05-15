@@ -12,7 +12,7 @@ import java.util.Date;
  * @date 2023-05-09
  */
 @Data
-@TableName(value = "juliet_flow")
+@TableName(value = "jbpm_flow")
 public class FlowEntity extends BaseEntity {
 
     @TableId

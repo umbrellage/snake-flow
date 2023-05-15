@@ -10,7 +10,7 @@ import lombok.Data;
  * @date 2023-05-09
  */
 @Data
-@TableName("juliet_flow_node_form_field")
+@TableName("jbpm_flow_node_form_field")
 public class FieldEntity extends BaseEntity {
 
     @TableId
