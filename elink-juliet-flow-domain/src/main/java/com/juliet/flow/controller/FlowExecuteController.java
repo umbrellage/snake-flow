@@ -54,9 +54,9 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult<Void> forward(FlowIdDTO dto, Map<String, ?> map) {
-        flowExecuteService.forward(dto.getFlowId(), map);
-        return AjaxResult.success();
+    public AjaxResult<Long> forward(FlowIdDTO dto, Map<String, ?> map) {
+        Long flowId = flowExecuteService.forward(dto.getFlowId(), map);
+        return AjaxResult.success(flowId);
     }
 
     @Override

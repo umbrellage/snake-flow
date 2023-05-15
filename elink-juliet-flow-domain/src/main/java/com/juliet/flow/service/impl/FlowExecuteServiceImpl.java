@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -65,7 +66,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void forward(Long flowId, Map<String, ?> map) {
+    public Long forward(Long flowId, Map<String, ?> map) {
+        if (flowId == null) {
+            Long templateId = (Long) map.entrySet().stream()
+                .filter(entry -> "templateId".equals(entry.getKey()))
+                .map(Entry::getValue)
+                .findAny()
+                .orElseThrow(() -> new ServiceException("缺少模版id"));
+            return startFlow(templateId);
+        }
         // 判断哪个节点需要被执行
         List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(flowId);
@@ -87,6 +96,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(map)));
         }
         executableNode.forEach(node -> task(flowId, mainNode.getId(), mainNode.getName(), mainNode.getProcessedBy()));
+
+        return null;
     }
 
     @Override

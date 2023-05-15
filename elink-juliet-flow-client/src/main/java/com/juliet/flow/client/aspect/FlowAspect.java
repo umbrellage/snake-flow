@@ -81,11 +81,12 @@ public class FlowAspect {
 
             String bodyStr = ServletUtils.readBody(request);
             Map<String, ?> map = JSON.parseObject(bodyStr, Map.class);
-            AjaxResult ajaxResult = julietFlowClient.forward(flowIdDTO, map);
+            AjaxResult<Long> ajaxResult = julietFlowClient.forward(flowIdDTO, map);
             if (ajaxResult.getCode().intValue() != 200) {
                 log.error("data saved but flow error:{}", ajaxResult);
                 throw new RuntimeException("数据已保存，但是流程异常:" + JSON.toJSONString(ajaxResult));
             }
+            request.setAttribute("flowId", ajaxResult.getData());
         } else {
             log.info("data saved error, flow abort! flow id:{}", longJulietFlowId);
         }
