@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class BpmDTO {
     /**
-     * 流程模版 id
+     * 流程模版 code
      */
-    private Long templateId;
+    private String templateCode;
 }

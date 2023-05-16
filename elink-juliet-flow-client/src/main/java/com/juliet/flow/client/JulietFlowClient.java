@@ -22,7 +22,7 @@ public interface JulietFlowClient {
     AjaxResult<NodeVO> open(@RequestBody FlowOpenDTO dto);
 
     @PostMapping("/bpm/forward")
-    AjaxResult<Long> forward(@RequestBody FlowIdDTO dto, @RequestParam("map") Map<String, ?>  map);
+    AjaxResult<Long> forward(@RequestBody NodeFieldDTO dto, @RequestParam("templateCode") String templateCode);
 
     /**
      * 根据字段列表查询节点

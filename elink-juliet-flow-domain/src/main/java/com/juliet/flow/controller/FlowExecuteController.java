@@ -52,8 +52,8 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("通过表单字段查询节点，并执行")
     @Override
-    public AjaxResult<Long> forward(FlowIdDTO dto, Map<String, ?> map) {
-        Long flowId = flowExecuteService.forward(dto.getFlowId(), map);
+    public AjaxResult<Long> forward(NodeFieldDTO dto, String templateCode) {
+        Long flowId = flowExecuteService.forward(dto, templateCode);
         return AjaxResult.success(flowId);
     }
 
@@ -72,7 +72,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("初始化一个流程")
     @Override
     public AjaxResult<Long> initBmp(BpmDTO dto) {
-        Long flowId = flowExecuteService.startFlow(dto.getTemplateId());
+        Long flowId = flowExecuteService.startFlow(dto.getTemplateCode());
         return AjaxResult.success(flowId);
     }
 

@@ -70,8 +70,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Long startFlow(Long templateId) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
+    public Long startFlow(String templateCode) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(templateCode);
         if (flowTemplate == null) {
             throw new ServiceException("流程模版不存在");
         }
@@ -99,20 +99,17 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long forward(Long flowId, Map<String, ?> map) {
-        if (flowId == null) {
-            Long templateId = (Long) map.entrySet().stream()
-                .filter(entry -> "templateId".equals(entry.getKey()))
-                .map(Entry::getValue)
-                .findAny()
+    public Long forward(NodeFieldDTO dto, String templateCode) {
+        if (dto.getFlowId() == null) {
+            Optional.ofNullable(templateCode)
                 .orElseThrow(() -> new ServiceException("缺少模版id"));
-            return startFlow(templateId);
+            return startFlow(templateCode);
         }
         // 判断哪个节点需要被执行
         List<Node> executableNode = new ArrayList<>();
-        Flow flow = flowRepository.queryById(flowId);
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
-        Node mainNode = flow.findNode(map);
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
+        Node mainNode = flow.findNode(dto.getFieldCodeList());
         if (CollectionUtils.isEmpty(subFlowList)) {
             if (mainNode.isExecutable()) {
                 executableNode.add(mainNode);
@@ -123,12 +120,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         } else {
             subFlowList.stream()
                 .filter(subFlow -> {
-                    Node node = subFlow.findNode(map);
+                    Node node = subFlow.findNode(dto.getFieldCodeList());
                     return node.isExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
-                .forEach(subFlow -> executableNode.add(subFlow.findNode(map)));
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
         }
-        executableNode.forEach(node -> task(flowId, mainNode.getId(), mainNode.getName(), mainNode.getProcessedBy()));
+        executableNode.forEach(node -> task(dto.getFlowId(), mainNode.getId(), mainNode.getName(), mainNode.getProcessedBy()));
 
         return null;
     }

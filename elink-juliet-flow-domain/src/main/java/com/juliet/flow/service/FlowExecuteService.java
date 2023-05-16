@@ -16,11 +16,11 @@ public interface FlowExecuteService {
 
     NodeVO queryStartNodeById(FlowOpenDTO dto);
 
-    Long startFlow(Long templateId);
+    Long startFlow(String templateCode);
 
     boolean flowEnd(Long flowId);
 
-    Long forward(Long flowId, Map<String, ?> map);
+    Long forward(NodeFieldDTO dto, String templateCode);
 
     List<NodeVO> currentNodeList(Long flowId);
 
