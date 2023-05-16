@@ -44,7 +44,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("获取流程模版的开始节点")
     @Override
     public AjaxResult<NodeVO> open(FlowOpenDTO dto) {
-        NodeVO node = flowExecuteService.queryStartNodeById(dto.getTemplateId());
+        NodeVO node = flowExecuteService.queryStartNodeById(dto);
         BusinessAssert.assertNotNull(node, StatusCode.SERVICE_ERROR, "can not find node by code:" + dto.getCode());
         return AjaxResult.success(node);
     }

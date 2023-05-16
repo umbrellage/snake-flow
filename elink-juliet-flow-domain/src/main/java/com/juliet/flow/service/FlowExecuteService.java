@@ -1,5 +1,6 @@
 package com.juliet.flow.service;
 
+import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.Node;
@@ -12,7 +13,7 @@ import java.util.Map;
  */
 public interface FlowExecuteService {
 
-    NodeVO queryStartNodeById(Long templateId);
+    NodeVO queryStartNodeById(FlowOpenDTO dto);
 
     Long startFlow(Long templateId);
 
