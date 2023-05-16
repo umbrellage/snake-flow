@@ -5,6 +5,7 @@ import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -54,6 +55,12 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<Long> forward(FlowIdDTO dto, Map<String, ?> map) {
         Long flowId = flowExecuteService.forward(dto.getFlowId(), map);
         return AjaxResult.success(flowId);
+    }
+
+    @Override
+    public AjaxResult<NodeVO> node(NodeFieldDTO dto) {
+        NodeVO nodeVO = flowExecuteService.fieldNode(dto);
+        return AjaxResult.success(nodeVO);
     }
 
     @ApiOperation("流程是否结束")

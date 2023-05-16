@@ -2,6 +2,7 @@ package com.juliet.flow.service.impl;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -87,6 +88,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             throw new ServiceException("流程不存在");
         }
         return flow.isFlowEnd();
+    }
+
+    @Override
+    public NodeVO fieldNode(NodeFieldDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        Node node = flow.findNode(dto.getFieldCodeList());
+        return node.toNodeVo(flow.getId());
     }
 
     @Override
@@ -250,4 +258,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         return flow.flowVO();
     }
+
+
 }

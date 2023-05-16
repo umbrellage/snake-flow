@@ -25,6 +25,14 @@ public interface JulietFlowClient {
     AjaxResult<Long> forward(@RequestBody FlowIdDTO dto, @RequestParam("map") Map<String, ?>  map);
 
     /**
+     * 根据字段列表查询节点
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/nodeField")
+    AjaxResult<NodeVO> node(NodeFieldDTO dto);
+
+    /**
      * 判断当前流程是否已经结束
      * @param dto flowId 必填
      */

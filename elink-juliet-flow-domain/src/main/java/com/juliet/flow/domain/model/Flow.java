@@ -89,6 +89,27 @@ public class Flow extends BaseModel {
             .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
     }
 
+    /**
+     * 根据可填写的字段查找节点
+     *
+     * @param fieldCodeList
+     * @return
+     */
+    public Node findNode(List<String> fieldCodeList) {
+        return nodes.stream().filter(node -> {
+                Form form = node.getForm();
+                List<String> codeList = form.getFields().stream()
+                    .map(Field::getCode)
+                    .collect(Collectors.toList());
+
+                return codeList.containsAll(fieldCodeList) && fieldCodeList.size() == codeList.size();
+            })
+            .findAny()
+            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+    }
+
+
+
     public Node findNode(Long nodeId) {
         if (CollectionUtils.isEmpty(nodes)) {
             return null;

@@ -1,6 +1,7 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.Node;
@@ -30,4 +31,6 @@ public interface FlowExecuteService {
     void task(Long flowId, Long nodeId, String nodeName, Long userId);
 
     FlowVO flow(Long flowId);
+
+    NodeVO fieldNode(NodeFieldDTO dto);
 }
