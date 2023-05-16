@@ -198,10 +198,10 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 新建一条错误流程时 递归修改已处理节点的状态，修改为已认领
+     * 新建一条错误流程时 递归修改已处理节点的状态，修改为未激活
      */
     public void modifyNodeStatus(Node errorNode) {
-        List<String> nextNameList = Arrays.stream(errorNode.getNextName().split(",")).collect(Collectors.toList());
+        List<String> nextNameList = errorNode.nextNameList();
         List<Node> toBeProcessedNodeList = new ArrayList<>();
         nodes.forEach(node -> {
             //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为未激活
@@ -243,7 +243,11 @@ public class Flow extends BaseModel {
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                        if (node.getProcessedBy() != null) {
+                            node.setStatus(NodeStatusEnum.ACTIVE);
+                        }else {
+                            node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                        }
                     }
                     if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                         node.setStatus(NodeStatusEnum.ACTIVE);
@@ -251,17 +255,5 @@ public class Flow extends BaseModel {
                 }
             }
         });
-    }
-
-    /**
-     * 完成某个节点的处理
-     *
-     * @param nodeId
-     */
-    public void finishNode(Long nodeId) {
-        nodes.stream()
-            .filter(node -> node.getId().equals(nodeId))
-            .forEach(node -> node.setStatus(NodeStatusEnum.PROCESSED));
-
     }
 }

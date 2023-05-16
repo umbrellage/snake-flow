@@ -188,7 +188,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
                     Flow subFlow = flow.subFlow();
                     subFlow.modifyNodeStatus(node);
-                    subFlow.modifyNextNodeStatus(nodeId);
+                    Node subNode = subFlow.findNode(node.getName());
+                    subFlow.modifyNextNodeStatus(subNode.getId());
                     flowRepository.add(subFlow);
                     return;
                 }
