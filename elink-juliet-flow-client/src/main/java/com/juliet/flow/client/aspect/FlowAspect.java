@@ -9,7 +9,9 @@ import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
+import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.utils.ServletUtils;
 
 import java.lang.reflect.Type;
@@ -18,6 +20,7 @@ import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
+import org.aspectj.apache.bcel.generic.RET;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -51,6 +54,12 @@ public class FlowAspect {
     @Autowired
     private List<ControllerResponseCallback> callbacks;
 
+    private static final String HEADER_NAME_JULIET_FLOW_CODE = "juliet-flow-code";
+
+    private static final String PARAM_MAME_JULIET_FLOW_CODE = "julietFlowCode";
+
+    private static final String PARAM_MAME_JULIET_FLOW_ID = "julietFlowId";
+
     @Pointcut("@annotation(com.juliet.flow.client.annotation.JulietFlowInterceptor)")
     public void pointcut() {
     }
@@ -60,52 +69,58 @@ public class FlowAspect {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
         if (null == sra) {
-            throw new RuntimeException("please put the JulietFlowSubmit on the controller method");
+            throw new RuntimeException("please put the JulietFlowInterceptor on the controller method");
         }
         HttpServletRequest request = sra.getRequest();
-        String julietFlowId = request.getParameter("julietFlowId");
-
-        if (julietFlowId == null || julietFlowId.length() == 0) {
-            throw new RuntimeException("By use annotation of JulietFlowSubmit, Required request parameter 'julietFlowId'");
-        }
-        Long longJulietFlowId;
-        try {
-            longJulietFlowId = Long.parseLong(julietFlowId);
-        } catch (Exception e) {
-            log.error("julietFlowId type must be Long!", e);
-            throw new RuntimeException("julietFlowId type must be Long! but " + julietFlowId);
-        }
+        String julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        String julietFlowCode = getJulietFlowCode(request);
 
         List<String> fields = parseRequestParams(point);
-        log.info("all fields:{}", fields);
+        log.info("juliet flow interceptor all fields:{}", fields);
 
-        // 判断一下当前流程是否已经结束了
-//        Boolean end = getCurrentFlowIsEnd(longJulietFlowId);
-//        if (end == null) {
-//            throw new RuntimeException("get current flow status fail, flow id:" + longJulietFlowId);
-//        }
-//        if (end) {
-//            throw new RuntimeException("current flow is ended!, flow id:" + longJulietFlowId);
-//        }
+        boolean bpmInit = true;
+        Long longJulietFlowId = 0L;
+        if (julietFlowId != null) {
+            bpmInit = false;
+            try {
+                longJulietFlowId = Long.parseLong(julietFlowId);
+                if (longJulietFlowId <= 0) {
+                    throw new RuntimeException("invalid juliet flow id, value:" + longJulietFlowId);
+                }
+            } catch (Exception e) {
+                log.error("julietFlowId type must be Long!", e);
+                throw new RuntimeException("request parameter `julietFlowId` type must be Long! but " + julietFlowId);
+            }
+            AjaxResult<Long> initResult = julietFlowClient.forward(toNodeFieldDTO(fields, longJulietFlowId), julietFlowCode);
+            if (!isSuccess(initResult)) {
+                log.error("juliet flow init error! response:{}", initResult);
+                throw new RuntimeException("juliet flow init error!");
+            }
+            longJulietFlowId = initResult.getData();
+            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(longJulietFlowId)});
+        } else if (julietFlowCode == null || julietFlowCode.length() == 0) {
+            throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
+        }
 
         Object result = point.proceed();
         if (responseIsSuccess(result)) {
             log.info("juliet flow forward by flow id:{}", longJulietFlowId);
-            FlowIdDTO flowIdDTO = new FlowIdDTO();
-            flowIdDTO.setFlowId(longJulietFlowId);
-
-//            String bodyStr = ServletUtils.readBody(request);
-//            Map<String, ?> map = JSON.parseObject(bodyStr, Map.class);
-//            AjaxResult<Long> ajaxResult = julietFlowClient.forward(flowIdDTO, map);
-//            if (ajaxResult.getCode().intValue() != 200) {
-//                log.error("data saved but flow error:{}", ajaxResult);
-//                throw new RuntimeException("数据已保存，但是流程异常:" + JSON.toJSONString(ajaxResult));
-//            }
-//            request.setAttribute("flowId", ajaxResult.getData());
+            // 业务处理成功，流程往后走
         } else {
             log.info("data saved error, flow abort! flow id:{}", longJulietFlowId);
+            if (bpmInit) {
+                // 初始化流程的情况下，业务处理失败，流程结束
+
+            }
         }
         return result;
+    }
+
+    private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId) {
+        NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
+        nodeFieldDTO.setFieldCodeList(fields);
+        nodeFieldDTO.setFlowId(julietFlowId);
+        return nodeFieldDTO;
     }
 
     private boolean responseIsSuccess(Object object) {
@@ -120,20 +135,6 @@ public class FlowAspect {
             return callback.responseIsSuccess(object);
         }
         throw new RuntimeException("impossible!");
-    }
-
-    private Boolean getCurrentFlowIsEnd(Long flowId) {
-        FlowIdDTO flowIdDTO = new FlowIdDTO();
-        flowIdDTO.setFlowId(flowId);
-        AjaxResult<Boolean> ajaxResult = julietFlowClient.flowIsEnd(flowIdDTO);
-        if (ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode().intValue() == 200) {
-            if (ajaxResult.getData() != null) {
-                return ajaxResult.getData();
-            }
-        } else {
-            log.error("query current flow status error:{}", ajaxResult);
-        }
-        return null;
     }
 
     private Map<String, Object> getMethodArgs(JoinPoint joinPoint) {
@@ -187,7 +188,9 @@ public class FlowAspect {
             } else if (jsonObject.get(key) instanceof JSONArray) {
                 parseFieldByJsonArray(fields, jsonObject.getJSONArray(key), wholeKey);
             } else {
-                fields.add(wholeKey);
+                if (jsonObject.get(key) != null) {
+                    fields.add(wholeKey);
+                }
             }
         }
     }
@@ -199,5 +202,19 @@ public class FlowAspect {
         for (int i = 0; i < jsonArray.size(); i++) {
             parseFieldByJsonObject(fields, jsonArray.getJSONObject(i), fieldPrefix);
         }
+    }
+
+    private String getJulietFlowCode(HttpServletRequest request) {
+        String julietFlowCode = null;
+        julietFlowCode = request.getHeader(HEADER_NAME_JULIET_FLOW_CODE);
+        if (julietFlowCode != null) {
+            return julietFlowCode;
+        }
+        julietFlowCode = request.getParameter(PARAM_MAME_JULIET_FLOW_CODE);
+        return julietFlowCode;
+    }
+
+    private boolean isSuccess(AjaxResult ajaxResult) {
+        return ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode().intValue() == 200;
     }
 }
