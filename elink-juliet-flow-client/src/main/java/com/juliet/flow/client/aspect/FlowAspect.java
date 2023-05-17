@@ -91,12 +91,12 @@ public class FlowAspect {
                 log.error("julietFlowId type must be Long!", e);
                 throw new RuntimeException("request parameter `julietFlowId` type must be Long! but " + julietFlowId);
             }
-            AjaxResult<Long> initResult = julietFlowClient.forward(toNodeFieldDTO(fields, longJulietFlowId), julietFlowCode);
+            AjaxResult<Void> initResult = julietFlowClient.forward(toNodeFieldDTO(fields, longJulietFlowId), julietFlowCode);
             if (!isSuccess(initResult)) {
                 log.error("juliet flow init error! response:{}", initResult);
                 throw new RuntimeException("juliet flow init error!");
             }
-            longJulietFlowId = initResult.getData();
+//            longJulietFlowId = initResult.getData();
             request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(longJulietFlowId)});
         } else if (julietFlowCode == null || julietFlowCode.length() == 0) {
             throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");

@@ -138,7 +138,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Long forward(NodeFieldDTO dto) {
+    public void forward(NodeFieldDTO dto) {
 //        if (dto.getFlowId() == null) {
 //            Optional.ofNullable(templateCode)
 //                .orElseThrow(() -> new ServiceException("缺少模版id"));
@@ -170,7 +170,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         executableNode.forEach(
             node -> task(dto.getFlowId(), node.getId(), node.getName(), node.getProcessedBy()));
 
-        return null;
     }
 
     /**
