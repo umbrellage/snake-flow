@@ -87,10 +87,14 @@ public class FlowAspect {
             bpmInit = true;
             AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode));
             if (!isSuccess(initResult)) {
-                log.error("juliet flow init error! response:{}", initResult);
+                log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
                 throw new RuntimeException("juliet flow init error!");
             }
             julietFlowId = initResult.getData();
+            if (julietFlowId == null) {
+                log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
+                throw new RuntimeException("juliet flow init error! flow id is null!");
+            }
             log.info("juliet flow init success!");
 //            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
             request.setAttribute(PARAM_MAME_JULIET_FLOW_ID, julietFlowId);
