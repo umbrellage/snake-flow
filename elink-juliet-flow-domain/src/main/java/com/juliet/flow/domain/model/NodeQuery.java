@@ -1,8 +1,10 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.common.enums.NodeStatusEnum;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Data;
 
 import java.util.List;
@@ -51,6 +53,8 @@ public class NodeQuery {
     public static NodeQuery findByUserId(Long userId) {
         NodeQuery data = new NodeQuery();
         data.setUserId(userId);
+        data.setStatusList(Stream.of(NodeStatusEnum.TO_BE_CLAIMED, NodeStatusEnum.ACTIVE).map(NodeStatusEnum::getCode)
+            .collect(Collectors.toList()));
         return data;
     }
 
@@ -59,6 +63,8 @@ public class NodeQuery {
         if (CollectionUtils.isNotEmpty(postIdList)) {
             data.setPostIds(postIdList.stream().map(String::valueOf).collect(Collectors.toList()));
         }
+        data.setStatusList(Stream.of(NodeStatusEnum.TO_BE_CLAIMED, NodeStatusEnum.ACTIVE).map(NodeStatusEnum::getCode)
+            .collect(Collectors.toList()));
         return data;
     }
 }
