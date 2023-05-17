@@ -125,13 +125,25 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 new TreeSet<>(Comparator.comparing(NodeVO::getName))), ArrayList::new));
     }
 
+    /**
+     *
+     * @param flowId 可能是主流程id，也可能是异常流程id，如果是异常流程id，找到主流程然后认领主流程下所有异常流程的节点
+     * @param nodeId
+     * @param userId
+     */
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void claimTask(Long flowId, Long nodeId, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
-        BusinessAssert.assertNotNull(flow, StatusCode.SERVICE_ERROR, "can not find flow, flowId:" + flowId);
+        if (flow == null) {
+            return;
+        }
         Node node = flow.findNodeThrow(nodeId);
-        flow.claimNode(nodeId, userId);
+        if (flow.getParentId() != null) {
+            flow = flowRepository.queryById(flow.getParentId());
+        }
+        BusinessAssert.assertNotNull(flow, StatusCode.SERVICE_ERROR, "can not find flow, flowId:" + flowId);
+        flow.claimNode(node.getName(), userId);
         List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
         subFlowList.forEach(subFlow -> {
             subFlow.claimNode(node.getName(), userId);
