@@ -6,6 +6,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -280,12 +281,17 @@ public class Flow extends BaseModel {
                     .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
+                    if (node.getType() == NodeTypeEnum.END) {
+                        node.setStatus(NodeStatusEnum.PROCESSED);
+                        return;
+                    }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
                         if (node.getProcessedBy() != null) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         }else {
                             node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
                         }
+                        return;
                     }
                     if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                         node.setStatus(NodeStatusEnum.ACTIVE);
