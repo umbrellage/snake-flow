@@ -2,9 +2,11 @@ package com.juliet.flow.domain.model;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.stream.Collectors;
 import lombok.Data;
 
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * @author xujianjie
@@ -50,11 +52,10 @@ public class NodeQuery {
         return data;
     }
 
-    public static NodeQuery findByPostId(Long postId) {
+    public static NodeQuery findByPostId(List<Long> postIdList) {
         NodeQuery data = new NodeQuery();
-        if (postId != null) {
-            String value = String.valueOf(postId);
-            data.setPostIds(Collections.singletonList(value));
+        if (CollectionUtils.isNotEmpty(postIdList)) {
+            data.setPostIds(postIdList.stream().map(String::valueOf).collect(Collectors.toList()));
         }
         return data;
     }

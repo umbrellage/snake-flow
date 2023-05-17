@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,5 +16,5 @@ public class UserDTO {
 
     private Long userId;
     private Long tenantId;
-    private Long postId;
+    private List<Long> postId;
 }

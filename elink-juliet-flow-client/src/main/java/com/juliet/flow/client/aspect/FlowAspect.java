@@ -10,17 +10,11 @@ import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.dto.BpmDTO;
-import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
-import com.juliet.flow.client.utils.ServletUtils;
-
-import java.lang.reflect.Type;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
-import org.aspectj.apache.bcel.generic.RET;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -31,11 +25,9 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -240,7 +232,7 @@ public class FlowAspect {
     }
 
     private boolean isSuccess(AjaxResult ajaxResult) {
-        return ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode().intValue() == 200;
+        return ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode() == 200;
     }
 
     private Long getJulietFlowId(HttpServletRequest request) {
