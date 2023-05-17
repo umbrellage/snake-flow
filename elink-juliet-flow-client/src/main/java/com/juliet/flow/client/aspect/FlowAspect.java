@@ -72,48 +72,69 @@ public class FlowAspect {
             throw new RuntimeException("please put the JulietFlowInterceptor on the controller method");
         }
         HttpServletRequest request = sra.getRequest();
-        String julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+
         String julietFlowCode = getJulietFlowCode(request);
+        Long julietFlowId = getJulietFlowId(request);
 
         List<String> fields = parseRequestParams(point);
         log.info("juliet flow interceptor all fields:{}", fields);
 
-        boolean bpmInit = true;
-        Long longJulietFlowId = 0L;
-        if (julietFlowId != null) {
-            bpmInit = false;
-            try {
-                longJulietFlowId = Long.parseLong(julietFlowId);
-                if (longJulietFlowId <= 0) {
-                    throw new RuntimeException("invalid juliet flow id, value:" + longJulietFlowId);
-                }
-            } catch (Exception e) {
-                log.error("julietFlowId type must be Long!", e);
-                throw new RuntimeException("request parameter `julietFlowId` type must be Long! but " + julietFlowId);
+        boolean bpmInit = false;
+        if (julietFlowId == null) {
+            if (julietFlowCode == null || julietFlowCode.length() == 0) {
+                throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
-            AjaxResult<Long> initResult = julietFlowClient.forward(toNodeFieldDTO(fields, longJulietFlowId), julietFlowCode);
+            bpmInit = true;
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode));
             if (!isSuccess(initResult)) {
                 log.error("juliet flow init error! response:{}", initResult);
                 throw new RuntimeException("juliet flow init error!");
             }
-            longJulietFlowId = initResult.getData();
-            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(longJulietFlowId)});
-        } else if (julietFlowCode == null || julietFlowCode.length() == 0) {
-            throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
+            julietFlowId = initResult.getData();
+            log.info("juliet flow init success!");
+//            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
+            request.setAttribute(PARAM_MAME_JULIET_FLOW_ID, julietFlowId);
+        } else {
+            log.info("juliet flow pre forward!");
+            // todo 流程预校验
         }
 
-        Object result = point.proceed();
-        if (responseIsSuccess(result)) {
-            log.info("juliet flow forward by flow id:{}", longJulietFlowId);
-            // 业务处理成功，流程往后走
-        } else {
-            log.info("data saved error, flow abort! flow id:{}", longJulietFlowId);
-            if (bpmInit) {
-                // 初始化流程的情况下，业务处理失败，流程结束
-
+        boolean businessForwardSuccess = false;
+        try {
+            Object result = point.proceed();
+            if (responseIsSuccess(result)) {
+                businessForwardSuccess = true;
+            }
+            return result;
+        } catch (Exception e) {
+            log.error("business forward exception!", e);
+            throw e;
+        } finally {
+            if (businessForwardSuccess) {
+                log.info("juliet flow forward by flow id:{}", julietFlowId);
+                // 业务处理成功，流程往后走
+                if (!bpmInit) {
+                    NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId);
+                    AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
+                    if (!isSuccess(forwardResult)) {
+                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}", julietFlowId, nodeFieldDTO, forwardResult);
+                    }
+                    log.info("juliet flow forward success!");
+                }
+            } else {
+                log.error("business forward error, flow abort! flow id:{}", julietFlowId);
+                if (bpmInit) {
+                    // 初始化流程的情况下，业务处理失败，流程结束
+                    // TODO 关闭流程
+                }
             }
         }
-        return result;
+    }
+
+    private BpmDTO toBpmDTO(String julietFlowCode) {
+        BpmDTO bpmDTO = new BpmDTO();
+        bpmDTO.setTemplateCode(julietFlowCode);
+        return bpmDTO;
     }
 
     private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId) {
@@ -216,5 +237,22 @@ public class FlowAspect {
 
     private boolean isSuccess(AjaxResult ajaxResult) {
         return ajaxResult != null && ajaxResult.getCode() != null && ajaxResult.getCode().intValue() == 200;
+    }
+
+    private Long getJulietFlowId(HttpServletRequest request) {
+        String julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        if (julietFlowId == null || julietFlowId.trim().length() == 0) {
+            return null;
+        }
+        try {
+            Long longJulietFlowId = Long.parseLong(julietFlowId);
+            if (longJulietFlowId <= 0) {
+                throw new RuntimeException("invalid juliet flow id, value:" + longJulietFlowId);
+            }
+            return longJulietFlowId;
+        } catch (Exception e) {
+            log.error("julietFlowId type must be Long!", e);
+            throw new RuntimeException("request parameter `julietFlowId` type must be Long! but " + julietFlowId);
+        }
     }
 }
