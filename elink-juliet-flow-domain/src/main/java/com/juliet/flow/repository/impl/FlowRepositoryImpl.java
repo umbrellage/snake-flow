@@ -173,6 +173,12 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowTemplateDao.updateById(flowTemplateEntity);
     }
 
+    @Override
+    public List<Node> listNode(NodeQuery query) {
+        List<NodeEntity> nodeEntities = nodeDao.listNode(query);
+        return assembleNode(nodeEntities);
+    }
+
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
@@ -219,7 +225,7 @@ public class FlowRepositoryImpl implements FlowRepository {
      */
     private List<Node> assembleNode(List<NodeEntity> nodeEntities) {
         List<Node> nodes = FlowEntityFactory.toNodes(nodeEntities);
-        if (nodes == null) {
+        if (CollectionUtils.isEmpty(nodes)) {
             return null;
         }
         // 填充表单信息

@@ -35,12 +35,14 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     public void add(FlowTemplateAddDTO flowTemplateAddDTO) {
         flowTemplateAddDTO.setCreateBy(1L);
         flowTemplateAddDTO.setUpdateBy(1L);
+        flowTemplateAddDTO.setTenantId(168L);
         flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Override
     public void update(FlowTemplateAddDTO flowTemplateAddDTO) {
         flowTemplateAddDTO.setUpdateBy(2L);
+        flowTemplateAddDTO.setTenantId(168L);
         flowRepository.updateTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
@@ -61,7 +63,6 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
 
     private FlowTemplate toFlowTemplate(FlowTemplateAddDTO dto) {
         BusinessAssert.assertNotEmpty(dto.getNodes(), StatusCode.ILLEGAL_PARAMS, "Node节点不能空!");
-        Long tenantId = 1L;
         FlowTemplate flowTemplate = new FlowTemplate();
         flowTemplate.setId(dto.getId());
         flowTemplate.setNodes(dto.getNodes().stream()
@@ -70,7 +71,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         flowTemplate.setName(dto.getName());
         flowTemplate.setCode(dto.getCode());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);
-        flowTemplate.setTenantId(tenantId);
+        flowTemplate.setTenantId(dto.getTenantId());
         flowTemplate.setCreateBy(dto.getCreateBy());
         flowTemplate.setUpdateBy(dto.getUpdateBy());
         return flowTemplate;

@@ -13,9 +13,8 @@ import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.utils.ServletUtils;
 
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
@@ -36,7 +35,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.List;
 
 /**
  * @author xujianjie
@@ -82,13 +80,13 @@ public class FlowAspect {
         log.info("all fields:{}", fields);
 
         // 判断一下当前流程是否已经结束了
-        Boolean end = getCurrentFlowIsEnd(longJulietFlowId);
-        if (end == null) {
-            throw new RuntimeException("get current flow status fail, flow id:" + longJulietFlowId);
-        }
-        if (end) {
-            throw new RuntimeException("current flow is ended!, flow id:" + longJulietFlowId);
-        }
+//        Boolean end = getCurrentFlowIsEnd(longJulietFlowId);
+//        if (end == null) {
+//            throw new RuntimeException("get current flow status fail, flow id:" + longJulietFlowId);
+//        }
+//        if (end) {
+//            throw new RuntimeException("current flow is ended!, flow id:" + longJulietFlowId);
+//        }
 
         Object result = point.proceed();
         if (responseIsSuccess(result)) {
@@ -163,7 +161,7 @@ public class FlowAspect {
         JSONObject jsonObject = JSON.parseObject(JSON.toJSONString(map));
         parseFieldByJsonObject(fields, jsonObject, "");
         // 去掉field的前缀
-        List<String> formattedFields = new ArrayList<>();
+        Set<String> formattedFields = new HashSet<>();
         if (!CollectionUtils.isEmpty(fields)) {
             fields.forEach(field -> {
                 int index = field.indexOf(".");
@@ -172,7 +170,7 @@ public class FlowAspect {
                 }
             });
         }
-        return formattedFields;
+        return formattedFields.stream().collect(Collectors.toList());
     }
 
     private void parseFieldByJsonObject(List<String> fields, JSONObject jsonObject, String fieldPrefix) {

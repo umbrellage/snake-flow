@@ -4,6 +4,9 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
+import com.juliet.flow.domain.model.Node;
+import com.juliet.flow.domain.model.NodeQuery;
+
 import java.util.List;
 
 import java.util.List;
@@ -35,5 +38,8 @@ public interface FlowRepository {
     FlowTemplate queryTemplateByCode(String code);
 
     void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id);
+
+    List<Node> listNode(NodeQuery query);
+
 
 }

@@ -25,6 +25,8 @@ public class Node extends BaseModel {
 
     private Long id;
 
+    private Long flowId;
+
     private String title;
 
     private String name;
