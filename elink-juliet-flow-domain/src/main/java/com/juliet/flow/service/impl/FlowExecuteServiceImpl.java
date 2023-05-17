@@ -12,17 +12,12 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.Node;
-import com.juliet.flow.domain.model.Role;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowExecuteService;
 import com.juliet.flow.service.TodoService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -97,38 +92,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         return node.toNodeVo(flow.getId());
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public Long forward(NodeFieldDTO dto, String templateCode) {
-        if (dto.getFlowId() == null) {
-            Optional.ofNullable(templateCode)
-                .orElseThrow(() -> new ServiceException("缺少模版id"));
-            return startFlow(templateCode);
-        }
-        // 判断哪个节点需要被执行
-        List<Node> executableNode = new ArrayList<>();
-        Flow flow = flowRepository.queryById(dto.getFlowId());
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
-        Node mainNode = flow.findNode(dto.getFieldCodeList());
-        if (CollectionUtils.isEmpty(subFlowList)) {
-            if (mainNode.isExecutable()) {
-                executableNode.add(mainNode);
-            } else {
-                log.info("[node code, is not executable] {}", mainNode.getName());
-                throw new ServiceException("当前节点不可被执行");
-            }
-        } else {
-            subFlowList.stream()
-                .filter(subFlow -> {
-                    Node node = subFlow.findNode(dto.getFieldCodeList());
-                    return node.isExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
-                })
-                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
-        }
-        executableNode.forEach(node -> task(dto.getFlowId(), mainNode.getId(), mainNode.getName(), mainNode.getProcessedBy()));
-
-        return null;
-    }
 
     @Override
     public List<NodeVO> currentNodeList(Long flowId) {
@@ -144,7 +107,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         return flowList.stream().map(subFlow ->
                 subFlow.getNodeByNodeStatus(nodeStatusEnumList)
                     .stream()
-                    .map(node -> node.toNodeVo(flowId))
+                    .map(node -> node.toNodeVo(subFlow.getId()))
                     .collect(Collectors.toList())
             )
             .flatMap(Collection::stream)
@@ -161,15 +124,60 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     public List<NodeVO> todoNodeList(Long userId) {
+
         // TODO: 2023/5/11  
         return null;
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long forward(NodeFieldDTO dto) {
+//        if (dto.getFlowId() == null) {
+//            Optional.ofNullable(templateCode)
+//                .orElseThrow(() -> new ServiceException("缺少模版id"));
+//            return startFlow(templateCode);
+//        }
+        // 判断哪些节点需要被执行
+        List<Node> executableNode = new ArrayList<>();
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
+
+        Node mainNode = flow.findNode(dto.getFieldCodeList());
+
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            subFlowList.stream()
+                .filter(subFlow -> {
+                    Node node = subFlow.findNode(dto.getFieldCodeList());
+                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
+                })
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
+        }
+
+        if (CollectionUtils.isEmpty(executableNode)) {
+            executableNode.add(mainNode);
+        }
+        if (CollectionUtils.isNotEmpty(executableNode) && mainNode.isNormalExecutable()) {
+            executableNode.add(mainNode);
+        }
+
+        executableNode.forEach(
+            node -> task(dto.getFlowId(), node.getId(), node.getName(), node.getProcessedBy()));
+
+        return null;
+    }
+
     /**
-     * 该方法主要分4种情况 待处理的节点主要分为两种节点: 一. 主流程中的节点 1. 当前要处理的节点为异常节点，且存在异常流程并未结 ------>抛出异常 TODO: 2023/5/11 后面如果支持多条异常流程则把
-     * 1的处理删除 2. 当前要处理的节点为异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程） -------> 创建一条异常流程 3. 当前要处理的节点为非异常节点 ---------> 正常处理节点的逻辑走
-     * 二. 异常流程中的节点 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理, 是否需要合并
+     * <ul>
+     * 该方法主要分4种情况
+     * 待处理的节点主要分为两种节点:
+     * 一. 主流程中的节点
+     * 1. 当前要处理的节点为异常节点，且存在异常流程并未结 ------>抛出异常 TODO: 2023/5/11 后面如果支持多条异常流程则把1的处理删除
+     * 2. 当前要处理的节点为异常节点，（存在异常流程且异常流程都已结束）或者 （不存在异常流程） -------> 创建一条异常流程
+     * 3. 当前要处理的节点为非异常节点 ---------> 正常处理节点的逻辑走
+     * 二. 异常流程中的节点
+     * 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理, 是否需要合并
      * TODO: 2023/5/11  当前认为只有一条异常流程存在，如果后面要做多条再修改
+     * </ul>
      *
      * @param flowId
      * @param nodeId
@@ -190,7 +198,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
-                throw new ServiceException("该节点未被认领");
+//                throw new ServiceException("该节点未被认领");
+                return;
             }
             // 判断 存在异常流程，且异常流程已全部结束
             boolean existsAnomalyFlowsAndFlowsEnd =

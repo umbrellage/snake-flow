@@ -11,6 +11,8 @@ import javax.validation.constraints.NotBlank;
 @Data
 public class FlowOpenDTO {
 
+    private Long tenantId;
+
     private String code;
 
     /**

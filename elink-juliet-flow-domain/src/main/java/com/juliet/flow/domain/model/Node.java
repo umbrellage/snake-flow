@@ -101,6 +101,17 @@ public class Node extends BaseModel {
     }
 
     /**
+     * 判断节点是否是一个可被正常执行的
+     *
+     * @return
+     */
+    public boolean isNormalExecutable() {
+        return status == NodeStatusEnum.ACTIVE;
+    }
+
+
+
+    /**
      * 通过岗位判断当前用户是否可以操作
      */
     public boolean isOperator(Long[] postIds) {

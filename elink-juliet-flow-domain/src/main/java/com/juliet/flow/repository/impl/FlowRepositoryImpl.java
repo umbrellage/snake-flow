@@ -1,13 +1,10 @@
 package com.juliet.flow.repository.impl;
 
-import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.common.utils.StreamUtil;
 import com.juliet.flow.dao.*;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -121,7 +118,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
         // 不会很多
         List<Flow> flows = flowEntities.stream().map(FlowEntityFactory::toFlow).collect(Collectors.toList());
-        flows.stream().forEach(flow -> {
+        flows.forEach(flow -> {
             List<Node> nodes = getNodes(flow.getId());
             flow.setNodes(nodes);
         });

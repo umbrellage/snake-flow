@@ -10,17 +10,11 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
-
-import java.util.Collection;
 import java.util.List;
-import org.springframework.beans.BeanUtils;
 
 /**
  * 流程
@@ -137,6 +131,11 @@ public class Flow extends BaseModel {
             .orElse(null);
     }
 
+    /**
+     * 前置节点已经处理
+     * @param name
+     * @return
+     */
     public boolean ifPreNodeIsHandle(String name) {
         Node node = findNode(name);
         if (node == null) {

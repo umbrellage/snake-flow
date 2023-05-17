@@ -4,9 +4,7 @@ import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
-import com.juliet.flow.domain.model.Node;
 import java.util.List;
-import java.util.Map;
 
 /**
  * @author xujianjie
@@ -20,7 +18,7 @@ public interface FlowExecuteService {
 
     boolean flowEnd(Long flowId);
 
-    Long forward(NodeFieldDTO dto, String templateCode);
+    Long forward(NodeFieldDTO dto);
 
     List<NodeVO> currentNodeList(Long flowId);
 

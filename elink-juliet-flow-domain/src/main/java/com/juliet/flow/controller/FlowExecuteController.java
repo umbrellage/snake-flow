@@ -52,8 +52,8 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("通过表单字段查询节点，并执行")
     @Override
-    public AjaxResult<Long> forward(NodeFieldDTO dto, String templateCode) {
-        Long flowId = flowExecuteService.forward(dto, templateCode);
+    public AjaxResult<Long> forward(NodeFieldDTO dto) {
+        Long flowId = flowExecuteService.forward(dto);
         return AjaxResult.success(flowId);
     }
 
