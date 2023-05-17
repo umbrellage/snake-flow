@@ -242,6 +242,7 @@ public class FlowEntityFactory {
     private static Node toSingleNode(NodeEntity nodeEntity) {
         Node node = new Node();
         node.setId(nodeEntity.getId());
+        node.setFlowId(nodeEntity.getFlowId());
         node.setTitle(nodeEntity.getTitle());
         node.setName(nodeEntity.getName());
         node.setPreName(nodeEntity.getPreName());
@@ -315,7 +316,7 @@ public class FlowEntityFactory {
             List<PostEntity> bindPostEntities = postEntities.stream()
                 .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
                 .collect(Collectors.toList());
-            if (CollectionUtils.isEmpty(bindPostEntities)) {
+            if (!CollectionUtils.isEmpty(bindPostEntities)) {
                 node.setBindPosts(
                     bindPostEntities.stream().map(FlowEntityFactory::toPost).collect(Collectors.toList()));
             }

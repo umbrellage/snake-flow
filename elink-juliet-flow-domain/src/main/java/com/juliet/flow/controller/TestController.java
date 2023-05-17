@@ -1,10 +1,15 @@
 package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.domain.model.NodeQuery;
+import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.Api;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Arrays;
 
 /**
  * @author xujianjie
@@ -15,8 +20,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class TestController {
 
+    @Autowired
+    FlowRepository flowRepository;
+
     @GetMapping("/test")
     public AjaxResult moduleDelete() {
-        return AjaxResult.success();
+        NodeQuery query = new NodeQuery();
+        query.setPostIds(Arrays.asList("a111222"));
+        query.setUserId(1L);
+        query.setTenantId(2L);
+        return AjaxResult.success(flowRepository.listNode(query));
     }
 }

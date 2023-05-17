@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.juliet.flow.dao.NodeDao">
+
+
+    <resultMap id="BaseResultMap" type="com.juliet.flow.domain.entity.NodeEntity">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="node_name" property="name" />
+        <result column="pre_name" property="preName" />
+        <result column="next_name" property="nextName" />
+        <result column="flow_id" property="flowId" />
+        <result column="flow_template_id" property="flowTemplateId" />
+        <result column="node_type" property="type" />
+        <result column="node_status" property="status" />
+        <result column="processed_by" property="processedBy" />
+        <result column="tenant_id" property="tenantId" />
+        <result column="del_flag" property="delFlag" />
+        <result column="create_by" property="createBy" />
+        <result column="create_time" property="createTime" />
+        <result column="update_by" property="updateBy" />
+        <result column="update_time" property="updateTime" />
+    </resultMap>
+
+    <sql id="fieldList">id, title, node_name, pre_name, next_name, flow_id, flow_template_id, node_type, node_status, processed_by, del_flag, create_time, update_time, create_by, update_by, rep_time</sql>
+    <sql id="fieldListT1">t1.id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.node_type, t1.node_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time</sql>
+    <sql id="tableName">jbpm_flow_node</sql>
+
+    <select id="listNode" resultMap="BaseResultMap">
+        select <include refid="fieldListT1" />
+        from <include refid="tableName" /> t1
+        left join jbpm_flow_node_post t2 on t1.id = t2.node_id
+        <where>
+            <if test="query.userId!=null">
+                and t1.processed_by = #{query.userId}
+            </if>
+            <if test="query.postIds!=null and query.postIds.size>0">
+                and t2.post_id in
+                <foreach item="id" collection="query.postIds" separator="," open="(" close=")" index="">
+                    #{id, jdbcType=NUMERIC}
+                </foreach>
+            </if>
+            <if test="query.tenantId!=null">
+                and t1.tenant_id = #{query.tenantId}
+            </if>
+        </where>
+        limit #{query.offset}, #{query.pageSize}
+    </select>
+
+</mapper>
