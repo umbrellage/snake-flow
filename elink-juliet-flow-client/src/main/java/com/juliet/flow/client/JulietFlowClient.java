@@ -21,7 +21,7 @@ public interface JulietFlowClient {
     AjaxResult<NodeVO> open(@RequestBody FlowOpenDTO dto);
 
     @PostMapping("/bpm/forward")
-    AjaxResult<Long> forward(@RequestBody NodeFieldDTO dto);
+    AjaxResult<Void> forward(@RequestBody NodeFieldDTO dto);
 
     /**
      * 根据字段列表查询节点

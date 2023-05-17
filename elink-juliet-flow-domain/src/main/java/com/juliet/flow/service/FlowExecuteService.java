@@ -19,7 +19,7 @@ public interface FlowExecuteService {
 
     boolean flowEnd(Long flowId);
 
-    Long forward(NodeFieldDTO dto);
+    void forward(NodeFieldDTO dto);
 
     List<NodeVO> currentNodeList(Long flowId);
 
