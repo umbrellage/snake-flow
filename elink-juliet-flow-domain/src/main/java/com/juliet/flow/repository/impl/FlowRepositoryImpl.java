@@ -10,11 +10,11 @@ import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.trasnfer.FlowEntityFactory;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -107,6 +107,21 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<Node> nodes = getNodes(flowEntity.getId());
         flow.setNodes(nodes);
         return flow;
+    }
+
+    @Override
+    public List<Flow> queryByIdList(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return Collections.emptyList();
+        }
+        return flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList)).stream()
+            .map(flowEntity -> {
+                Flow flow = FlowEntityFactory.toFlow(flowEntity);
+                List<Node> nodes = getNodes(flowEntity.getId());
+                flow.setNodes(nodes);
+                return flow;
+            })
+            .collect(Collectors.toList());
     }
 
     @Override

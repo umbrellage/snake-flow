@@ -1,5 +1,7 @@
 package com.juliet.flow.service.impl;
 
+import static java.util.stream.Collectors.toCollection;
+
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -20,6 +22,10 @@ import com.juliet.flow.service.TodoService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Map;
+import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
@@ -91,7 +97,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     public NodeVO fieldNode(NodeFieldDTO dto) {
         Flow flow = flowRepository.queryById(dto.getFlowId());
         Node node = flow.findNode(dto.getFieldCodeList());
-        return node.toNodeVo(flow.getId());
+        return node.toNodeVo(flow);
     }
 
 
@@ -106,21 +112,31 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
         flowList.add(flow);
 
-        return flowList.stream().map(subFlow ->
+        // 子流程的节点都是当作主流程的待办来处理
+        return flowList.stream()
+            .map(subFlow ->
                 subFlow.getNodeByNodeStatus(nodeStatusEnumList)
                     .stream()
-                    .map(node -> node.toNodeVo(subFlow.getId()))
+                    .map(node -> node.toNodeVo(subFlow))
                     .collect(Collectors.toList())
             )
             .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+            .collect(Collectors.collectingAndThen(toCollection(() ->
+                new TreeSet<>(Comparator.comparing(NodeVO::getName))), ArrayList::new));
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void claimTask(Long flowId, Long nodeId, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         BusinessAssert.assertNotNull(flow, StatusCode.SERVICE_ERROR, "can not find flow, flowId:" + flowId);
+        Node node = flow.findNodeThrow(nodeId);
         flow.claimNode(nodeId, userId);
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
+        subFlowList.forEach(subFlow -> {
+            subFlow.claimNode(node.getName(), userId);
+            flowRepository.update(subFlow);
+        });
         flowRepository.update(flow);
     }
 
@@ -130,9 +146,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Node> postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
             .filter(node -> node.getProcessedBy() == null)
             .collect(Collectors.toList());
+        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList)
+            .flatMap(Collection::stream)
+            .map(Node::getFlowId)
+            .distinct()
+            .collect(Collectors.toList());
+
+        Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
+            .collect(Collectors.toMap(Flow::getId, Function.identity()));
+
         return Stream.of(userIdNodeList, postIdNodeList)
             .flatMap(Collection::stream)
-            .map(e -> e.toNodeVo(null))
+            .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
     }
 
@@ -147,6 +172,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         // 判断哪些节点需要被执行
         List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return;
+        }
+        if (flow.getParentId() != null) {
+            dto.setFlowId(flow.getParentId());
+        }
         List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
 
         Node mainNode = flow.findNode(dto.getFieldCodeList());

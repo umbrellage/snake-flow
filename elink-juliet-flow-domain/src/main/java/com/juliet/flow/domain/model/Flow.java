@@ -184,6 +184,28 @@ public class Flow extends BaseModel {
         }
     }
 
+    /**
+     * 给节点分配一个待办人
+     *
+     * @param nodeName
+     * @param userId
+     */
+    public void claimNode(String nodeName, Long userId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        Node currentNode = findNode(nodeName);
+        List<String> preNameList = currentNode.preNameList();
+        boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+            currentNode.setProcessedBy(userId);
+            currentNode.setStatus(NodeStatusEnum.ACTIVE);
+        } else {
+            throw new ServiceException("流程未走到当前节点");
+        }
+    }
+
     public FlowVO flowVO() {
         FlowVO data = new FlowVO();
         data.setId(id);
@@ -193,7 +215,7 @@ public class Flow extends BaseModel {
         data.setTenantId(tenantId);
         if (CollectionUtils.isNotEmpty(nodes)) {
             List<NodeVO> nodeVOList = nodes.stream()
-                .map(e -> e.toNodeVo(id))
+                .map(e -> e.toNodeVo(this))
                 .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }

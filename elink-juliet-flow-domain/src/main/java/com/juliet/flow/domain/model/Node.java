@@ -5,6 +5,7 @@ import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Optional;
@@ -56,12 +57,18 @@ public class Node extends BaseModel {
     private BaseRule submitRule;
 
     /**
+     * 上一个处理人
+     */
+    private List<Long> preProcessedBy;
+    /**
      * 处理人
      */
     private Long processedBy;
+    private LocalDateTime processedTime;
 
     /**
      * 获取前置节点列表
+     *
      * @return
      */
     public List<String> preNameList() {
@@ -74,6 +81,7 @@ public class Node extends BaseModel {
 
     /**
      * 获取后置节点列表
+     *
      * @return
      */
     public List<String> nextNameList() {
@@ -112,7 +120,6 @@ public class Node extends BaseModel {
     }
 
 
-
     /**
      * 通过岗位判断当前用户是否可以操作
      */
@@ -131,13 +138,16 @@ public class Node extends BaseModel {
         return false;
     }
 
-    public NodeVO toNodeVo(Long flowId) {
+    /**
+     *
+     * @param flow 当前流程
+     * @return
+     */
+    public NodeVO toNodeVo(Flow flow) {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
-        if (flowId == null) {
-            data.setFlowId(this.flowId);
-        }
+        data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
         if (status != null) {
@@ -151,6 +161,15 @@ public class Node extends BaseModel {
                 .collect(Collectors.toList());
             data.setBindPosts(postVOList);
         }
+        data.setProcessedTime(processedTime);
+
+        if (flow != null) {
+            List<Long> preProcessedBy = preNameList().stream()
+                .map(name -> flow.findNode(name).getProcessedBy())
+                .collect(Collectors.toList());
+            data.setPreprocessedBy(preProcessedBy);
+        }
+
         return data;
     }
 

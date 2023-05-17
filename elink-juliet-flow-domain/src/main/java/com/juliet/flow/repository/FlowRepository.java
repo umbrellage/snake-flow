@@ -27,6 +27,8 @@ public interface FlowRepository {
 
     Flow queryById(Long id);
 
+    List<Flow> queryByIdList(List<Long> idList);
+
     List<Flow> listFlowByParentId(Long id);
 
     Flow queryByCode(String code);

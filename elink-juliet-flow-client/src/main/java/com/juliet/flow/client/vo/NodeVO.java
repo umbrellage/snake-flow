@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -34,7 +35,12 @@ public class NodeVO {
     private List<PostVO> bindPosts;
 
     /**
+     * 上一个处理人
+     */
+    private List<Long> preprocessedBy;
+    /**
      * 处理人
      */
     private Long processedBy;
+    private LocalDateTime processedTime;
 }
