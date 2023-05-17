@@ -3,6 +3,7 @@ package com.juliet.flow.service.impl;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -12,6 +13,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.Node;
+import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowExecuteService;
 import com.juliet.flow.service.TodoService;
@@ -123,10 +125,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
-    public List<NodeVO> todoNodeList(Long userId) {
-
-        // TODO: 2023/5/11  
-        return null;
+    public List<NodeVO> todoNodeList(UserDTO dto) {
+        List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
+        List<Node> postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
+            .filter(node -> node.getProcessedBy() == null)
+            .collect(Collectors.toList());
+        return Stream.of(userIdNodeList, postIdNodeList)
+            .flatMap(Collection::stream)
+            .map(e -> e.toNodeVo(null))
+            .collect(Collectors.toList());
     }
 
     @Override

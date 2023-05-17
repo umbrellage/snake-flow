@@ -1,5 +1,7 @@
 package com.juliet.flow.domain.model;
 
+import java.util.Collection;
+import java.util.Collections;
 import lombok.Data;
 
 import java.util.List;
@@ -40,5 +42,20 @@ public class NodeQuery {
             pageSize = MAX_PAGE_SIZE;
         }
         return pageSize;
+    }
+
+    public static NodeQuery findByUserId(Long userId) {
+        NodeQuery data = new NodeQuery();
+        data.setUserId(userId);
+        return data;
+    }
+
+    public static NodeQuery findByPostId(Long postId) {
+        NodeQuery data = new NodeQuery();
+        if (postId != null) {
+            String value = String.valueOf(postId);
+            data.setPostIds(Collections.singletonList(value));
+        }
+        return data;
     }
 }

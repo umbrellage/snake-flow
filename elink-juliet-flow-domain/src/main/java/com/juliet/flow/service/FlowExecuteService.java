@@ -2,6 +2,7 @@ package com.juliet.flow.service;
 
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
@@ -24,7 +25,7 @@ public interface FlowExecuteService {
 
     void claimTask(Long flowId, Long nodeId, Long userId);
 
-    List<NodeVO> todoNodeList(Long userId);
+    List<NodeVO> todoNodeList(UserDTO dto);
 
     void task(Long flowId, Long nodeId, String nodeName, Long userId);
 

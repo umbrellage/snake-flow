@@ -29,7 +29,7 @@ public interface JulietFlowClient {
      * @return
      */
     @PostMapping("/bpm/nodeField")
-    AjaxResult<NodeVO> node(NodeFieldDTO dto);
+    AjaxResult<NodeVO> node(@RequestBody NodeFieldDTO dto);
 
     /**
      * 判断当前流程是否已经结束
