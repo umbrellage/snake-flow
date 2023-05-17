@@ -100,7 +100,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("获取所有的待办")
     @Override
     public AjaxResult<List<NodeVO>> todoNodeList(UserDTO dto) {
-        List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto.getUserId());
+        List<NodeVO> nodeVOList = flowExecuteService.todoNodeList(dto);
         return AjaxResult.success(nodeVOList);
     }
 

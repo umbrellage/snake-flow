@@ -135,7 +135,9 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
-        data.setFlowId(flowId);
+        if (flowId == null) {
+            data.setFlowId(this.flowId);
+        }
         data.setPreName(preName);
         data.setNextName(nextName);
         if (status != null) {
