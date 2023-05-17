@@ -176,6 +176,14 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowTemplateDao.updateById(flowTemplateEntity);
     }
 
+    @Override
+    public List<Node> listNode(NodeQuery query) {
+
+
+
+        return null;
+    }
+
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;

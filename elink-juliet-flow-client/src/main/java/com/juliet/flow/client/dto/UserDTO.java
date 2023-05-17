@@ -15,4 +15,6 @@ public class UserDTO {
 
     private Long userId;
     private Long tenantId;
+
+    private Long postCode;
 }
