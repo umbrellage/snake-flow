@@ -179,8 +179,6 @@ public class Flow extends BaseModel {
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
-        } else {
-            throw new ServiceException("流程未走到当前节点");
         }
     }
 
@@ -201,8 +199,6 @@ public class Flow extends BaseModel {
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
-        } else {
-            throw new ServiceException("流程未走到当前节点");
         }
     }
 
