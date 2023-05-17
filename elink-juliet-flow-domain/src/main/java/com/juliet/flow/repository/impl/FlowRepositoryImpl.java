@@ -50,6 +50,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntityFactory.cleanFlowId(flow);
         FlowEntity entity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.insert(entity);
+        flow.setId(entity.getId());
         addNodes(flow.getNodes(), flow.getTenantId(), entity.getId(), 0L);
     }
 
