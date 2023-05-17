@@ -31,6 +31,7 @@ public class Form extends BaseModel {
         data.setId(id);
         data.setName(name);
         data.setPath(path);
+        data.setCode(code);
         if (CollectionUtils.isNotEmpty(fields)) {
             List<FieldVO> fieldVOList = fields.stream()
                 .map(Field::toField)

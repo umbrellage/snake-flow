@@ -26,6 +26,8 @@ public class FlowEntityFactory {
 
     public static Flow toFlow(FlowEntity flowEntity) {
         Flow flow = new Flow();
+        flow.setName(flowEntity.getName());
+        flow.setTenantId(flow.getTenantId());
         flow.setId(flowEntity.getId());
         flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));
         flow.setFlowTemplateId(flowEntity.getFlowTemplateId());
