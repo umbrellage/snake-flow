@@ -25,6 +25,8 @@ public class NodeQuery {
 
     private Long tenantId;
 
+    private List<Integer> statusList;
+
     private Integer pageNo;
 
     private Integer pageSize;

@@ -45,6 +45,12 @@
             <if test="query.tenantId!=null">
                 and t1.tenant_id = #{query.tenantId}
             </if>
+            <if test="query.statusList!=null and query.statusList.size>0">
+                and t1.node_status in
+                <foreach item="status" collection="query.statusList" separator="," open="(" close=")" index="">
+                    #{status, jdbcType=NUMERIC}
+                </foreach>
+            </if>
         </where>
         limit #{query.offset}, #{query.pageSize}
     </select>
