@@ -242,7 +242,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     private List<Node> assembleNode(List<NodeEntity> nodeEntities) {
         List<Node> nodes = FlowEntityFactory.toNodes(nodeEntities);
         if (CollectionUtils.isEmpty(nodes)) {
-            return null;
+            return Lists.newArrayList();
         }
         // 填充表单信息
         List<Long> nodeIds = nodeEntities.stream().map(NodeEntity::getId).collect(Collectors.toList());
