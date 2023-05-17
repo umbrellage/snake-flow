@@ -37,7 +37,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 ## 根据自身情况，修改路径
-cp elink-item-center-domain/target/elink-juliet-flow.jar ${output}/elink-juliet-flow.jar
+cp elink-juliet-flow-domain/target/elink-juliet-flow.jar ${output}/elink-juliet-flow.jar
 cp startup.sh ${output}
 cp shutdown.sh ${output}
 chmod 744 ${output}/startup.sh
