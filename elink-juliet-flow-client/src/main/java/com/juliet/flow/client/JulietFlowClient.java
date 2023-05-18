@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * @author xujianjie
@@ -23,6 +22,8 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/forward")
     AjaxResult<Void> forward(@RequestBody NodeFieldDTO dto);
 
+
+
     /**
      * 根据字段列表查询节点
      * @param dto
@@ -30,6 +31,8 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/nodeField")
     AjaxResult<NodeVO> node(@RequestBody NodeFieldDTO dto);
+
+
 
     /**
      * 判断当前流程是否已经结束
@@ -62,6 +65,14 @@ public interface JulietFlowClient {
      */
     @PostMapping("/claim/task")
     AjaxResult<Void> claimTask(@RequestBody TaskDTO dto);
+
+    /**
+     * 认领待办任务、修改待办人、分配一个待办人
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/node")
+    AjaxResult<NodeVO> node(@RequestBody TaskDTO dto);
 
     /**
      * 执行一个节点任务

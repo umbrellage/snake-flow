@@ -5,6 +5,7 @@ import static java.util.stream.Collectors.toCollection;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -97,6 +98,19 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     public NodeVO fieldNode(NodeFieldDTO dto) {
         Flow flow = flowRepository.queryById(dto.getFlowId());
         Node node = flow.findNode(dto.getFieldCodeList());
+        return node.toNodeVo(flow);
+    }
+
+    @Override
+    public NodeVO node(TaskDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return null;
+        }
+        Node node = flow.findNode(dto.getNodeId());
+        if (node == null) {
+            return null;
+        }
         return node.toNodeVo(flow);
     }
 
