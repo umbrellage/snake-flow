@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -107,11 +108,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return null;
         }
-        Node node = null;
+        Optional.ofNullable(dto.getUserId()).orElseThrow(() -> new ServiceException("用户id 不可以为空"));
+        Node node;
         if (dto.getNodeId() != null) {
             node = flow.findNode(dto.getNodeId());
-        }
-        if (dto.getUserId() != null) {
+        } else {
             node = flow.findTodoNode(dto.getUserId());
         }
 
