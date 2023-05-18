@@ -65,24 +65,6 @@ public class Flow extends BaseModel {
         return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
     }
 
-    /**
-     * 根据可填写的字段查找节点
-     *
-     * @param body
-     * @return
-     */
-    public Node findNode(Map<String, ?> body) {
-        return nodes.stream().filter(node -> {
-                Form form = node.getForm();
-                List<String> codeList = form.getFields().stream()
-                    .map(Field::getCode)
-                    .collect(Collectors.toList());
-
-                return codeList.containsAll(body.keySet()) && body.size() == codeList.size();
-            })
-            .findAny()
-            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
-    }
 
     /**
      * 根据可填写的字段查找节点
@@ -101,6 +83,17 @@ public class Flow extends BaseModel {
             })
             .findAny()
             .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+    }
+
+
+    public Node findTodoNode(Long userId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
+            .findAny()
+            .orElse(null);
     }
 
 

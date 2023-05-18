@@ -121,6 +121,18 @@ public class Node extends BaseModel {
 
 
     /**
+     * 判断节点是否是待办的
+     *
+     * @return
+     */
+    public boolean isTodoNode() {
+        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
+    }
+
+
+
+
+    /**
      * 通过岗位判断当前用户是否可以操作
      */
     public boolean isOperator(Long[] postIds) {

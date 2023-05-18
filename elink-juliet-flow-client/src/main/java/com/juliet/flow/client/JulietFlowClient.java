@@ -67,7 +67,7 @@ public interface JulietFlowClient {
     AjaxResult<Void> claimTask(@RequestBody TaskDTO dto);
 
     /**
-     * 认领待办任务、修改待办人、分配一个待办人
+     * 获取节点
      * @param dto
      * @return
      */
