@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import java.util.List;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -19,4 +20,6 @@ public class FlowOpenDTO {
      * 可以指定某一个发布的模板，不指定时默认取最新版
      */
     private Long templateId;
+
+    private List<Long> postIdList;
 }

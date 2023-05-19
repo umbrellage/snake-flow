@@ -3,6 +3,7 @@ package com.juliet.flow.service.impl;
 import static java.util.stream.Collectors.toCollection;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -66,21 +67,24 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (template == null) {
             return null;
         }
-        return template.getNodes().stream()
-            .filter(node -> StringUtils.isBlank(node.getPreName()))
+        Node node = template.getNodes().stream()
+            .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
             .findAny()
-            .map(e -> e.toNodeVo(null))
             .orElseThrow(() -> new ServiceException("找不到开始节点"));
+        if (node.postAuthority(dto.getPostIdList())) {
+            return node.toNodeVo(null);
+        }
+        throw new ServiceException("该用户没有该节点的处理权限");
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public Long startFlow(String templateCode) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(templateCode);
+    public Long startFlow(BpmDTO dto) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode());
         if (flowTemplate == null) {
             throw new ServiceException("流程模版不存在");
         }
-        Flow flow = flowTemplate.toFlowInstance();
+        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         flow.validate();
         flowRepository.add(flow);
         return flow.getId();
@@ -198,11 +202,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void forward(NodeFieldDTO dto) {
-//        if (dto.getFlowId() == null) {
-//            Optional.ofNullable(templateCode)
-//                .orElseThrow(() -> new ServiceException("缺少模版id"));
-//            return startFlow(templateCode);
-//        }
         // 判断哪些节点需要被执行
         List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(dto.getFlowId());

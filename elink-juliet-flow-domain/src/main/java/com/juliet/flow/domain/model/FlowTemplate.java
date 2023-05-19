@@ -31,7 +31,7 @@ public class FlowTemplate extends BaseModel {
     /**
      * 通过模板实例化一个流程
      */
-    public Flow toFlowInstance() {
+    public Flow toFlowInstance(Long userId) {
         Flow flow = new Flow();
         flow.setFlowTemplateId(this.id);
 
@@ -46,6 +46,7 @@ public class FlowTemplate extends BaseModel {
                 }
                 if (node.getType().equals(NodeTypeEnum.START)) {
                     node.setStatus(NodeStatusEnum.PROCESSED);
+                    node.setProcessedBy(userId);
                 }
             });
         flow.setNodes(nodes);

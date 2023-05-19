@@ -72,7 +72,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("初始化一个流程")
     @Override
     public AjaxResult<Long> initBmp(BpmDTO dto) {
-        Long flowId = flowExecuteService.startFlow(dto.getTemplateCode());
+        Long flowId = flowExecuteService.startFlow(dto);
         return AjaxResult.success(flowId);
     }
 

@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -8,6 +9,7 @@ import com.juliet.flow.common.utils.IdGenerator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -65,6 +67,25 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+
+    /**
+     * 判断该岗位是否有该节点权限
+     * @param postIdList
+     * @return
+     */
+    public boolean postAuthority(List<Long> postIdList) {
+        if (CollectionUtils.isEmpty(bindPosts)) {
+            throw new ServiceException("当前节点没有绑定权限");
+        }
+        List<Long> sourcePostIdList = bindPosts.stream()
+            .map(Post::getPostId)
+            .filter(Objects::nonNull)
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
+
+        return !Collections.disjoint(postIdList, sourcePostIdList);
+    }
+
 
     /**
      * 获取前置节点列表
@@ -130,8 +151,6 @@ public class Node extends BaseModel {
     }
 
 
-
-
     /**
      * 通过岗位判断当前用户是否可以操作
      */
@@ -151,7 +170,6 @@ public class Node extends BaseModel {
     }
 
     /**
-     *
      * @param flow 当前流程
      * @return
      */
