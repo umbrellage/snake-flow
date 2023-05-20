@@ -8,6 +8,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
+import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -43,8 +44,13 @@ public class FlowAspect {
     @Autowired
     private JulietFlowClient julietFlowClient;
 
+
+
     @Autowired
     private List<ControllerResponseCallback> callbacks;
+
+    @Autowired
+    private UserInfoCallback userInfoCallback;
 
     private static final String HEADER_NAME_JULIET_FLOW_CODE = "juliet-flow-code";
 
@@ -77,7 +83,8 @@ public class FlowAspect {
                 throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
-            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode));
+            Long userId = userInfoCallback.getUserId(request);
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId));
             if (!isSuccess(initResult)) {
                 log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
                 throw new RuntimeException("juliet flow init error!");
@@ -127,9 +134,10 @@ public class FlowAspect {
         }
     }
 
-    private BpmDTO toBpmDTO(String julietFlowCode) {
+    private BpmDTO toBpmDTO(String julietFlowCode, Long userId) {
         BpmDTO bpmDTO = new BpmDTO();
         bpmDTO.setTemplateCode(julietFlowCode);
+        bpmDTO.setUserId(userId);
         return bpmDTO;
     }
 
