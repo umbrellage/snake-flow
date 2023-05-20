@@ -56,6 +56,8 @@ public class FlowAspect {
 
     private static final String PARAM_MAME_JULIET_FLOW_CODE = "julietFlowCode";
 
+    private static final String HEADER_NAME_JULIET_FLOW_ID = "juliet-flow-id";
+
     private static final String PARAM_MAME_JULIET_FLOW_ID = "julietFlowId";
 
     @Pointcut("@annotation(com.juliet.flow.client.annotation.JulietFlowInterceptor)")
@@ -244,7 +246,11 @@ public class FlowAspect {
     }
 
     private Long getJulietFlowId(HttpServletRequest request) {
-        String julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        String julietFlowId = null;
+        julietFlowId = request.getHeader(HEADER_NAME_JULIET_FLOW_ID);
+        if (julietFlowId == null || julietFlowId.trim().length() == 0) {
+            julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        }
         if (julietFlowId == null || julietFlowId.trim().length() == 0) {
             return null;
         }

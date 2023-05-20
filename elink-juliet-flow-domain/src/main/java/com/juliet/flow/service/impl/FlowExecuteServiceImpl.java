@@ -120,8 +120,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             node = flow.findTodoNode(dto.getUserId());
         }
 
-        if (node != null) {
-            return node.toNodeVo(flow);
+        if (node == null) {
+            return null;
+        }
+        if (node.postAuthority(dto.getPostIdList())) {
+            return node.toNodeVo(null);
         }
         return null;
     }
