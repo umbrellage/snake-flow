@@ -222,10 +222,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
                 .filter(subFlow -> {
-                    Node node = subFlow.findNode(dto.getFieldCodeList());
+                    Node node = subFlow.findNode(dto.getFieldCodeList(), dto.getUserId());
                     return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
-                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList(), dto.getUserId())));
         }
 
         if (CollectionUtils.isEmpty(executableNode)) {
