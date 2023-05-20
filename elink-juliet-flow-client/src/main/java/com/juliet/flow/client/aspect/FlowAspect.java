@@ -49,7 +49,7 @@ public class FlowAspect {
     @Autowired
     private List<ControllerResponseCallback> callbacks;
 
-    @Autowired
+    @Autowired(required = false)
     private UserInfoCallback userInfoCallback;
 
     private static final String HEADER_NAME_JULIET_FLOW_CODE = "juliet-flow-code";
