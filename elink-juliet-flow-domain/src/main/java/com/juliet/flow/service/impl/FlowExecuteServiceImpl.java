@@ -216,7 +216,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
 
-        Node mainNode = flow.findNode(dto.getFieldCodeList());
+//        Node mainNode = flow.findNode(dto.getFieldCodeList());
+        Node mainNode = flow.findNode(dto.getFieldCodeList(), dto.getUserId());
 
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()

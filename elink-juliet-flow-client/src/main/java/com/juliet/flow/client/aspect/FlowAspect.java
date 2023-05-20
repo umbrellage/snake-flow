@@ -122,7 +122,8 @@ public class FlowAspect {
                     NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId);
                     AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
                     if (!isSuccess(forwardResult)) {
-                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}", julietFlowId, nodeFieldDTO, forwardResult);
+                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}",
+                                julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
                     }
                     log.info("juliet flow forward success!");
                 }

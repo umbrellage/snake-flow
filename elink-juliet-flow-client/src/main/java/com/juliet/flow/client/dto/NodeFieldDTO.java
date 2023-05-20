@@ -16,4 +16,5 @@ public class NodeFieldDTO {
 
     private List<String> fieldCodeList;
     private Long flowId;
+    private Long userId;
 }
