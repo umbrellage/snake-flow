@@ -239,10 +239,15 @@ public class FlowEntityFactory {
         if (CollectionUtils.isEmpty(nodeEntities)) {
             return Lists.newArrayList();
         }
-        return nodeEntities.stream().map(FlowEntityFactory::toSingleNode).collect(Collectors.toList());
+        return nodeEntities.stream().map(FlowEntityFactory::toSingleNode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private static Node toSingleNode(NodeEntity nodeEntity) {
+    public static Node toSingleNode(NodeEntity nodeEntity) {
+        if (nodeEntity == null) {
+            return null;
+        }
         Node node = new Node();
         node.setId(nodeEntity.getId());
         node.setFlowId(nodeEntity.getFlowId());

@@ -43,5 +43,7 @@ public interface FlowRepository {
 
     List<Node> listNode(NodeQuery query);
 
+    Node queryNodeById(Long nodeId);
+
 
 }

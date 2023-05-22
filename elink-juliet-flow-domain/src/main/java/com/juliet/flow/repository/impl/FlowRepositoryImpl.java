@@ -195,6 +195,11 @@ public class FlowRepositoryImpl implements FlowRepository {
         return assembleNode(nodeEntities);
     }
 
+    @Override
+    public Node queryNodeById(Long nodeId) {
+        return FlowEntityFactory.toSingleNode(nodeDao.selectById(nodeId));
+    }
+
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
