@@ -232,7 +232,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     Node node = subFlow.findNode(currentFlowNode.getName());
                     return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
-                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList(), dto.getUserId())));
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
         if (CollectionUtils.isEmpty(executableNode)) {
             executableNode.add(mainNode);
@@ -241,9 +241,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             executableNode.add(mainNode);
         }
 
-        executableNode.forEach(
-            node -> task(dto.getFlowId(), node.getId(), node.getName(), node.getProcessedBy()));
-
+        for (Node node : executableNode) {
+            task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
+        }
     }
 
     /**
