@@ -239,7 +239,7 @@ public class FlowEntityFactory {
         if (CollectionUtils.isEmpty(nodeEntities)) {
             return Lists.newArrayList();
         }
-        return nodeEntities.stream().map(nodeEntity -> toSingleNode(nodeEntity)).collect(Collectors.toList());
+        return nodeEntities.stream().map(FlowEntityFactory::toSingleNode).collect(Collectors.toList());
     }
 
     private static Node toSingleNode(NodeEntity nodeEntity) {

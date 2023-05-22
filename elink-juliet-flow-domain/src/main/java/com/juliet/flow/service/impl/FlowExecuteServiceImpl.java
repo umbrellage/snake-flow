@@ -238,9 +238,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 throw new ServiceException("当前流程未走到该节点");
             }
             executableNode.add(mainNode);
-        }
-        if (CollectionUtils.isNotEmpty(executableNode) && mainNode.isNormalExecutable()) {
-            executableNode.add(mainNode);
+        } else {
+            if (CollectionUtils.isNotEmpty(executableNode) && mainNode.isNormalExecutable()) {
+                executableNode.add(mainNode);
+            }
         }
 
         for (Node node : executableNode) {
