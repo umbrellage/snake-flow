@@ -292,7 +292,7 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        if (node.isTodoNode()) {
+                        if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         }else {
                             node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
