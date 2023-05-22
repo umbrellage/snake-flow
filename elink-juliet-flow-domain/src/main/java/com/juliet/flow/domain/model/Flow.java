@@ -54,6 +54,10 @@ public class Flow extends BaseModel {
         return status == FlowStatusEnum.END || isEnd();
     }
 
+    public boolean hasParentFlow() {
+        return parentId != null && parentId != 0;
+    }
+
 
     /**
      * 当前流程是否已经结束

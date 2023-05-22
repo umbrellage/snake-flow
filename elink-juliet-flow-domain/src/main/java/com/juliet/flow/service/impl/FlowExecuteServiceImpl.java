@@ -165,13 +165,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     public void claimTask(Long flowId, Long nodeId, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null) {
-            return;
+            throw new ServiceException("流程不存在");
         }
         Node node = flow.findNodeThrow(nodeId);
-        if (flow.getParentId() != null) {
+        if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
-        BusinessAssert.assertNotNull(flow, StatusCode.SERVICE_ERROR, "can not find flow, flowId:" + flowId);
         flow.claimNode(node.getName(), userId);
         List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
         subFlowList.forEach(subFlow -> {
@@ -217,11 +216,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         // 主流程
         Flow mainFlow = null;
         // 如果当前需要处理的是异常流程的节点
-        if (flow.getParentId() != null) {
+        if (flow.hasParentFlow()) {
             subFlowList = flowRepository.listFlowByParentId(flow.getParentId());
             mainFlow = flowRepository.queryById(flow.getParentId());
         }
-        if (flow.getParentId() == null) {
+        if (!flow.hasParentFlow()) {
             subFlowList = flowRepository.listFlowByParentId(flow.getId());
            mainFlow = flow;
         }
