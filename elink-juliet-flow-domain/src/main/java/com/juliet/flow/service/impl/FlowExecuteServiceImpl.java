@@ -235,6 +235,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
         if (CollectionUtils.isEmpty(executableNode)) {
+            if (!mainNode.isExecutable()) {
+                throw new ServiceException("当前流程未走到该节点");
+            }
             executableNode.add(mainNode);
         }
         if (CollectionUtils.isNotEmpty(executableNode) && mainNode.isNormalExecutable()) {
@@ -259,7 +262,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      * TODO: 2023/5/11  当前认为只有一条异常流程存在，如果后面要做多条再修改
      * </ul>
      *
-     * @param flowId
+     * @param flowId 主流程节点
      * @param nodeId
      * @param nodeName
      * @param userId
