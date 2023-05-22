@@ -86,6 +86,14 @@ public class Node extends BaseModel {
         return !Collections.disjoint(postIdList, sourcePostIdList);
     }
 
+    /**
+     * 判断节点是否已经存在处理人
+     * @return
+     */
+    public boolean nodeTodo() {
+        return processedBy != null && processedBy != 0;
+    }
+
 
     /**
      * 获取前置节点列表

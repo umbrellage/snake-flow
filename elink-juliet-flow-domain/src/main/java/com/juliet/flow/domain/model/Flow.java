@@ -89,18 +89,6 @@ public class Flow extends BaseModel {
             .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
     }
 
-    public Node findNode(List<String> fieldCodeList, Long userId) {
-        if (CollectionUtils.isEmpty(fieldCodeList) || userId == null) {
-            return null;
-        }
-        return nodes.stream().filter(node -> {
-            if (node.getProcessedBy() == null || !node.getProcessedBy().equals(userId)) {
-                return false;
-            }
-            return node.getStatus() == NodeStatusEnum.ACTIVE;
-        }).findAny().orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
-    }
-
 
     public Node findTodoNode(Long userId) {
         if (CollectionUtils.isEmpty(nodes)) {
@@ -304,7 +292,7 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        if (node.getProcessedBy() != null) {
+                        if (node.isTodoNode()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         }else {
                             node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
