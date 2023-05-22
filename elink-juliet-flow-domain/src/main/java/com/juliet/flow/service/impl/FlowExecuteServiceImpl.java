@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -239,7 +240,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             subFlowList = flowRepository.listFlowByParentId(flow.getId());
            mainFlow = flow;
         }
-        Node mainNode = mainFlow.findNode(currentFlowNode.getName());
+        subFlowList.add(mainFlow);
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
                 .filter(subFlow -> {
@@ -248,18 +249,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
-        if (CollectionUtils.isEmpty(executableNode)) {
-            if (!mainNode.isExecutable()) {
-                throw new ServiceException("当前流程未走到该节点");
-            }
-            executableNode.add(mainNode);
-        } else {
-            if (CollectionUtils.isNotEmpty(executableNode) && mainNode.isNormalExecutable()) {
-                executableNode.add(mainNode);
-            }
-        }
 
-        for (Node node : executableNode) {
+        executableNode.add(currentFlowNode);
+
+        List<Node> nodeList = executableNode.stream().collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1)).entrySet().stream().map(
+            Entry::getValue).collect(Collectors.toList());
+
+        for (Node node : nodeList) {
             task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
         }
     }
