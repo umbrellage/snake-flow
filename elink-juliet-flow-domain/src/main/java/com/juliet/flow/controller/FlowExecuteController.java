@@ -90,6 +90,7 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+    @ApiOperation("获取节点")
     @Override
     public AjaxResult<NodeVO> node(TaskDTO dto) {
         NodeVO nodeVO = flowExecuteService.node(dto);

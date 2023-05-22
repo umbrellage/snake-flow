@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -121,12 +122,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
 
         if (node == null) {
-            return null;
+            node = findSubFlowList(flow.getId()).stream()
+                .map(subFlow -> subFlow.findTodoNode(dto.getUserId()))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElse(null);
         }
-        if (node.postAuthority(dto.getPostIdList())) {
+
+        if (node != null && node.postAuthority(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
         return null;
+    }
+
+
+    private List<Flow> findSubFlowList(Long id) {
+        List<Flow> flowList = flowRepository.listFlowByParentId(id);
+        if (CollectionUtils.isEmpty(flowList)) {
+            return Collections.emptyList();
+        }
+        return flowList;
     }
 
 
