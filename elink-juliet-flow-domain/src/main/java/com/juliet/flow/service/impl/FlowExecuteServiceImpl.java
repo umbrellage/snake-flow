@@ -120,8 +120,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             node = flow.findTodoNode(dto.getUserId());
         }
 
-        if (node != null) {
-            return node.toNodeVo(flow);
+        if (node == null) {
+            return null;
+        }
+        if (node.postAuthority(dto.getPostIdList())) {
+            return node.toNodeVo(null);
         }
         return null;
     }
@@ -229,7 +232,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     Node node = subFlow.findNode(currentFlowNode.getName());
                     return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
-                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList(), dto.getUserId())));
         }
         if (CollectionUtils.isEmpty(executableNode)) {
             executableNode.add(mainNode);

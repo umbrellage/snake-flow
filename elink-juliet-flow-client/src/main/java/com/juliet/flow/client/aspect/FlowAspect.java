@@ -8,6 +8,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
+import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -43,12 +44,19 @@ public class FlowAspect {
     @Autowired
     private JulietFlowClient julietFlowClient;
 
+
+
     @Autowired
     private List<ControllerResponseCallback> callbacks;
+
+    @Autowired(required = false)
+    private UserInfoCallback userInfoCallback;
 
     private static final String HEADER_NAME_JULIET_FLOW_CODE = "juliet-flow-code";
 
     private static final String PARAM_MAME_JULIET_FLOW_CODE = "julietFlowCode";
+
+    private static final String HEADER_NAME_JULIET_FLOW_ID = "juliet-flow-id";
 
     private static final String PARAM_MAME_JULIET_FLOW_ID = "julietFlowId";
 
@@ -71,13 +79,15 @@ public class FlowAspect {
         List<String> fields = parseRequestParams(point);
         log.info("juliet flow interceptor all fields:{}", fields);
 
+        Long userId = userInfoCallback.getUserId(request);
+
         boolean bpmInit = false;
         if (julietFlowId == null) {
             if (julietFlowCode == null || julietFlowCode.length() == 0) {
                 throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
-            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode));
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId));
             if (!isSuccess(initResult)) {
                 log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
                 throw new RuntimeException("juliet flow init error!");
@@ -110,10 +120,11 @@ public class FlowAspect {
                 log.info("juliet flow forward by flow id:{}", julietFlowId);
                 // 业务处理成功，流程往后走
                 if (!bpmInit) {
-                    NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId);
+                    NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId, userId);
                     AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
                     if (!isSuccess(forwardResult)) {
-                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}", julietFlowId, nodeFieldDTO, forwardResult);
+                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}",
+                                julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
                     }
                     log.info("juliet flow forward success!");
                 }
@@ -127,16 +138,18 @@ public class FlowAspect {
         }
     }
 
-    private BpmDTO toBpmDTO(String julietFlowCode) {
+    private BpmDTO toBpmDTO(String julietFlowCode, Long userId) {
         BpmDTO bpmDTO = new BpmDTO();
         bpmDTO.setTemplateCode(julietFlowCode);
+        bpmDTO.setUserId(userId);
         return bpmDTO;
     }
 
-    private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId) {
+    private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId, Long userId) {
         NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
         nodeFieldDTO.setFieldCodeList(fields);
         nodeFieldDTO.setFlowId(julietFlowId);
+        nodeFieldDTO.setUserId(userId);
         return nodeFieldDTO;
     }
 
@@ -236,7 +249,11 @@ public class FlowAspect {
     }
 
     private Long getJulietFlowId(HttpServletRequest request) {
-        String julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        String julietFlowId = null;
+        julietFlowId = request.getHeader(HEADER_NAME_JULIET_FLOW_ID);
+        if (julietFlowId == null || julietFlowId.trim().length() == 0) {
+            julietFlowId = request.getParameter(PARAM_MAME_JULIET_FLOW_ID);
+        }
         if (julietFlowId == null || julietFlowId.trim().length() == 0) {
             return null;
         }
