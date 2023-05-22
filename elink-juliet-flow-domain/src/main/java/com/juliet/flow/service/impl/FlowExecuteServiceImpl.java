@@ -202,28 +202,35 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void forward(NodeFieldDTO dto) {
-        // 判断哪些节点需要被执行
+        // 需要被执行的节点列表
         List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
             return;
         }
+        Node currentFlowNode = flow.findNode(dto.getNodeId());
+        // 异常子流程
+        List<Flow> subFlowList = new ArrayList<>();
+        // 主流程
+        Flow mainFlow = null;
+        // 如果当前需要处理的是异常流程的节点
         if (flow.getParentId() != null) {
-            dto.setFlowId(flow.getParentId());
+            subFlowList = flowRepository.listFlowByParentId(flow.getParentId());
+            mainFlow = flowRepository.queryById(flow.getParentId());
         }
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
-
-        Node mainNode = flow.findNode(dto.getFieldCodeList());
-
+        if (flow.getParentId() == null) {
+            subFlowList = flowRepository.listFlowByParentId(flow.getId());
+           mainFlow = flow;
+        }
+        Node mainNode = mainFlow.findNode(currentFlowNode.getName());
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
                 .filter(subFlow -> {
-                    Node node = subFlow.findNode(dto.getFieldCodeList());
+                    Node node = subFlow.findNode(currentFlowNode.getName());
                     return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(dto.getFieldCodeList())));
         }
-
         if (CollectionUtils.isEmpty(executableNode)) {
             executableNode.add(mainNode);
         }

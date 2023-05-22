@@ -125,6 +125,15 @@ public class Flow extends BaseModel {
             .orElse(null);
     }
 
+    public Node findNodeThrow(String name) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getName().equals(name)).findAny()
+            .orElseThrow(() -> new ServiceException("找不到节点"));
+    }
+
     /**
      * 前置节点已经处理
      * @param name
