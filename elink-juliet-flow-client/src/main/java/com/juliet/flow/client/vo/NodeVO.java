@@ -47,4 +47,13 @@ public class NodeVO {
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+
+    public NodeSimpleVO toSimple() {
+        NodeSimpleVO ret = new NodeSimpleVO();
+        ret.setId(id);
+        ret.setName(name);
+        ret.setFlowId(flowId);
+        ret.setProcessedBy(processedBy);
+        return ret;
+    }
 }

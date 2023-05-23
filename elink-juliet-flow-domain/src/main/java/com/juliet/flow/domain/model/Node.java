@@ -76,6 +76,7 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
+        ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
         ret.setMainFlowId(mainFlowId);
         ret.setType(NotifyTypeEnum.NORMAL);
@@ -88,9 +89,16 @@ public class Node extends BaseModel {
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
+        ret.setPostIdList(postIdList());
         ret.setMainFlowId(mainFlowId);
         ret.setType(NotifyTypeEnum.ANOMALY);
         return ret;
+    }
+
+    public List<String> postIdList() {
+        return bindPosts.stream()
+            .map(Post::getPostId)
+            .collect(Collectors.toList());
     }
 
     /**

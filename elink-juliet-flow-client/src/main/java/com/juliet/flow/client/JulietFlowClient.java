@@ -108,6 +108,4 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/flowList")
     AjaxResult<List<FlowVO>> flowList(@RequestBody FlowIdListDTO dto);
-
-
 }
