@@ -3,7 +3,9 @@ package com.juliet.flow.service.impl;
 import static java.util.stream.Collectors.toCollection;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -31,6 +33,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -56,7 +59,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     private FlowRepository flowRepository;
 
     @Autowired
-    private TodoService todoService;
+    private List<MsgNotifyCallback> msgNotifyCallbacks;
 
     @Override
     public NodeVO queryStartNodeById(FlowOpenDTO dto) {
@@ -72,9 +75,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             return null;
         }
         Node node = template.getNodes().stream()
-                .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("找不到开始节点"));
+            .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
+            .findAny()
+            .orElseThrow(() -> new ServiceException("找不到开始节点"));
         if (node.postAuthority(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
@@ -126,16 +129,27 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
         if (node == null) {
             node = findSubFlowList(flow.getId()).stream()
-                    .map(subFlow -> subFlow.findTodoNode(dto.getUserId()))
-                    .filter(Objects::nonNull)
-                    .findAny()
-                    .orElse(null);
+                .map(subFlow -> subFlow.findTodoNode(dto.getUserId()))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElse(null);
         }
 
         if (node != null && node.postAuthority(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
         return null;
+    }
+
+    @Override
+    public List<FlowVO> flowList(FlowIdListDTO dto) {
+        if (CollectionUtils.isEmpty(dto.getFlowIdList())) {
+            log.error("流程ID列表为空");
+            return Collections.emptyList();
+        }
+        return flowRepository.queryByIdList(dto.getFlowIdList()).stream()
+            .map(Flow::flowVO)
+            .collect(Collectors.toList());
     }
 
 
@@ -155,21 +169,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             return Collections.emptyList();
         }
         List<NodeStatusEnum> nodeStatusEnumList = Stream.of(NodeStatusEnum.TO_BE_CLAIMED, NodeStatusEnum.ACTIVE)
-                .collect(Collectors.toList());
+            .collect(Collectors.toList());
         List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
         flowList.add(flow);
 
         // 子流程的节点都是当作主流程的待办来处理
         return flowList.stream()
-                .map(subFlow ->
-                        subFlow.getNodeByNodeStatus(nodeStatusEnumList)
-                                .stream()
-                                .map(node -> node.toNodeVo(subFlow))
-                                .collect(Collectors.toList())
-                )
-                .flatMap(Collection::stream)
-                .collect(Collectors.collectingAndThen(toCollection(() ->
-                        new TreeSet<>(Comparator.comparing(NodeVO::getName))), ArrayList::new));
+            .map(subFlow ->
+                subFlow.getNodeByNodeStatus(nodeStatusEnumList)
+                    .stream()
+                    .map(node -> node.toNodeVo(subFlow))
+                    .collect(Collectors.toList())
+            )
+            .flatMap(Collection::stream)
+            .collect(Collectors.collectingAndThen(toCollection(() ->
+                new TreeSet<>(Comparator.comparing(NodeVO::getName))), ArrayList::new));
     }
 
     /**
@@ -201,21 +215,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     public List<NodeVO> todoNodeList(UserDTO dto) {
         List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
         List<Node> postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
-                .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
-                .collect(Collectors.toList());
+            .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
+            .collect(Collectors.toList());
         List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList)
-                .flatMap(Collection::stream)
-                .map(Node::getFlowId)
-                .distinct()
-                .collect(Collectors.toList());
+            .flatMap(Collection::stream)
+            .map(Node::getFlowId)
+            .distinct()
+            .collect(Collectors.toList());
 
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
-                .collect(Collectors.toMap(Flow::getId, Function.identity()));
+            .collect(Collectors.toMap(Flow::getId, Function.identity()));
 
         return Stream.of(userIdNodeList, postIdNodeList)
-                .flatMap(Collection::stream)
-                .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
-                .collect(Collectors.toList());
+            .flatMap(Collection::stream)
+            .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -245,16 +259,17 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         subFlowList.add(mainFlow);
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
-                    .filter(subFlow -> {
-                        Node node = subFlow.findNode(currentFlowNode.getName());
-                        return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
-                    })
-                    .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
+                .filter(subFlow -> {
+                    Node node = subFlow.findNode(currentFlowNode.getName());
+                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
+                })
+                .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
 
         executableNode.add(currentFlowNode);
 
-        List<Node> nodeList = executableNode.stream().collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1)).entrySet().stream().map(
+        List<Node> nodeList = executableNode.stream()
+            .collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1)).entrySet().stream().map(
                 Entry::getValue).collect(Collectors.toList());
 
         for (Node node : nodeList) {
@@ -299,10 +314,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             // 判断 存在异常流程，且异常流程已全部结束
             boolean existsAnomalyFlowsAndFlowsEnd =
-                    CollectionUtils.isNotEmpty(exFlowList) && exFlowList.stream().allMatch(Flow::isFlowEnd);
+                CollectionUtils.isNotEmpty(exFlowList) && exFlowList.stream().allMatch(Flow::isFlowEnd);
             // 判断 存在异常流程，且异常流程没有结束
             boolean existsAnomalyFlowsAndFlowsNotEnd =
-                    CollectionUtils.isNotEmpty(exFlowList) && !exFlowList.stream().allMatch(Flow::isFlowEnd);
+                CollectionUtils.isNotEmpty(exFlowList) && !exFlowList.stream().allMatch(Flow::isFlowEnd);
             // 当节点是异常节点时
             if (node.isProcessed()) {
                 if (existsAnomalyFlowsAndFlowsNotEnd) {
@@ -315,6 +330,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     Node subNode = subFlow.findNode(node.getName());
                     subFlow.modifyNextNodeStatus(subNode.getId());
                     flowRepository.add(subFlow);
+                    // 异步消息通知 todo
+                    CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(node.toNotify())));
                     return;
                 }
             }
@@ -323,7 +340,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (!node.isProcessed()) {
                 flow.modifyNextNodeStatus(nodeId);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
-                        .allMatch(Flow::isEnd))) {
+                    .allMatch(Flow::isEnd))) {
                     flow.setStatus(FlowStatusEnum.END);
                 }
                 flowRepository.update(flow);
@@ -331,8 +348,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         } else {
             // 如果是异常流程的节点
             Flow errorFlow = exFlowList.stream()
-                    .filter(exFlow -> exFlow.findNode(nodeId) != null)
-                    .findAny().orElse(null);
+                .filter(exFlow -> exFlow.findNode(nodeId) != null)
+                .findAny().orElse(null);
             if (errorFlow == null) {
                 return;
             }

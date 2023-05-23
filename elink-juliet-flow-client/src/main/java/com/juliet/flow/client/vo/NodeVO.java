@@ -29,6 +29,8 @@ public class NodeVO {
 
     private Long flowId;
 
+    private Long mainFlowId;
+
     /**
      * 表单
      */

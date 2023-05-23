@@ -4,6 +4,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -116,6 +117,12 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<FlowVO> flow(FlowIdDTO dto) {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
         return AjaxResult.success(flowVO);
+    }
+
+    @Override
+    public AjaxResult<List<FlowVO>> flowList(FlowIdListDTO dto) {
+        List<FlowVO> flowVOList = flowExecuteService.flowList(dto);
+        return AjaxResult.success(flowVOList);
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {

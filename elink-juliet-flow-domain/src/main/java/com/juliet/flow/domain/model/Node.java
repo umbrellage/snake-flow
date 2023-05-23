@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -67,6 +68,16 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+
+
+    public NotifyDTO toNotify() {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setUserId(processedBy);
+        return ret;
+    }
 
     /**
      * 判断该岗位是否有该节点权限
@@ -202,6 +213,7 @@ public class Node extends BaseModel {
         data.setProcessedTime(processedTime);
 
         if (flow != null) {
+            data.setMainFlowId(flow.getParentId());
             List<Long> preProcessedBy = preNameList().stream()
                 .map(name -> flow.findNode(name).getProcessedBy())
                 .collect(Collectors.toList());

@@ -98,6 +98,16 @@ public interface JulietFlowClient {
      * @return
      */
     @PostMapping("/bpm/flow")
-    AjaxResult<FlowVO> flow(FlowIdDTO dto);
+    AjaxResult<FlowVO> flow(@RequestBody FlowIdDTO dto);
+
+
+    /**
+     * 获取流程信息
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/flowList")
+    AjaxResult<List<FlowVO>> flowList(@RequestBody FlowIdListDTO dto);
+
 
 }

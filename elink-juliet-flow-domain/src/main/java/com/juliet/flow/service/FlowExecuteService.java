@@ -2,6 +2,7 @@ package com.juliet.flow.service;
 
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -37,4 +38,6 @@ public interface FlowExecuteService {
     NodeVO fieldNode(NodeFieldDTO dto);
 
     NodeVO node(TaskDTO dto);
+
+    List<FlowVO> flowList(FlowIdListDTO dto);
 }
