@@ -47,7 +47,7 @@ public class ElinkMonitor {
         Object response = point.proceed();
 
         logger.trace("Response print.uuid:{}, url:{},method:{}, body:{} response:{}",
-            data.getUuid(), data.getUrl(), data.getHttpMethod(), data.getBody(), JSON.toJSONString(response));
+            data.getUuid(), data.getUrl(), data.getHttpMethod(), JSON.toJSONString(data.getBody()), JSON.toJSONString(response));
 
         int status = attributes.getResponse() != null ? attributes.getResponse().getStatus() : 0;
 
