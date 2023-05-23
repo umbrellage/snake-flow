@@ -47,12 +47,12 @@ public class ElinkMonitor {
         Object response = point.proceed();
 
         logger.trace("Response print.uuid:{}, url:{},method:{}, body:{} response:{}",
-            data.getUuid(), data.getUrl(), data.getHttpMethod(), JSON.toJSONString(data.getBody()), JSON.toJSONString(response));
+            data.getUuid(), data.getUrl(), data.getHttpMethod(), JSON.toJSONString(response), JSON.toJSONString(response));
 
         int status = attributes.getResponse() != null ? attributes.getResponse().getStatus() : 0;
 
-        logger.info("Performance monitoring, uuid:{}, url:{}, status code:{}, cost time:{} ms ",
-            data.getUuid(), data.getUrl(), status, timeConsuming.consume());
+        logger.info("Performance monitoring, uuid:{}, url:{}, status code:{}, body:{}, cost time:{} ms ",
+            data.getUuid(), data.getUrl(), status, JSON.toJSONString(response), timeConsuming.consume());
 
         return response;
     }
