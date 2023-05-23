@@ -128,6 +128,7 @@ public class ElinkMonitor {
         } else {
             result.setUrl(path + "?" + String.join("&", urlParam));
         }
+        result.setBody(params);
         return result;
     }
 

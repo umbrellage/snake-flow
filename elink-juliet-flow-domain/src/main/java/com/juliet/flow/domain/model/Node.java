@@ -70,6 +70,11 @@ public class Node extends BaseModel {
     private Long processedBy;
     private LocalDateTime processedTime;
 
+    public boolean complianceTheRules() {
+        // TODO: 2023/5/23  
+        return true;
+    }
+
 
     public NotifyDTO toNotifyNormal(Long mainFlowId) {
         NotifyDTO ret = new NotifyDTO();

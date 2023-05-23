@@ -42,7 +42,10 @@ public class Flow extends BaseModel {
 
     private Long tenantId;
 
-
+    /**
+     * 流程是否已经结束
+     * @return
+     */
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END || isEnd();
     }
@@ -57,7 +60,7 @@ public class Flow extends BaseModel {
 
 
     /**
-     * 当前流程是否已经结束
+     * 当前流程节点是否已经结束
      */
     public boolean isEnd() {
         if (CollectionUtils.isEmpty(nodes)) {
@@ -136,7 +139,7 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 前置节点已经处理
+     * 前置节点是否已经处理
      * @param name
      * @return
      */

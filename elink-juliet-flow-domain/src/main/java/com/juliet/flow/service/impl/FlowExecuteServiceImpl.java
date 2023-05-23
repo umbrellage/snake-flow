@@ -241,7 +241,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return;
         }
-//        Node currentFlowNode = flow.findNode(dto.getNodeId());
         Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
         // 异常子流程
         List<Flow> subFlowList = new ArrayList<>();
