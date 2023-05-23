@@ -58,6 +58,10 @@ public class Flow extends BaseModel {
         return parentId != null && parentId != 0;
     }
 
+    public boolean isMainFlow() {
+        return parentId != null && parentId == 0;
+    }
+
 
     /**
      * 当前流程节点是否已经结束

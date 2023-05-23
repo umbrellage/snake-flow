@@ -321,7 +321,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是异常节点时
             if (node.isProcessed()) {
                 Flow mainFlow = flowRepository.queryById(node.getFlowId());
-                if (mainFlow.hasParentFlow()) {
+                if (mainFlow.isMainFlow()) {
                     Flow subFlow = flow.subFlow();
                     subFlow.modifyNodeStatus(node);
                     Node subNode = subFlow.findNode(node.getName());
