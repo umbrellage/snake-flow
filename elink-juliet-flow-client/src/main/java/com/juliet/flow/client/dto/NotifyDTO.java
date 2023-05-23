@@ -1,6 +1,6 @@
 package com.juliet.flow.client.dto;
 
-import java.util.List;
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,9 +14,9 @@ import lombok.Setter;
 @Setter
 public class NotifyDTO {
     private Long flowId;
-    // TODO: 2023/5/23 暂时未提供 
     private Long mainFlowId;
     private Long nodeId;
     private String nodeName;
     private Long userId;
+    private NotifyTypeEnum type;
 }

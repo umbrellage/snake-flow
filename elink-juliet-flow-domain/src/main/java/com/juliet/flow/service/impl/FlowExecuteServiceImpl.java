@@ -2,12 +2,14 @@ package com.juliet.flow.service.impl;
 
 import static java.util.stream.Collectors.toCollection;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -299,8 +301,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Transactional(rollbackFor = Exception.class)
     public synchronized void task(Long flowId, Long nodeId, String nodeName, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
-        if (flow == null) {
-            return;
+        if (flow == null || flow.hasParentFlow()) {
+            log.error("流程存在异常{}", JSON.toJSONString(flow));
+            throw new ServiceException("流程存在异常");
         }
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
@@ -309,7 +312,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
-//                throw new ServiceException("该节点未被认领");
                 return;
             }
             // 判断 存在异常流程，且异常流程已全部结束
@@ -330,8 +332,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     Node subNode = subFlow.findNode(node.getName());
                     subFlow.modifyNextNodeStatus(subNode.getId());
                     flowRepository.add(subFlow);
-                    // 异步消息通知 todo
-                    CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(node.toNotify())));
+                    // TODO: 2023/5/23
+                    // 发送消息提醒
+                    CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> {
+                        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
+                            .flatMap(Collection::stream)
+                            .collect(Collectors.toList());
+                        callback.notify(notifyDTOList);
+                    }));
                     return;
                 }
             }
@@ -344,6 +352,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     flow.setStatus(FlowStatusEnum.END);
                 }
                 flowRepository.update(flow);
+                // 发送消息提醒
+                CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(flow.anomalyNotifyList())));
             }
         } else {
             // 如果是异常流程的节点
@@ -365,8 +375,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 flowRepository.update(flow);
             }
             flowRepository.update(errorFlow);
+            // 发送消息提醒
+            CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(errorFlow.anomalyNotifyList())));
         }
-
     }
 
     @Override

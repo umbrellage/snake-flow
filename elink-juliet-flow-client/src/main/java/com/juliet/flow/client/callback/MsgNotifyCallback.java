@@ -2,6 +2,7 @@ package com.juliet.flow.client.callback;
 
 
 import com.juliet.flow.client.dto.NotifyDTO;
+import java.util.List;
 
 /**
  * MsgNotifyCallback
@@ -13,8 +14,8 @@ public interface MsgNotifyCallback {
 
     /**
      *
-     * @param dto
+     * @param list
      */
-    void notify(NotifyDTO dto);
+    void notify(List<NotifyDTO> list);
 
 }

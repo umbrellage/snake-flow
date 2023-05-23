@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -11,7 +12,6 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,18 +42,15 @@ public class Flow extends BaseModel {
 
     private Long tenantId;
 
-    public boolean forward() {
-        return true;
-    }
-
-    public Todo getCurrentTodo() {
-        return new Todo();
-    }
 
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END || isEnd();
     }
 
+    /**
+     * 是否是异常子流程
+     * @return
+     */
     public boolean hasParentFlow() {
         return parentId != null && parentId != 0;
     }
@@ -258,6 +255,34 @@ public class Flow extends BaseModel {
         for (Node node : toBeProcessedNodeList) {
             modifyNodeStatus(node);
         }
+    }
+
+    /**
+     * 通知待办列表
+     * @return
+     */
+    public List<NotifyDTO> normalNotifyList() {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Collections.emptyList();
+        }
+        return nodes.stream()
+            .filter(Node::isTodoNode)
+            .map(node -> node.toNotifyNormal(parentId))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 异常通知列表
+     * @return
+     */
+    public List<NotifyDTO> anomalyNotifyList() {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Collections.emptyList();
+        }
+        return nodes.stream()
+            .filter(Node::isTodoNode)
+            .map(node -> node.toNotifyAnomaly(parentId))
+            .collect(Collectors.toList());
     }
 
     /**

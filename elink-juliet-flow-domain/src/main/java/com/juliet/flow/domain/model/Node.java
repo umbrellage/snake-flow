@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
@@ -70,12 +71,25 @@ public class Node extends BaseModel {
     private LocalDateTime processedTime;
 
 
-    public NotifyDTO toNotify() {
+    public NotifyDTO toNotifyNormal(Long mainFlowId) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
+        ret.setMainFlowId(mainFlowId);
+        ret.setType(NotifyTypeEnum.NORMAL);
+        return ret;
+    }
+
+    public NotifyDTO toNotifyAnomaly(Long mainFlowId) {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setUserId(processedBy);
+        ret.setMainFlowId(mainFlowId);
+        ret.setType(NotifyTypeEnum.ANOMALY);
         return ret;
     }
 
