@@ -118,7 +118,7 @@ public class FlowExecuteController implements JulietFlowClient {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
         return AjaxResult.success(flowVO);
     }
-
+    @ApiOperation("获取流程列表")
     @Override
     public AjaxResult<List<FlowVO>> flowList(FlowIdListDTO dto) {
         List<FlowVO> flowVOList = flowExecuteService.flowList(dto);
