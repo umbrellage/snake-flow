@@ -302,8 +302,6 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.PROCESSED);
             }
         });
-
-
         nodes.forEach(node -> {
             if (nextNameList.contains(node.getName())) {
 

@@ -350,6 +350,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
                     flow.setStatus(FlowStatusEnum.END);
+                    exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
+                    exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 }
                 flowRepository.update(flow);
                 // 发送消息提醒
@@ -376,7 +378,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             flowRepository.update(errorFlow);
             // 发送消息提醒
-            CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(errorFlow.anomalyNotifyList())));
+            CompletableFuture.runAsync(
+                () -> msgNotifyCallbacks.forEach(callback -> callback.notify(errorFlow.anomalyNotifyList())));
         }
     }
 
