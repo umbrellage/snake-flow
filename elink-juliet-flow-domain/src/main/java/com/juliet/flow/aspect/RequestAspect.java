@@ -10,11 +10,11 @@ import org.springframework.stereotype.Component;
  *
  * @author Geweilang
  */
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class RequestAspect {
 
-    @Around(value = "within(com.juliet.flow.controller.*)")
+//    @Around(value = "within(com.juliet.flow.controller.*)")
     public Object checkAndPerformance(ProceedingJoinPoint point) throws Throwable {
         return ElinkMonitor.performance(point);
     }
