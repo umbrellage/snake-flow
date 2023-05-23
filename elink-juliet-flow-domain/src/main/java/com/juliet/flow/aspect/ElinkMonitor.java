@@ -42,7 +42,7 @@ public class ElinkMonitor {
 
         logger.info("Request start... uuid:{}, url:{},method:{}, body:{}, aop time:{} ms", data.getUuid(),
             data.getUrl(),
-            data.getHttpMethod(), data.getBody(), timeConsuming.consume());
+            data.getHttpMethod(),JSON.toJSONString(data.getBody()), timeConsuming.consume());
 
         Object response = point.proceed();
 
