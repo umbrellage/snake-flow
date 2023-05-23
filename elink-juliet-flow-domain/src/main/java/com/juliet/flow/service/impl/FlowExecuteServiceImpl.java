@@ -320,11 +320,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 //                CollectionUtils.isNotEmpty(exFlowList) && !exFlowList.stream().allMatch(Flow::isFlowEnd);
             // 当节点是异常节点时
             if (node.isProcessed()) {
-//                if (existsAnomalyFlowsAndFlowsNotEnd) {
-//                    throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
-//                }
-//                if (existsAnomalyFlowsAndFlowsEnd || CollectionUtils.isEmpty(exFlowList)) {
-                    // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
+                Flow mainFlow = flowRepository.queryById(node.getFlowId());
+                if (mainFlow.hasParentFlow()) {
                     Flow subFlow = flow.subFlow();
                     subFlow.modifyNodeStatus(node);
                     Node subNode = subFlow.findNode(node.getName());
@@ -334,11 +331,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     // 发送消息提醒
                     CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> {
                         List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
-                            .flatMap(Collection::stream)
-                            .collect(Collectors.toList());
+                                .flatMap(Collection::stream)
+                                .collect(Collectors.toList());
                         callback.notify(notifyDTOList);
                     }));
                     return;
+                }
+//                if (existsAnomalyFlowsAndFlowsNotEnd) {
+//                    throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
+//                }
+//                if (existsAnomalyFlowsAndFlowsEnd || CollectionUtils.isEmpty(exFlowList)) {
+                    // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
+
 //                }
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
