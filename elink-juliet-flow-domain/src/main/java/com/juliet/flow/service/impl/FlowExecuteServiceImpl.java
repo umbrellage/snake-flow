@@ -256,6 +256,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             subFlowList = flowRepository.listFlowByParentId(flow.getId());
             mainFlow = flow;
         }
+        assert mainFlow != null;
+        if (mainFlow.isFlowEnd()) {
+            throw new ServiceException("流程已结束");
+        }
         subFlowList.add(mainFlow);
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
