@@ -223,6 +223,7 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
+        data.setTitle(title);
         data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
