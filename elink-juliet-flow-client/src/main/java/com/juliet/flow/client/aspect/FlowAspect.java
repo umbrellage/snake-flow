@@ -84,6 +84,10 @@ public class FlowAspect {
         List<String> fields = parseRequestParams(point);
         log.info("juliet flow interceptor all fields:{}", fields);
 
+        if (userInfoCallback == null) {
+            throw new RuntimeException("Juliet Flow UserInfoCallback 未实现!");
+        }
+
         Long userId = userInfoCallback.getUserId(request);
 
         boolean bpmInit = false;
