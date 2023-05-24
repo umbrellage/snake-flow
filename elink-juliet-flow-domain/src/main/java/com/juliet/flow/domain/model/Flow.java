@@ -254,8 +254,10 @@ public class Flow extends BaseModel {
         List<Node> toBeProcessedNodeList = new ArrayList<>();
         nodes.forEach(node -> {
             //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为未激活
-            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
-                node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+//            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
+            if (nextNameList.contains(node.getName()) && node.getStatus() != NodeStatusEnum.NOT_ACTIVE) {
+
+                    node.setStatus(NodeStatusEnum.NOT_ACTIVE);
                 toBeProcessedNodeList.add(node);
             }
         });
