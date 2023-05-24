@@ -6,6 +6,8 @@ import java.lang.reflect.Method;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,9 +17,11 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * PctMonitor 请求参数监控类，用于请求URL参数打印，请求响应时间统计
@@ -40,19 +44,18 @@ public class ElinkMonitor {
 
         ReqData data = printReqParam(point);
 
-        logger.info("Request start... uuid:{}, url:{},method:{}, body:{}, aop time:{} ms", data.getUuid(),
-            data.getUrl(),
-            data.getHttpMethod(),JSON.toJSONString(data.getBody()), timeConsuming.consume());
+        logger.info("Request start... uuid:{}, url:{},method:{}, body:{}, aop time:{} ms", data.getUuid(), data.getUrl(),
+            data.getHttpMethod(), data.getBody(), timeConsuming.consume());
 
         Object response = point.proceed();
 
         logger.trace("Response print.uuid:{}, url:{},method:{}, body:{} response:{}",
-            data.getUuid(), data.getUrl(), data.getHttpMethod(), JSON.toJSONString(response), JSON.toJSONString(response));
+            data.getUuid(), data.getUrl(), data.getHttpMethod(), data.getBody(), JSON.toJSONString(null));
 
         int status = attributes.getResponse() != null ? attributes.getResponse().getStatus() : 0;
 
-        logger.info("Performance monitoring, uuid:{}, url:{}, status code:{}, body:{}, cost time:{} ms ",
-            data.getUuid(), data.getUrl(), status, JSON.toJSONString(response), timeConsuming.consume());
+        logger.info("Performance monitoring, uuid:{}, url:{}, status code:{}, cost time:{} ms ",
+            data.getUuid(), data.getUrl(), status, timeConsuming.consume());
 
         return response;
     }
@@ -82,6 +85,11 @@ public class ElinkMonitor {
         Set<String> urlParam = new HashSet<>();
 
         for (int i = 0; i < params.length; ++i) {
+            if (params[i] instanceof ServletRequest || params[i] instanceof ServletResponse || params[i] instanceof MultipartFile) {
+                //ServletRequest不能序列化，从入参里排除，否则报异常：java.lang.IllegalStateException: It is illegal to call this method if the current request is not in asynchronous mode (i.e. isAsyncStarted() returns false)
+                //ServletResponse不能序列化 从入参里排除，否则报异常：java.lang.IllegalStateException: getOutputStream() has already been called for this response
+                continue;
+            }
             Annotation[] annotations = parameterAnnotations[i];
             if (parentParamAnnotations != null) {
                 Annotation[] parentAnn = parentParamAnnotations[i];
@@ -99,12 +107,20 @@ public class ElinkMonitor {
             }
 
             RequestParam requestParam = null;
+            RequestBody requestBody = null;
+
 
             for (Annotation annotation : annotations) {
 
                 if (annotation instanceof RequestParam) {
                     requestParam = (RequestParam) annotation;
                 }
+                if (annotation instanceof RequestBody) {
+                    requestBody = (RequestBody) annotation;
+                }
+            }
+            if (requestBody != null) {
+                result.setBody(params[i]);
             }
 
             if (requestParam == null) {
@@ -128,7 +144,6 @@ public class ElinkMonitor {
         } else {
             result.setUrl(path + "?" + String.join("&", urlParam));
         }
-        result.setBody(params);
         return result;
     }
 
@@ -140,6 +155,7 @@ public class ElinkMonitor {
         private String url;
         private String httpMethod;
         private Object body;
+        private Object requestBody;
     }
 
     public static Annotation[][] superParameterAnnotations(Method method) {
