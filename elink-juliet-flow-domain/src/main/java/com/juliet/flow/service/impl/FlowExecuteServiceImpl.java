@@ -329,12 +329,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     flowRepository.add(subFlow);
                     // TODO: 2023/5/23
                     // 发送消息提醒
-                    CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> {
-                        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
-                                .flatMap(Collection::stream)
-                                .collect(Collectors.toList());
-                        callback.notify(notifyDTOList);
-                    }));
+                    List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
+                        .flatMap(Collection::stream)
+                        .collect(Collectors.toList());
+                    callback(notifyDTOList);
                     return;
                 }
 //                if (existsAnomalyFlowsAndFlowsNotEnd) {
@@ -357,7 +355,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 }
                 flowRepository.update(flow);
                 // 发送消息提醒
-                CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(flow.anomalyNotifyList())));
+                callback(flow.normalNotifyList());
             }
         } else {
             // 如果是异常流程的节点
@@ -379,9 +377,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 flowRepository.update(flow);
             }
             flowRepository.update(errorFlow);
-            // 发送消息提醒
-            CompletableFuture.runAsync(
-                () -> msgNotifyCallbacks.forEach(callback -> callback.notify(errorFlow.anomalyNotifyList())));
+            // 异步发送消息提醒
+            callback(errorFlow.anomalyNotifyList());
+        }
+    }
+
+    private void callback(List<NotifyDTO> list) {
+        if (CollectionUtils.isNotEmpty(list)) {
+            CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(list)));
         }
     }
 
