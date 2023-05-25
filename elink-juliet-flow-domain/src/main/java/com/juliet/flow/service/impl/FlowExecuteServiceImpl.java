@@ -94,7 +94,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         flow.validate();
         flowRepository.add(flow);
-        CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(flow.anomalyNotifyList())));
+        CompletableFuture.runAsync(
+            () -> msgNotifyCallbacks.forEach(callback -> callback.notify(flow.anomalyNotifyList())));
         return flow.getId();
     }
 
@@ -272,9 +273,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
         executableNode.add(currentFlowNode);
 
-        List<Node> nodeList = executableNode.stream()
-            .collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1)).entrySet().stream().map(
-                Entry::getValue).collect(Collectors.toList());
+        List<Node> nodeList = new ArrayList<>(
+            executableNode.stream().collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1))
+                .values());
 
         for (Node node : nodeList) {
             task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
@@ -291,7 +292,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      * 3. 当前要处理的节点为非异常节点 ---------> 正常处理节点的逻辑走
      * 二. 异常流程中的节点
      * 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理
-     * TODO: 2023/5/11  当前认为只有一条异常流程存在，如果后面要做多条再修改
      * </ul>
      *
      * @param flowId   主流程节点
@@ -343,7 +343,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 //                    throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
 //                }
 //                if (existsAnomalyFlowsAndFlowsEnd || CollectionUtils.isEmpty(exFlowList)) {
-                    // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
+                // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
 
 //                }
             }
