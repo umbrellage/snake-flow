@@ -220,6 +220,7 @@ public class FlowEntityFactory {
         nodeEntity.setProcessedBy(node.getProcessedBy());
         nodeEntity.setCreateBy(node.getCreateBy());
         nodeEntity.setUpdateBy(node.getUpdateBy());
+        nodeEntity.setFlowTemplateId(node.getFlowTemplateId());
         return nodeEntity;
     }
 
@@ -261,6 +262,7 @@ public class FlowEntityFactory {
         node.setCreateBy(nodeEntity.getCreateBy());
         node.setUpdateBy(nodeEntity.getUpdateBy());
         node.setTenantId(nodeEntity.getTenantId());
+        node.setFlowTemplateId(nodeEntity.getFlowTemplateId());
         return node;
     }
 
