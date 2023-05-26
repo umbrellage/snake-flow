@@ -33,9 +33,7 @@ public class FlowVO {
     private Boolean hasSubFlow;
 
     public List<NodeSimpleVO> nodeList() {
-        if (hasSubFlow) {
-            throw new ServiceException("当前流程已经存在一条异常流程");
-        }
+
         return nodes.stream()
             .map(NodeVO::toSimple)
             .collect(Collectors.toList());
