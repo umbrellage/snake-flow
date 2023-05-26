@@ -25,6 +25,9 @@ public class NodeVO {
 
     private String nextName;
 
+    /**
+     * NOT_ACTIVE(1, "未激活"), TO_BE_CLAIMED(2, "待认领"), ACTIVE(3, "已认领"), PROCESSED(4, "已处理")
+     */
     private Integer status;
 
     private Long flowId;

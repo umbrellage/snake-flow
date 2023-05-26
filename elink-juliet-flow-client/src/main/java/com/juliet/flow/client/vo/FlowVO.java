@@ -31,6 +31,22 @@ public class FlowVO {
     private Long tenantId;
 
     private Boolean hasSubFlow;
+    /**
+     * IN_PROGRESS(1, "进行中"),
+     * ABNORMAL(2, "异常中"),
+     * END(3, "已结束"),
+     */
+    private Integer status;
+
+
+    public List<Long> processedBy() {
+        return nodes.stream()
+            .filter(nodeVO -> nodeVO.getStatus() == 3)
+            .map(NodeVO::getProcessedBy)
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
 
     public List<NodeSimpleVO> nodeList() {
 
