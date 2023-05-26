@@ -222,6 +222,7 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }
+        data.setStatus(status.getCode());
 
         return data;
     }
