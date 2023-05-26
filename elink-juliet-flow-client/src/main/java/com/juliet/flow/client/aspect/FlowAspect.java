@@ -81,6 +81,11 @@ public class FlowAspect {
         Long julietFlowId = getJulietFlowId(request);
         Long julietNodeId = getJulietNodeId(request);
 
+        if (julietFlowId == null) {
+            // TODO 去流程引擎查是否当前流程处理人，更精确
+            throw new RuntimeException("不是当前流程的处理人!");
+        }
+
         List<String> fields = parseRequestParams(point);
         log.info("juliet flow interceptor all fields:{}", fields);
 
@@ -297,7 +302,8 @@ public class FlowAspect {
             return longJulietFlowNodeId;
         } catch (Exception e) {
             log.error("julietFlowNodeId type must be Long!", e);
-            throw new RuntimeException("request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
+            return null;
+//            throw new RuntimeException("request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
         }
     }
 }
