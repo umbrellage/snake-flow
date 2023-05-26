@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import com.juliet.common.core.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -29,8 +30,12 @@ public class FlowVO {
 
     private Long tenantId;
 
+    private Boolean hasSubFlow;
 
     public List<NodeSimpleVO> nodeList() {
+        if (hasSubFlow) {
+            throw new ServiceException("当前流程已经存在一条异常流程");
+        }
         return nodes.stream()
             .map(NodeVO::toSimple)
             .collect(Collectors.toList());
