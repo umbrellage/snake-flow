@@ -5,6 +5,7 @@ import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
+import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
@@ -60,10 +61,6 @@ public class Node extends BaseModel {
      */
     private BaseRule submitRule;
 
-    /**
-     * 上一个处理人
-     */
-    private List<Long> preProcessedBy;
     /**
      * 处理人
      */
@@ -242,11 +239,14 @@ public class Node extends BaseModel {
 
         if (flow != null) {
             data.setMainFlowId(flow.getParentId());
-            List<Long> preProcessedBy = preNameList().stream()
-                .map(name -> flow.findNode(name).getProcessedBy())
+            List<ProcessedByVO> preProcessedBy = preNameList().stream()
+                .map(flow::findNode)
+                .filter(Objects::nonNull)
+                .map(node -> ProcessedByVO.of(node.getProcessedBy(), node.getProcessedTime()))
                 .collect(Collectors.toList());
             data.setPreprocessedBy(preProcessedBy);
         }
+        data.setTenantId(getTenantId());
 
         return data;
     }

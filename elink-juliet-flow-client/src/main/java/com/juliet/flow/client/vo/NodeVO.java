@@ -17,6 +17,8 @@ public class NodeVO {
 
     private Long id;
 
+    private Long tenantId;
+
     private String title;
 
     private String name;
@@ -44,7 +46,8 @@ public class NodeVO {
     /**
      * 上一个处理人
      */
-    private List<Long> preprocessedBy;
+    private List<ProcessedByVO> preprocessedBy;
+
     /**
      * 处理人
      */
