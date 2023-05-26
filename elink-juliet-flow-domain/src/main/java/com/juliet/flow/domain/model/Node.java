@@ -73,27 +73,31 @@ public class Node extends BaseModel {
     }
 
 
-    public NotifyDTO toNotifyNormal(Long mainFlowId) {
+    public NotifyDTO toNotifyNormal(Flow flow) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
-        ret.setMainFlowId(mainFlowId);
+        ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.NORMAL);
+        ret.setTenantId(getTenantId());
+        ret.setPreprocessedBy(processedByList(flow));
         return ret;
     }
 
-    public NotifyDTO toNotifyAnomaly(Long mainFlowId) {
+    public NotifyDTO toNotifyAnomaly(Flow flow) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
         ret.setPostIdList(postIdList());
-        ret.setMainFlowId(mainFlowId);
+        ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.ANOMALY);
+        ret.setTenantId(getTenantId());
+        ret.setPreprocessedBy(processedByList(flow));
         return ret;
     }
 
@@ -239,16 +243,20 @@ public class Node extends BaseModel {
 
         if (flow != null) {
             data.setMainFlowId(flow.getParentId());
-            List<ProcessedByVO> preProcessedBy = preNameList().stream()
-                .map(flow::findNode)
-                .filter(Objects::nonNull)
-                .map(node -> ProcessedByVO.of(node.getProcessedBy(), node.getProcessedTime()))
-                .collect(Collectors.toList());
+            List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);
         }
         data.setTenantId(getTenantId());
 
         return data;
+    }
+
+    public List<ProcessedByVO> processedByList(Flow flow) {
+        return preNameList().stream()
+            .map(flow::findNode)
+            .filter(Objects::nonNull)
+            .map(node -> ProcessedByVO.of(node.getProcessedBy(), node.getProcessedTime()))
+            .collect(Collectors.toList());
     }
 
     public Node copyNode() {

@@ -273,7 +273,7 @@ public class Flow extends BaseModel {
         }
         return nodes.stream()
             .filter(Node::isTodoNode)
-            .map(node -> node.toNotifyNormal(parentId))
+            .map(node -> node.toNotifyNormal(this))
             .collect(Collectors.toList());
     }
 
@@ -287,7 +287,7 @@ public class Flow extends BaseModel {
         }
         return nodes.stream()
             .filter(Node::isTodoNode)
-            .map(node -> node.toNotifyAnomaly(parentId))
+            .map(node -> node.toNotifyAnomaly(this))
             .collect(Collectors.toList());
     }
 
