@@ -11,9 +11,12 @@ import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import com.juliet.flow.client.vo.FlowVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
 import org.aspectj.lang.JoinPoint;
@@ -80,11 +83,6 @@ public class FlowAspect {
         String julietFlowCode = getJulietFlowCode(request);
         Long julietFlowId = getJulietFlowId(request);
         Long julietNodeId = getJulietNodeId(request);
-
-        if (julietFlowId == null) {
-            // TODO 去流程引擎查是否当前流程处理人，更精确
-            throw new RuntimeException("不是当前流程的处理人!");
-        }
 
         List<String> fields = parseRequestParams(point);
         log.info("juliet flow interceptor all fields:{}", fields);
@@ -302,8 +300,17 @@ public class FlowAspect {
             return longJulietFlowNodeId;
         } catch (Exception e) {
             log.error("julietFlowNodeId type must be Long!", e);
-            return null;
-//            throw new RuntimeException("request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
+            throw new RuntimeException("request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
         }
     }
+
+//    private boolean isCurrentProcessor(Long flowId) {
+//        FlowIdDTO flowIdDTO = new FlowIdDTO();
+//        flowIdDTO.setFlowId(flowId);
+//        AjaxResult<FlowVO> result = julietFlowClient.flow(flowIdDTO);
+//        if (result != null) {
+//            if (result.getCode() != null && result.getCode().intValue() == 200 && result.getData() != null) {
+//            }
+//        }
+//    }
 }
