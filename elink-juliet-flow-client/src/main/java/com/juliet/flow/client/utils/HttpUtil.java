@@ -19,13 +19,13 @@ public class HttpUtil {
             .build();
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
 
-    private static OkHttpClient httpsClient = new OkHttpClient().newBuilder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())//配置
-            .hostnameVerifier(SSLSocketClient.getHostnameVerifier())//配置
-            .build();
+//    private static OkHttpClient httpsClient = new OkHttpClient().newBuilder()
+//            .connectTimeout(30, TimeUnit.SECONDS)
+//            .readTimeout(30, TimeUnit.SECONDS)
+//            .writeTimeout(30, TimeUnit.SECONDS)
+//            .sslSocketFactory(SSLSocketClient.getSSLSocketFactory())//配置
+//            .hostnameVerifier(SSLSocketClient.getHostnameVerifier())//配置
+//            .build();
 
     public static String postJson(String url, String json) throws IOException {
         return postJson(url, json, null);
@@ -163,31 +163,31 @@ public class HttpUtil {
         return "";
     }
 
-    public static String getHttpsWithHeader(String url, Map<String, String> header) {
-
-        Request.Builder builder = new Request.Builder();
-
-        if (header != null) {
-            for (String key : header.keySet()) {
-                builder.addHeader(key, header.get(key));
-            }
-        }
-
-        Request request = builder
-                .url(url)
-                .get()
-                .build();
-        try {
-            Response response = httpsClient.newCall(request).execute();
-            if (response.isSuccessful()) {
-                return response.body().string();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "";
-        }
-        return "";
-    }
+//    public static String getHttpsWithHeader(String url, Map<String, String> header) {
+//
+//        Request.Builder builder = new Request.Builder();
+//
+//        if (header != null) {
+//            for (String key : header.keySet()) {
+//                builder.addHeader(key, header.get(key));
+//            }
+//        }
+//
+//        Request request = builder
+//                .url(url)
+//                .get()
+//                .build();
+//        try {
+//            Response response = httpsClient.newCall(request).execute();
+//            if (response.isSuccessful()) {
+//                return response.body().string();
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            return "";
+//        }
+//        return "";
+//    }
 
     public static String get(String url, Map<String, String> params) {
         HttpUrl httpUrl = HttpUrl.parse(url);

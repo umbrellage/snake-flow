@@ -31,4 +31,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
             throw new RuntimeException(e);
         }
     }
+
+    public static void main(String[] args) throws IOException {
+        HttpUtil.postJson("http://172.16.1.152:9400/todo/callback", "[]");
+    }
 }
