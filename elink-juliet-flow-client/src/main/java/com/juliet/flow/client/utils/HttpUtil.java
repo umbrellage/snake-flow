@@ -13,9 +13,9 @@ public class HttpUtil {
 
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private static OkHttpClient client = new OkHttpClient.Builder()
-            .connectTimeout(60, TimeUnit.SECONDS)
-            .readTimeout(60, TimeUnit.SECONDS)
-            .writeTimeout(60, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
             .build();
     private final static Logger LOGGER = LoggerFactory.getLogger(HttpUtil.class);
 

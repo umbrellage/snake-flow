@@ -25,7 +25,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}", JSON.toJSONString(list));
         try {
-            HttpUtil.postJson("http://127.0.0.1:9400/todo/callback", JSON.toJSONString(list));
+            String resp =  HttpUtil.postJson("http://127.0.0.1:9400/todo/callback", JSON.toJSONString(list));
+            log.info("notify callback response:{}", resp);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
