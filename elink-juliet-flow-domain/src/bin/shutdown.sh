@@ -7,10 +7,10 @@
 #======================================================================
 
 # 项目名称
-APPLICATION="elink-juliet-flow"
+APPLICATION="@project.name@"
 
 # 项目启动jar包名称
-APPLICATION_JAR="elink-juliet-flow.jar"
+APPLICATION_JAR="@build.finalName@.jar"
 
 PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
 if [[ -z "$PID" ]]

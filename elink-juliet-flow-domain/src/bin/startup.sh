@@ -12,12 +12,10 @@
 #======================================================================
 
 # 项目名称
-APPLICATION="elink-juliet-flow"
+APPLICATION="@project.name@"
 
 # 项目启动jar包名称
-APPLICATION_JAR="elink-juliet-flow.jar"
-
-export PATH=$PATH:/usr/java/jdk1.8.0_331/bin
+APPLICATION_JAR="@build.finalName@.jar"
 
 # bin目录绝对路径
 BIN_PATH=$(
@@ -27,7 +25,7 @@ BIN_PATH=$(
 # 进入bin目录
 cd $(dirname $0)
 # 返回到上一级项目根目录路径
-#cd ..
+cd ..
 # 打印项目根目录绝对路径
 # `pwd` 执行系统命令并获得结果
 BASE_PATH=$(pwd)
@@ -87,12 +85,7 @@ echo "" >${LOG_PATH}
 JAVA_OPT="-server -Xms512m -Xmx512m -Xmn256m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+ExplicitGCInvokesConcurrent -XX:ErrorFile=${LOG_DIR}/hs_err_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR} -Xloggc:${LOG_DIR}/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause -XX:MaxTenuringThreshold=15 -XX:SurvivorRatio=10"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 if test -n "$1" && [ $1 = "debug" ]; then
-  JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=8804"
-fi
-if [ "${2}"x = "test"x -o "${2}"x = "prod"x -o "${2}"x = "dev"x -o "${2}"x = "uat"x -o "${2}"x = "zly-test"x -o "${2}"x = "zly-prod"x -o "${2}"x = "zly-dev"x -o "${2}"x = "zly-uat"x ];then
-PROFILE=$2
-else
-PROFILE="dev"
+  JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9902"
 fi
 
 #=======================================================
@@ -107,22 +100,20 @@ STARTUP_LOG="${STARTUP_LOG}application jar  name: ${APPLICATION_JAR}\n"
 STARTUP_LOG="${STARTUP_LOG}application root path: ${BASE_PATH}\n"
 # 输出项目bin路径
 STARTUP_LOG="${STARTUP_LOG}application bin  path: ${BIN_PATH}\n"
-## 输出项目config路径
-#STARTUP_LOG="${STARTUP_LOG}application config path: ${CONFIG_DIR}\n"
+# 输出项目config路径
+STARTUP_LOG="${STARTUP_LOG}application config path: ${CONFIG_DIR}\n"
 # 打印日志路径
 STARTUP_LOG="${STARTUP_LOG}application log  path: ${LOG_PATH}\n"
 # 打印JVM配置
 STARTUP_LOG="${STARTUP_LOG}application JAVA_OPT : ${JAVA_OPT}\n"
 
 # 打印启动命令
-#STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_OPT} -jar ${BASE_PATH}/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &\n"
-STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_OPT} -jar ${BASE_PATH}/${APPLICATION_JAR} --spring.profiles.active=$PROFILE 2>&1 &\n"
+STARTUP_LOG="${STARTUP_LOG}application startup command: nohup java ${JAVA_OPT} -jar ${BASE_PATH}/boot/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} > ${LOG_PATH} 2>&1 &\n"
 
 #======================================================================
 # 执行启动命令：后台启动项目,并将日志输出到项目根目录下的logs文件夹下
 #======================================================================
-nohup java ${JAVA_OPT} -jar ${BASE_PATH}/${APPLICATION_JAR} --spring.profiles.active=$PROFILE > ${LOG_PATH} 2>&1 &
-#nohup java ${JAVA_OPT} -jar ${BASE_PATH}/boot/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} >${LOG_PATH} 2>&1 &
+nohup java ${JAVA_OPT} -jar ${BASE_PATH}/boot/${APPLICATION_JAR} --spring.config.location=${CONFIG_DIR} >${LOG_PATH} 2>&1 &
 
 # 进程ID
 PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')

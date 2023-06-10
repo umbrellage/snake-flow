@@ -8,7 +8,7 @@ spring:
     # 应用名称
     name: elink-juliet-flow
   profiles:
-    active: dev
+    active: @profileActive@
   cloud:
     nacos:
       discovery:
