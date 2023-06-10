@@ -85,7 +85,7 @@ echo "" >${LOG_PATH}
 JAVA_OPT="-server -Xms512m -Xmx512m -Xmn256m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+ExplicitGCInvokesConcurrent -XX:ErrorFile=${LOG_DIR}/hs_err_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR} -Xloggc:${LOG_DIR}/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause -XX:MaxTenuringThreshold=15 -XX:SurvivorRatio=10"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 if test -n "$1" && [ $1 = "debug" ]; then
-  JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9902"
+  JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9907"
 fi
 
 #=======================================================
