@@ -322,6 +322,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是异常节点时
             if (node.isProcessed()) {
                 if (existsAnomalyFlowsAndFlowsNotEnd) {
+                    log.error("已经存在10条异常流程");
                     throw new ServiceException("已经存在异常流程正在流转中，请等待异常流程流转完成后再进行修改", StatusCode.SERVICE_ERROR.getStatus());
                 }
                 // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
