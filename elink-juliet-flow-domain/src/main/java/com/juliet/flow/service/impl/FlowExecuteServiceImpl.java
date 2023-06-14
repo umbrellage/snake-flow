@@ -318,7 +318,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             // 判断 存在异常流程，且异常流程大于10条
             boolean existsAnomalyFlowsAndFlowsNotEnd =
-                CollectionUtils.isNotEmpty(exFlowList) && exFlowList.size() > 10;
+                CollectionUtils.isNotEmpty(exFlowList) && exFlowList.size() >= 10;
             // 当节点是异常节点时
             if (node.isProcessed()) {
                 if (existsAnomalyFlowsAndFlowsNotEnd) {
