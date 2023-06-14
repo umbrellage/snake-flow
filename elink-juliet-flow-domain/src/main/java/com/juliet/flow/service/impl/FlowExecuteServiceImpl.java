@@ -393,11 +393,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         FlowVO flowVO = flow.flowVO();
         List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
-        if (CollectionUtils.isNotEmpty(flowList)) {
-            flowVO.setHasSubFlow(true);
-        } else {
-            flowVO.setHasSubFlow(false);
-        }
+        flowVO.setHasSubFlow(CollectionUtils.isNotEmpty(flowList));
+        flowVO.setSubFlowCount(flowList.size());
         return flowVO;
     }
 
