@@ -16,4 +16,5 @@ public class BpmDTO {
      * 流程模版 code
      */
     private String templateCode;
+    private Long userId;
 }

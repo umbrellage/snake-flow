@@ -4,6 +4,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
+import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -21,6 +22,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -72,7 +74,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("初始化一个流程")
     @Override
     public AjaxResult<Long> initBmp(BpmDTO dto) {
-        Long flowId = flowExecuteService.startFlow(dto.getTemplateCode());
+        Long flowId = flowExecuteService.startFlow(dto);
         return AjaxResult.success(flowId);
     }
 
@@ -88,6 +90,13 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<Void> claimTask(TaskDTO dto) {
         flowExecuteService.claimTask(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
         return AjaxResult.success();
+    }
+
+    @ApiOperation("获取节点")
+    @Override
+    public AjaxResult<NodeVO> node(TaskDTO dto) {
+        NodeVO nodeVO = flowExecuteService.node(dto);
+        return AjaxResult.success(nodeVO);
     }
 
     @ApiOperation("执行一个节点任务")
@@ -109,6 +118,12 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<FlowVO> flow(FlowIdDTO dto) {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
         return AjaxResult.success(flowVO);
+    }
+    @ApiOperation("获取流程列表")
+    @Override
+    public AjaxResult<List<FlowVO>> flowList(FlowIdListDTO dto) {
+        List<FlowVO> flowVOList = flowExecuteService.flowList(dto);
+        return AjaxResult.success(flowVOList);
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {

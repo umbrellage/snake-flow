@@ -1,6 +1,5 @@
 package com.juliet.flow.repository.trasnfer;
 
-import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -29,6 +28,7 @@ public class FlowEntityFactory {
         flow.setName(flowEntity.getName());
         flow.setTenantId(flow.getTenantId());
         flow.setId(flowEntity.getId());
+        flow.setParentId(flowEntity.getParentId());
         flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));
         flow.setFlowTemplateId(flowEntity.getFlowTemplateId());
         return flow;
@@ -238,10 +238,15 @@ public class FlowEntityFactory {
         if (CollectionUtils.isEmpty(nodeEntities)) {
             return Lists.newArrayList();
         }
-        return nodeEntities.stream().map(nodeEntity -> toSingleNode(nodeEntity)).collect(Collectors.toList());
+        return nodeEntities.stream().map(FlowEntityFactory::toSingleNode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
-    private static Node toSingleNode(NodeEntity nodeEntity) {
+    public static Node toSingleNode(NodeEntity nodeEntity) {
+        if (nodeEntity == null) {
+            return null;
+        }
         Node node = new Node();
         node.setId(nodeEntity.getId());
         node.setFlowId(nodeEntity.getFlowId());

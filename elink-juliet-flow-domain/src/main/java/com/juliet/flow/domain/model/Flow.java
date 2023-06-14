@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -11,7 +12,6 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -42,21 +42,25 @@ public class Flow extends BaseModel {
 
     private Long tenantId;
 
-    public boolean forward() {
-        return true;
-    }
-
-    public Todo getCurrentTodo() {
-        return new Todo();
-    }
-
+    /**
+     * 流程是否已经结束
+     * @return
+     */
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END || isEnd();
     }
 
+    /**
+     * 是否是异常子流程
+     * @return
+     */
+    public boolean hasParentFlow() {
+        return parentId != null && parentId != 0;
+    }
+    
 
     /**
-     * 当前流程是否已经结束
+     * 当前流程节点是否已经结束
      */
     public boolean isEnd() {
         if (CollectionUtils.isEmpty(nodes)) {
@@ -65,24 +69,6 @@ public class Flow extends BaseModel {
         return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
     }
 
-    /**
-     * 根据可填写的字段查找节点
-     *
-     * @param body
-     * @return
-     */
-    public Node findNode(Map<String, ?> body) {
-        return nodes.stream().filter(node -> {
-                Form form = node.getForm();
-                List<String> codeList = form.getFields().stream()
-                    .map(Field::getCode)
-                    .collect(Collectors.toList());
-
-                return codeList.containsAll(body.keySet()) && body.size() == codeList.size();
-            })
-            .findAny()
-            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
-    }
 
     /**
      * 根据可填写的字段查找节点
@@ -101,6 +87,17 @@ public class Flow extends BaseModel {
             })
             .findAny()
             .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+    }
+
+
+    public Node findTodoNode(Long userId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
+            .findAny()
+            .orElse(null);
     }
 
 
@@ -132,8 +129,17 @@ public class Flow extends BaseModel {
             .orElse(null);
     }
 
+    public Node findNodeThrow(String name) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> node.getName().equals(name)).findAny()
+            .orElseThrow(() -> new ServiceException("找不到节点"));
+    }
+
     /**
-     * 前置节点已经处理
+     * 前置节点是否已经处理
      * @param name
      * @return
      */
@@ -216,6 +222,7 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }
+        data.setStatus(status.getCode());
 
         return data;
     }
@@ -244,14 +251,44 @@ public class Flow extends BaseModel {
         List<Node> toBeProcessedNodeList = new ArrayList<>();
         nodes.forEach(node -> {
             //如果当前节点的节点名称等于错误节点的下一节点名称，且当前节点的节点状态为已处理，则修改当前节点的节点状态为未激活
-            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
-                node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+//            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
+            if (nextNameList.contains(node.getName()) && node.getStatus() != NodeStatusEnum.NOT_ACTIVE) {
+
+                    node.setStatus(NodeStatusEnum.NOT_ACTIVE);
                 toBeProcessedNodeList.add(node);
             }
         });
         for (Node node : toBeProcessedNodeList) {
             modifyNodeStatus(node);
         }
+    }
+
+    /**
+     * 通知待办列表
+     * @return
+     */
+    public List<NotifyDTO> normalNotifyList() {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Collections.emptyList();
+        }
+        return nodes.stream()
+            .filter(Node::isTodoNode)
+            .map(node -> node.toNotifyNormal(this))
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 异常通知列表
+     * @return
+     */
+    public List<NotifyDTO> anomalyNotifyList() {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Collections.emptyList();
+        }
+        return nodes.stream()
+            .filter(Node::isTodoNode)
+            .map(node -> node.toNotifyAnomaly(this))
+            .collect(Collectors.toList());
     }
 
     /**
@@ -271,8 +308,6 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.PROCESSED);
             }
         });
-
-
         nodes.forEach(node -> {
             if (nextNameList.contains(node.getName())) {
 
@@ -286,7 +321,7 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        if (node.getProcessedBy() != null) {
+                        if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         }else {
                             node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);

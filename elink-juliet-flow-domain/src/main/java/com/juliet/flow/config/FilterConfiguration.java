@@ -15,7 +15,7 @@ public class FilterConfiguration {
     public FilterRegistrationBean<RpcGzipFilter> gzipFilter(){
         FilterRegistrationBean<RpcGzipFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new RpcGzipFilter());
-        registration.addUrlPatterns("/item/center/*");
+        registration.addUrlPatterns("/juliet/*");
         registration.setName("gzipFilter");
         registration.setOrder(5);
         return registration;

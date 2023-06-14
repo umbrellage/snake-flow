@@ -1,6 +1,8 @@
 package com.juliet.flow.config;
 
 import com.alibaba.fastjson.JSON;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -12,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author xujianjie
@@ -38,7 +41,16 @@ public class GlobalControllerHandler {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("uri=").append(request.getRequestURI());
         try {
-            stringBuilder.append("||args=").append(JSON.toJSONString(point.getArgs()));
+            Object[] args = point.getArgs();
+            stringBuilder.append("||args=");
+            for (Object arg : args) {
+                if (arg instanceof ServletRequest || arg instanceof ServletResponse || arg instanceof MultipartFile) {
+                    //ServletRequest不能序列化，从入参里排除，否则报异常：java.lang.IllegalStateException: It is illegal to call this method if the current request is not in asynchronous mode (i.e. isAsyncStarted() returns false)
+                    //ServletResponse不能序列化 从入参里排除，否则报异常：java.lang.IllegalStateException: getOutputStream() has already been called for this response
+                    continue;
+                }
+                stringBuilder.append("&").append(arg);
+            }
         } catch (Exception e) {
             log.error("error print args.", e);
         }

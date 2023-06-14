@@ -3,6 +3,8 @@ package com.juliet.flow.client.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 /**
  * UserIdDto
  *
@@ -16,4 +18,5 @@ public class TaskDTO {
     private Long nodeId;
     private String nodeName;
     private Long userId;
+    private List<Long> postIdList;
 }

@@ -15,5 +15,7 @@ import lombok.Setter;
 public class NodeFieldDTO {
 
     private List<String> fieldCodeList;
+    private Long nodeId;
     private Long flowId;
+    private Long userId;
 }

@@ -5,6 +5,7 @@ import com.juliet.flow.client.dto.*;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,6 +24,8 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/forward")
     AjaxResult<Void> forward(@RequestBody NodeFieldDTO dto);
 
+
+
     /**
      * 根据字段列表查询节点
      * @param dto
@@ -30,6 +33,8 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/nodeField")
     AjaxResult<NodeVO> node(@RequestBody NodeFieldDTO dto);
+
+
 
     /**
      * 判断当前流程是否已经结束
@@ -64,6 +69,14 @@ public interface JulietFlowClient {
     AjaxResult<Void> claimTask(@RequestBody TaskDTO dto);
 
     /**
+     * 获取节点
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/node")
+    AjaxResult<NodeVO> node(@RequestBody TaskDTO dto);
+
+    /**
      * 执行一个节点任务
      * @param dto 必填
      * @return
@@ -87,6 +100,14 @@ public interface JulietFlowClient {
      * @return
      */
     @PostMapping("/bpm/flow")
-    AjaxResult<FlowVO> flow(FlowIdDTO dto);
+    AjaxResult<FlowVO> flow(@RequestBody FlowIdDTO dto);
 
+
+    /**
+     * 获取流程信息
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/flowList")
+    AjaxResult<List<FlowVO>> flowList(@RequestBody FlowIdListDTO dto);
 }

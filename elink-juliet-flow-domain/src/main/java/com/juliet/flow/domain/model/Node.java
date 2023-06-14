@@ -1,13 +1,18 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
+import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -57,14 +62,77 @@ public class Node extends BaseModel {
     private BaseRule submitRule;
 
     /**
-     * 上一个处理人
-     */
-    private List<Long> preProcessedBy;
-    /**
      * 处理人
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+
+    public boolean complianceTheRules() {
+        // TODO: 2023/5/23  
+        return true;
+    }
+
+
+    public NotifyDTO toNotifyNormal(Flow flow) {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setPostIdList(postIdList());
+        ret.setUserId(processedBy);
+        ret.setMainFlowId(flow.getParentId());
+        ret.setType(NotifyTypeEnum.NORMAL);
+        ret.setTenantId(getTenantId());
+        ret.setPreprocessedBy(processedByList(flow));
+        return ret;
+    }
+
+    public NotifyDTO toNotifyAnomaly(Flow flow) {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setUserId(processedBy);
+        ret.setPostIdList(postIdList());
+        ret.setMainFlowId(flow.getParentId());
+        ret.setType(NotifyTypeEnum.ANOMALY);
+        ret.setTenantId(getTenantId());
+        ret.setPreprocessedBy(processedByList(flow));
+        return ret;
+    }
+
+    public List<String> postIdList() {
+        return bindPosts.stream()
+            .map(Post::getPostId)
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * 判断该岗位是否有该节点权限
+     * @param postIdList
+     * @return
+     */
+    public boolean postAuthority(List<Long> postIdList) {
+        if (CollectionUtils.isEmpty(bindPosts)) {
+            throw new ServiceException("当前节点没有绑定权限");
+        }
+        List<Long> sourcePostIdList = bindPosts.stream()
+            .map(Post::getPostId)
+            .filter(Objects::nonNull)
+            .map(Long::parseLong)
+            .collect(Collectors.toList());
+
+        return !Collections.disjoint(postIdList, sourcePostIdList);
+    }
+
+    /**
+     * 判断节点是否已经存在处理人
+     * @return
+     */
+    public boolean nodeTodo() {
+        return processedBy != null && processedBy != 0;
+    }
+
 
     /**
      * 获取前置节点列表
@@ -121,6 +189,16 @@ public class Node extends BaseModel {
 
 
     /**
+     * 判断节点是否是待办的
+     *
+     * @return
+     */
+    public boolean isTodoNode() {
+        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
+    }
+
+
+    /**
      * 通过岗位判断当前用户是否可以操作
      */
     public boolean isOperator(Long[] postIds) {
@@ -139,7 +217,6 @@ public class Node extends BaseModel {
     }
 
     /**
-     *
      * @param flow 当前流程
      * @return
      */
@@ -147,6 +224,7 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
+        data.setTitle(title);
         data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
@@ -164,13 +242,21 @@ public class Node extends BaseModel {
         data.setProcessedTime(processedTime);
 
         if (flow != null) {
-            List<Long> preProcessedBy = preNameList().stream()
-                .map(name -> flow.findNode(name).getProcessedBy())
-                .collect(Collectors.toList());
+            data.setMainFlowId(flow.getParentId());
+            List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);
         }
+        data.setTenantId(getTenantId());
 
         return data;
+    }
+
+    public List<ProcessedByVO> processedByList(Flow flow) {
+        return preNameList().stream()
+            .map(flow::findNode)
+            .filter(Objects::nonNull)
+            .map(node -> ProcessedByVO.of(node.getProcessedBy(), node.getProcessedTime()))
+            .collect(Collectors.toList());
     }
 
     public Node copyNode() {
