@@ -1,6 +1,5 @@
 package com.juliet.flow.client.vo;
 
-import com.juliet.common.core.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
