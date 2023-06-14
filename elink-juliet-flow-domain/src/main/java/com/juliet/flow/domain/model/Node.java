@@ -62,6 +62,31 @@ public class Node extends BaseModel {
     private BaseRule submitRule;
 
     /**
+     * 主管分配
+     */
+    private Boolean supervisorAssignment;
+
+    /**
+     * 认领+调整
+     */
+    private Boolean selfAndSupervisorAssignment;
+
+    /**
+     * 规则分配
+     */
+    private Boolean ruleAssignment;
+
+    /**
+     * 分配规则
+     */
+    private BaseAssignRule assignRule;
+
+    /**
+     * 主管ID列表
+     */
+    private List<Long> supervisorIds;
+
+    /**
      * 处理人
      */
     private Long processedBy;
