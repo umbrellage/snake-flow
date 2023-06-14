@@ -61,6 +61,8 @@ public class Node extends BaseModel {
      */
     private BaseRule submitRule;
 
+
+
     /**
      * 主管分配
      */

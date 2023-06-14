@@ -1,6 +1,5 @@
 package com.juliet.flow.client.vo;
 
-import com.juliet.common.core.exception.ServiceException;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -32,6 +31,11 @@ public class FlowVO {
 
     private Boolean hasSubFlow;
     /**
+     * 异常流程数量
+     */
+    private Integer subFlowCount;
+
+    /**
      * IN_PROGRESS(1, "进行中"),
      * ABNORMAL(2, "异常中"),
      * END(3, "已结束"),
@@ -54,4 +58,5 @@ public class FlowVO {
             .map(NodeVO::toSimple)
             .collect(Collectors.toList());
     }
+
 }

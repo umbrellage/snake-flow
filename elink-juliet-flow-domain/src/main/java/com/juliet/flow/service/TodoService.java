@@ -1,7 +1,6 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.domain.model.Post;
-import com.juliet.flow.domain.model.Role;
 import com.juliet.flow.domain.model.Todo;
 
 import java.util.List;
