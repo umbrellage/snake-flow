@@ -57,19 +57,16 @@ public class FlowRepositoryImpl implements FlowRepository {
     private void addNodes(List<Node> nodes, Long tenantId, Long flowId, Long flowTemplateId) {
         List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes,
             tenantId, flowId, flowTemplateId);
-        nodeEntities.forEach(nodeEntity -> nodeDao.insert(nodeEntity));
+        nodeDao.insertBatch(nodeEntities);
 
         List<FormEntity> formEntities = FlowEntityFactory.transferFormEntities(nodes, tenantId);
-        // TODO 改批量
-        formEntities.forEach(formEntity -> formDao.insert(formEntity));
+        formDao.insertBatch(formEntities);
 
         List<FieldEntity> fieldEntities = FlowEntityFactory.transferFieldEntities(nodes, tenantId);
-        // TODO 改批量
-        fieldEntities.forEach(fieldEntity -> fieldDao.insert(fieldEntity));
+        fieldDao.insertBatch(fieldEntities);
 
         List<PostEntity> postEntities = FlowEntityFactory.transferPostEntity(nodes, tenantId);
-        // TODO 改批量
-        postEntities.forEach(postEntity -> postDao.insert(postEntity));
+        postDao.insertBatch(postEntities);
     }
 
     @Override

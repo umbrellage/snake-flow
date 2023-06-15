@@ -29,6 +29,41 @@ public class NodeDTO {
     private String nextName;
 
     /**
+     * 准入规则
+     */
+    private String accessRuleName;
+
+    /**
+     * 提交规则
+     */
+    private String submitRuleName;
+
+    /**
+     * 主管分配
+     */
+    private Boolean supervisorAssignment;
+
+    /**
+     * 认领+调整
+     */
+    private Boolean selfAndSupervisorAssignment;
+
+    /**
+     * 规则分配
+     */
+    private Boolean ruleAssignment;
+
+    /**
+     * 分配规则
+     */
+    private String assignRuleName;
+
+    /**
+     * 主管ID列表
+     */
+    private List<Long> supervisorIds;
+
+    /**
      * 值参考NodeTypeEnum
      */
     @NotNull

@@ -13,6 +13,13 @@
         <result column="next_name" property="nextName" />
         <result column="flow_id" property="flowId" />
         <result column="flow_template_id" property="flowTemplateId" />
+        <result column="access_rule_name" property="accessRuleName" />
+        <result column="submit_rule_name" property="submitRuleName" />
+        <result column="assign_rule_name" property="assignRuleName" />
+        <result column="supervisor_assignment" property="supervisorAssignment" />
+        <result column="self_and_supervisor_assignment" property="selfAndSupervisorAssignment" />
+        <result column="rule_assignment" property="ruleAssignment" />
+        <result column="supervisor_ids" property="supervisorIds" />
         <result column="node_type" property="type" />
         <result column="node_status" property="status" />
         <result column="processed_by" property="processedBy" />
@@ -24,8 +31,8 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <sql id="fieldList">id, title, node_name, pre_name, next_name, flow_id, flow_template_id, node_type, node_status, processed_by, del_flag, create_time, update_time, create_by, update_by, rep_time</sql>
-    <sql id="fieldListT1">t1.id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.node_type, t1.node_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time</sql>
+    <sql id="fieldList">id, title, node_name, pre_name, next_name, flow_id, flow_template_id, access_rule_name, submit_rule_name, assign_rule_name, supervisor_assignment, self_and_supervisor_assignment, rule_assignment, supervisor_ids, node_type, node_status, processed_by, del_flag, create_time, update_time, create_by, update_by</sql>
+    <sql id="fieldListT1">t1.id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.access_rule_name, t1.submit_rule_name, t1.assign_rule_name, t1.supervisor_assignment, t1.self_and_supervisor_assignment, t1.rule_assignment, t1.supervisor_ids, t1.node_type, t1.node_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time</sql>
     <sql id="tableName">jbpm_flow_node</sql>
 
     <select id="listNode" resultMap="BaseResultMap">
@@ -54,5 +61,18 @@
         </where>
         limit #{query.offset}, #{query.pageSize}
     </select>
+
+
+    <insert id="insertBatch"  parameterType="com.juliet.flow.domain.entity.NodeEntity">
+        INSERT INTO <include refid="tableName" /> (
+        <include refid="fieldList"></include>
+        )
+        values
+        <foreach collection="nodeEntities" item="entity" separator=",">
+            (#{entity.id}, #{entity.title}, #{entity.name},#{entity.preName},#{entity.nextName},#{entity.flowId},#{entity.flowTemplateId},
+            #{entity.accessRuleName},#{entity.submitRuleName},#{entity.assignRuleName},#{entity.supervisorAssignment},#{entity.selfAndSupervisorAssignment},#{entity.ruleAssignment},#{entity.supervisorIds}
+            #{entity.type},#{entity.status},#{entity.processedBy},0,#{entity.tenantId}, 0, #{entity.createTime}, #{entity.updateTime}, #{entity.createBy},#{entity.updateBy})
+        </foreach>
+    </insert>
 
 </mapper>
