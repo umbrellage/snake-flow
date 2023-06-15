@@ -268,7 +268,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             subFlowList.stream()
                 .filter(subFlow -> {
                     Node node = subFlow.findNode(currentFlowNode.getName());
-                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
+                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName()) && node.getStatus() != NodeStatusEnum.IGNORE;
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
@@ -282,6 +282,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         for (Node node : nodeList) {
             task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
         }
+
     }
 
     /**
@@ -313,6 +314,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
+//        if (node.getStatus() == NodeStatusEnum.IGNORE) {
+//            return;
+//        }
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {

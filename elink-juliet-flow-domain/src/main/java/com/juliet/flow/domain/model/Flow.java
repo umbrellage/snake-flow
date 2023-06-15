@@ -12,6 +12,8 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
@@ -266,6 +268,26 @@ public class Flow extends BaseModel {
     }
 
     /**
+     * 递归设置节点状态为忽略
+     * @param ignoreNode 需要被忽略的节点
+     */
+    public void ignoreEqualAfterNode(Node ignoreNode) {
+        ignoreNode.setStatus(NodeStatusEnum.IGNORE);
+        List<String> nextNameList = ignoreNode.nextNameList();
+        List<Node> ignoreNodeList = nextNameList.stream()
+            .map(this::findNode)
+            .filter(node -> node.preNameList().stream()
+                .map(this::findNode)
+                .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
+            .distinct()
+            .collect(Collectors.toList());
+
+        for (Node node : ignoreNodeList) {
+            ignoreEqualAfterNode(node);
+        }
+    }
+
+    /**
      * 通知待办列表
      * @return
      */
@@ -315,9 +337,15 @@ public class Flow extends BaseModel {
 
                 List<String> preNameList = node.preNameList();
                 boolean preHandled = nodes.stream().filter(handledNode -> preNameList.contains(handledNode.getName()))
-                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED);
+                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED || handledNode.getStatus() == NodeStatusEnum.IGNORE);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
+                    // FIXME: 2023/6/15 传入参数
+                    boolean flag = node.getAccessRule().accessRule(Collections.emptyMap());
+                    // 如果规则不匹配，递归修改后面节点的状态为忽略
+                    if (!flag) {
+                        ignoreEqualAfterNode(node);
+                    }
                     if (node.getType() == NodeTypeEnum.END) {
                         node.setStatus(NodeStatusEnum.PROCESSED);
                         return;
@@ -346,5 +374,31 @@ public class Flow extends BaseModel {
     public boolean checkoutFlowNodeIsHandled(String nodeName) {
         Node node = findNodeThrow(nodeName);
         return node.getStatus() == NodeStatusEnum.PROCESSED;
+    }
+
+    /**
+     * 校准流程节点,并且返回需要被通知的节点
+     * @param flow 标准流程，按照这个流程来校准
+     */
+    public List<Node> calibrateFlow(Flow flow) {
+        List<Node> notifyNodeList = new ArrayList<>();
+        Map<String, Node> nodeMap = flow.getNodes().stream()
+            .collect(Collectors.toMap(Node::getName, Function.identity()));
+        nodes.forEach(node -> {
+            Node standardNode = nodeMap.get(node.getName());
+            if (standardNode.getStatus() == NodeStatusEnum.IGNORE && node.getStatus() != NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.IGNORE);
+                notifyNodeList.add(node);
+            }
+//            if (standardNode.getStatus() != NodeStatusEnum.IGNORE && node.getStatus() == NodeStatusEnum.IGNORE) {
+//                if (node.getProcessedBy() == null) {
+//                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+//                } else {
+//                    node.setStatus(NodeStatusEnum.ACTIVE);
+//                }
+//            }
+        });
+
+        return notifyNodeList;
     }
 }
