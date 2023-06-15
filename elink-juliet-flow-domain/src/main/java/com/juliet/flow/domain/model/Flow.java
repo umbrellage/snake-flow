@@ -337,4 +337,14 @@ public class Flow extends BaseModel {
             }
         });
     }
+
+    /**
+     * 判断该节点在当前流程中与该节点的相同的节点是否已完成
+     * @param nodeName
+     * @return true 可以创建异常流程， false 不可以
+     */
+    public boolean checkoutFlowNodeIsHandled(String nodeName) {
+        Node node = findNodeThrow(nodeName);
+        return node.getStatus() == NodeStatusEnum.PROCESSED;
+    }
 }
