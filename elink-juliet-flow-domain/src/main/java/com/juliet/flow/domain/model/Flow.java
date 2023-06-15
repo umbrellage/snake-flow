@@ -35,6 +35,8 @@ public class Flow extends BaseModel {
     private Long parentId;
 
     private Long flowTemplateId;
+    // TODO: 2023/6/15 许剑杰
+    private String templateCode;
 
     private List<Node> nodes;
 
@@ -286,7 +288,7 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(Node::isTodoNode)
+            .filter(Node::isToBeExecuted)
             .map(node -> node.toNotifyAnomaly(this))
             .collect(Collectors.toList());
     }

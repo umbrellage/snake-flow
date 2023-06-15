@@ -12,6 +12,7 @@ import com.juliet.flow.common.utils.IdGenerator;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,8 +62,6 @@ public class Node extends BaseModel {
      */
     private BaseRule submitRule;
 
-
-
     /**
      * 主管分配
      */
@@ -94,9 +93,10 @@ public class Node extends BaseModel {
     private Long processedBy;
     private LocalDateTime processedTime;
 
-    public boolean complianceTheRules() {
-        // TODO: 2023/5/23  
-        return true;
+    public void regularDistribution(Map<String, Object> params) {
+        if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
+            processedBy = assignRule.getAssignUserId(params);
+        }
     }
 
 
@@ -105,6 +105,10 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
+        ret.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
+        ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
+        ret.setSupervisorAssignment(supervisorAssignment);
+        ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
         ret.setMainFlowId(flow.getParentId());
@@ -119,6 +123,9 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
+        ret.setCode(flow.getTemplateCode());
+        ret.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
+        ret.setSupervisorAssignment(supervisorAssignment);
         ret.setUserId(processedBy);
         ret.setPostIdList(postIdList());
         ret.setMainFlowId(flow.getParentId());
@@ -136,6 +143,7 @@ public class Node extends BaseModel {
 
     /**
      * 判断该岗位是否有该节点权限
+     *
      * @param postIdList
      * @return
      */
@@ -154,6 +162,7 @@ public class Node extends BaseModel {
 
     /**
      * 判断节点是否已经存在处理人
+     *
      * @return
      */
     public boolean nodeTodo() {
@@ -214,6 +223,14 @@ public class Node extends BaseModel {
         return status == NodeStatusEnum.ACTIVE;
     }
 
+    /**
+     * 判断节点是否已认领，待被执行
+     *
+     * @return
+     */
+    public boolean isToBeExecuted() {
+        return status == NodeStatusEnum.ACTIVE;
+    }
 
     /**
      * 判断节点是否是待办的
