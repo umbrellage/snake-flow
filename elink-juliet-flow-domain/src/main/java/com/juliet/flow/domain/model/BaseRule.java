@@ -10,5 +10,5 @@ public abstract class BaseRule {
 
     public abstract String getRuleName();
 
-    public abstract boolean check(Map<String, Object> params);
+    public abstract boolean accessRule(Map<String, Object> params);
 }

@@ -18,7 +18,7 @@ public class DefaultAccessRule extends BaseRule {
     }
 
     @Override
-    public boolean check(Map<String, Object> params) {
+    public boolean accessRule(Map<String, Object> params) {
         return true;
     }
 }
