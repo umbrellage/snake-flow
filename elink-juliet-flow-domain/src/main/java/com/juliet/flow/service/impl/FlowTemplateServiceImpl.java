@@ -13,7 +13,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
 import com.juliet.flow.client.dto.NodeDTO;
 import com.juliet.flow.domain.model.*;
-import com.juliet.flow.domain.model.assign.AssignRuleFactory;
+import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,7 +98,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setRuleAssignment(nodeDTO.getRuleAssignment());
         node.setSupervisorAssignment(nodeDTO.getSupervisorAssignment());
         node.setSelfAndSupervisorAssignment(nodeDTO.getSelfAndSupervisorAssignment());
-        node.setAssignRule(AssignRuleFactory.getAssignRule(nodeDTO.getName()));
+        node.setAssignRule(RuleFactory.getAssignRule(nodeDTO.getName()));
         node.setCreateBy(createBy);
         node.setUpdateBy(updateBy);
         if (nodeDTO.getForm() != null) {

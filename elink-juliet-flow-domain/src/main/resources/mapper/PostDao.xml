@@ -17,7 +17,7 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <sql id="tableName">jbpm_flow_node_form_post</sql>
+    <sql id="tableName">jbpm_flow_node_post</sql>
 
     <insert id="insertBatch"  parameterType="com.juliet.flow.domain.entity.PostEntity">
         INSERT INTO <include refid="tableName" /> (
