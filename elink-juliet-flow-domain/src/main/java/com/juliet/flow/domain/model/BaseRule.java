@@ -1,5 +1,7 @@
 package com.juliet.flow.domain.model;
 
+import java.util.Map;
+
 /**
  * @author xujianjie
  * @date 2023-05-08
@@ -7,4 +9,6 @@ package com.juliet.flow.domain.model;
 public abstract class BaseRule {
 
     public abstract boolean fire(Node node);
+
+    public abstract boolean accessRule(Map<String, Object> params);
 }
