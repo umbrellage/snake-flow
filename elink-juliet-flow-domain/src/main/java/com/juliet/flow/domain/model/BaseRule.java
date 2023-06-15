@@ -8,7 +8,7 @@ import java.util.Map;
  */
 public abstract class BaseRule {
 
-    public abstract boolean fire(Node node);
+    public abstract String getRuleName();
 
     public abstract boolean accessRule(Map<String, Object> params);
 }

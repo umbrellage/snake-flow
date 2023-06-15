@@ -11,7 +11,7 @@ import com.juliet.flow.domain.model.*;
 
 import java.util.*;
 
-import com.juliet.flow.domain.model.assign.AssignRuleFactory;
+import com.juliet.flow.domain.model.rule.RuleFactory;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.util.CollectionUtils;
 
@@ -157,6 +157,10 @@ public class FlowEntityFactory {
         entity.setTenantId(tenantId);
         entity.setName(field.getName());
         entity.setCode(field.getCode());
+        entity.setDelFlag(0);
+        Date now = new Date();
+        entity.setCreateTime(field.getCreateTime() == null ? now : field.getCreateTime());
+        entity.setUpdateTime(field.getUpdateTime() == null ? now : field.getUpdateTime());
         entity.setCreateBy(field.getCreateBy());
         entity.setUpdateBy(field.getUpdateBy());
         return entity;
@@ -187,6 +191,10 @@ public class FlowEntityFactory {
         entity.setPostName(post.getPostName());
         entity.setNodeId(nodeId);
         entity.setTenantId(tenantId);
+        entity.setDelFlag(0);
+        Date now = new Date();
+        entity.setCreateTime(post.getCreateTime() == null ? now : post.getCreateTime());
+        entity.setUpdateTime(post.getUpdateTime() == null ? now : post.getUpdateTime());
         entity.setCreateBy(post.getCreateBy());
         entity.setUpdateBy(post.getUpdateBy());
         return entity;
@@ -229,7 +237,8 @@ public class FlowEntityFactory {
 
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
-        nodeEntity.setProcessedBy(node.getProcessedBy());
+        nodeEntity.setProcessedBy(node.getProcessedBy() == null ? 0 : node.getProcessedBy());
+        nodeEntity.setDelFlag(0);
         nodeEntity.setCreateBy(node.getCreateBy());
         nodeEntity.setUpdateBy(node.getUpdateBy());
         Date now = new Date();
@@ -274,7 +283,8 @@ public class FlowEntityFactory {
         node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment().intValue() == 1);
         node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment().intValue() == 1);
         node.setRuleAssignment(nodeEntity.getRuleAssignment().intValue() == 1);
-        node.setAssignRule(AssignRuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
+        node.setAccessRule(RuleFactory.getAccessRule(nodeEntity.getAccessRuleName()));
+        node.setAssignRule(RuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
         if (StringUtils.isNotBlank(nodeEntity.getSupervisorIds())) {
             node.setSupervisorIds(Arrays.stream(nodeEntity.getSupervisorIds().split(",")).map(Long::valueOf).collect(Collectors.toList()));
         } else {

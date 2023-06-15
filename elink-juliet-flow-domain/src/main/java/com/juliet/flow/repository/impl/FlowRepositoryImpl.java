@@ -1,6 +1,7 @@
 package com.juliet.flow.repository.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.google.common.collect.Lists;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
@@ -11,7 +12,6 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.trasnfer.FlowEntityFactory;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,7 +63,10 @@ public class FlowRepositoryImpl implements FlowRepository {
         formDao.insertBatch(formEntities);
 
         List<FieldEntity> fieldEntities = FlowEntityFactory.transferFieldEntities(nodes, tenantId);
-        fieldDao.insertBatch(fieldEntities);
+        List<List<FieldEntity>> parts = Lists.partition(fieldEntities, 50);
+        for (List<FieldEntity> part : parts) {
+            fieldDao.insertBatch(part);
+        }
 
         List<PostEntity> postEntities = FlowEntityFactory.transferPostEntity(nodes, tenantId);
         postDao.insertBatch(postEntities);
@@ -109,8 +112,22 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public Flow queryLatestByParentId(Long id) {
-        // TODO: 2023/6/15  
-        return null;
+        List<Flow> flows = listFlowByParentId(id);
+        if (CollectionUtils.isEmpty(flows)) {
+            return null;
+        }
+        Flow latestFlow = null;
+        for (Flow flow : flows) {
+            if (latestFlow == null) {
+                latestFlow = flow;
+                continue;
+            }
+            // 获取创建时间最晚的
+            if (flow.getCreateTime().after(latestFlow.getCreateTime())) {
+                latestFlow = flow;
+            }
+        }
+        return latestFlow;
     }
 
     @Override

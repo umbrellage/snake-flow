@@ -1,6 +1,7 @@
-package com.juliet.flow.domain.model.assign;
+package com.juliet.flow.domain.model.rule;
 
 import com.juliet.flow.domain.model.BaseAssignRule;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 
@@ -8,6 +9,7 @@ import java.util.Map;
  * @author xujianjie
  * @date 2023-06-14
  */
+@Component
 public class BrandAssignRule extends BaseAssignRule {
 
     @Override
