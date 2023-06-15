@@ -27,6 +27,13 @@ public interface FlowRepository {
 
     Flow queryById(Long id);
 
+    /**
+     * 获取最新的异常流程
+     * @param id 主流程id
+     * @return
+     */
+    Flow queryLatestByParentId(Long id);
+
     List<Flow> queryByIdList(List<Long> idList);
 
     List<Flow> listFlowByParentId(Long id);
@@ -44,6 +51,7 @@ public interface FlowRepository {
     List<Node> listNode(NodeQuery query);
 
     Node queryNodeById(Long nodeId);
+
 
 
 }

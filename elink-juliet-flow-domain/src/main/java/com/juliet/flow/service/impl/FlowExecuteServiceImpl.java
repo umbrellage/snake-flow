@@ -321,12 +321,17 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是异常节点时
             if (node.isProcessed()) {
                 // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
+                // 判断有没有必要创建一条异常流程
+                Flow latestFlow = flowRepository.queryLatestByParentId(node.getFlowId());
+                boolean flag = latestFlow.checkoutFlowNodeIsHandled(node.getName());
+                if (!flag) {
+                    throw new ServiceException("有流程将经过当前节点，不可变更");
+                }
                 Flow subFlow = flow.subFlow();
                 subFlow.modifyNodeStatus(node);
                 Node subNode = subFlow.findNode(node.getName());
                 subFlow.modifyNextNodeStatus(subNode.getId());
                 flowRepository.add(subFlow);
-                // TODO: 2023/5/23
                 // 发送消息提醒
                 List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
                     .flatMap(Collection::stream)
@@ -348,7 +353,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 // 发送消息提醒
                 callback(flow.normalNotifyList());
             }
-        } else {
+        }
+        if (node == null) {
             // 如果是异常流程的节点
             Flow errorFlow = exFlowList.stream()
                 .filter(exFlow -> exFlow.findNode(nodeId) != null)
