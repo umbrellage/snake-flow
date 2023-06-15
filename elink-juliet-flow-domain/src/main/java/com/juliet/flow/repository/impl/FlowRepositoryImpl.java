@@ -111,6 +111,12 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public Flow queryLatestByParentId(Long id) {
+        // TODO: 2023/6/15  
+        return null;
+    }
+
+    @Override
     public List<Flow> queryByIdList(List<Long> idList) {
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();

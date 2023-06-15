@@ -326,7 +326,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 Node subNode = subFlow.findNode(node.getName());
                 subFlow.modifyNextNodeStatus(subNode.getId());
                 flowRepository.add(subFlow);
-                // TODO: 2023/5/23
                 // 发送消息提醒
                 List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
                     .flatMap(Collection::stream)
