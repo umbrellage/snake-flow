@@ -1,5 +1,6 @@
 package com.juliet.flow.repository.trasnfer;
 
+import com.juliet.common.core.utils.StringUtils;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -7,14 +8,13 @@ import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
-import java.util.Arrays;
-import java.util.Optional;
+
+import java.util.*;
+
+import com.juliet.flow.domain.model.assign.AssignRuleFactory;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -124,6 +124,10 @@ public class FlowEntityFactory {
         entity.setTenantId(tenantId);
         entity.setCreateBy(form.getCreateBy());
         entity.setUpdateBy(form.getUpdateBy());
+        entity.setStatus(0);
+        Date now = new Date();
+        entity.setCreateTime(form.getCreateTime() == null ? now : form.getCreateTime());
+        entity.setUpdateTime(form.getUpdateTime() == null ? now : form.getUpdateTime());
         return entity;
     }
 
@@ -214,11 +218,23 @@ public class FlowEntityFactory {
         nodeEntity.setTenantId(tenantId);
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
+
+        nodeEntity.setAccessRuleName(node.getAccessRule() == null ? "" : "1");
+        nodeEntity.setSubmitRuleName("");
+        nodeEntity.setAssignRuleName(node.getAssignRule() == null ? "" : node.getAssignRule().getRuleName());
+        nodeEntity.setSupervisorAssignment(node.getSupervisorAssignment() != null && node.getSupervisorAssignment() ? 1 : 0);
+        nodeEntity.setSelfAndSupervisorAssignment(node.getSelfAndSupervisorAssignment() != null && node.getSelfAndSupervisorAssignment() ? 1 : 0);
+        nodeEntity.setRuleAssignment(node.getRuleAssignment() != null && node.getRuleAssignment() ? 1 : 0);
+        nodeEntity.setSupervisorIds(CollectionUtils.isEmpty(node.getSupervisorIds()) ? "" : node.getSupervisorIds().stream().map(String::valueOf).collect(Collectors.joining(",")));
+
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
         nodeEntity.setProcessedBy(node.getProcessedBy());
         nodeEntity.setCreateBy(node.getCreateBy());
         nodeEntity.setUpdateBy(node.getUpdateBy());
+        Date now = new Date();
+        nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
+        nodeEntity.setUpdateTime(node.getUpdateTime() == null ? now : node.getUpdateTime());
         return nodeEntity;
     }
 
@@ -254,6 +270,16 @@ public class FlowEntityFactory {
         node.setName(nodeEntity.getName());
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
+
+        node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment().intValue() == 1);
+        node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment().intValue() == 1);
+        node.setRuleAssignment(nodeEntity.getRuleAssignment().intValue() == 1);
+        node.setAssignRule(AssignRuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
+        if (StringUtils.isNotBlank(nodeEntity.getSupervisorIds())) {
+            node.setSupervisorIds(Arrays.stream(nodeEntity.getSupervisorIds().split(",")).map(Long::valueOf).collect(Collectors.toList()));
+        } else {
+            node.setSupervisorIds(Lists.newArrayList());
+        }
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
         node.setProcessedBy(nodeEntity.getProcessedBy());

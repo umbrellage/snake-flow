@@ -1,5 +1,7 @@
 package com.juliet.flow.service.impl;
 
+import com.juliet.api.development.domain.entity.SysUser;
+import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.FormDTO;
 import com.juliet.flow.client.dto.PostDTO;
@@ -11,6 +13,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
 import com.juliet.flow.client.dto.NodeDTO;
 import com.juliet.flow.domain.model.*;
+import com.juliet.flow.domain.model.assign.AssignRuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,16 +36,18 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void add(FlowTemplateAddDTO flowTemplateAddDTO) {
-        flowTemplateAddDTO.setCreateBy(1L);
-        flowTemplateAddDTO.setUpdateBy(1L);
-        flowTemplateAddDTO.setTenantId(168L);
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        flowTemplateAddDTO.setCreateBy(sysUser.getUserId());
+        flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
+        flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
         flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Override
     public void update(FlowTemplateAddDTO flowTemplateAddDTO) {
-        flowTemplateAddDTO.setUpdateBy(2L);
-        flowTemplateAddDTO.setTenantId(168L);
+        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
+        flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
+        flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
         flowRepository.updateTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
@@ -89,6 +94,11 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setNextName(nodeDTO.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));
         node.setType(NodeTypeEnum.byCode(nodeDTO.getType()));
+        node.setSupervisorIds(nodeDTO.getSupervisorIds());
+        node.setRuleAssignment(nodeDTO.getRuleAssignment());
+        node.setSupervisorAssignment(nodeDTO.getSupervisorAssignment());
+        node.setSelfAndSupervisorAssignment(nodeDTO.getSelfAndSupervisorAssignment());
+        node.setAssignRule(AssignRuleFactory.getAssignRule(nodeDTO.getName()));
         node.setCreateBy(createBy);
         node.setUpdateBy(updateBy);
         if (nodeDTO.getForm() != null) {

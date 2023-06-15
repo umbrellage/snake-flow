@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author xujianjie
  * @date 2023-05-09
@@ -28,6 +30,41 @@ public class NodeEntity extends BaseEntity {
     private Long flowId;
 
     private Long flowTemplateId;
+
+    /**
+     * 准入规则
+     */
+    private String accessRuleName;
+
+    /**
+     * 提交规则
+     */
+    private String submitRuleName;
+
+    /**
+     * 主管分配
+     */
+    private Integer supervisorAssignment;
+
+    /**
+     * 认领+调整
+     */
+    private Integer selfAndSupervisorAssignment;
+
+    /**
+     * 规则分配
+     */
+    private Integer ruleAssignment;
+
+    /**
+     * 分配规则
+     */
+    private String assignRuleName;
+
+    /**
+     * 主管ID列表
+     */
+    private String supervisorIds;
 
     @TableField(value = "node_status")
     private Integer status;
