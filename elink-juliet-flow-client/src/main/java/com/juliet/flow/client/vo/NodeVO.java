@@ -19,6 +19,11 @@ public class NodeVO {
 
     private Long tenantId;
 
+    /**
+     * 模版code
+     */
+    private String code;
+
     private String title;
 
     private String name;
@@ -37,11 +42,26 @@ public class NodeVO {
     private Long mainFlowId;
 
     /**
+     * 主管分配
+     */
+    private Boolean supervisorAssignment;
+
+    /**
+     * 认领+调整
+     */
+    private Boolean selfAndSupervisorAssignment;
+
+    /**
      * 表单
      */
     private FormVO form;
 
     private List<PostVO> bindPosts;
+
+    /**
+     * 主管ID列表
+     */
+    private List<Long> supervisorIds;
 
     /**
      * 上一个处理人

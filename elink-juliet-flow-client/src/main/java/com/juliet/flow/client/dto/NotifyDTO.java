@@ -19,6 +19,10 @@ public class NotifyDTO {
     private Long nodeId;
     private List<String> filedList;
     /**
+     * 主管ID列表
+     */
+    private List<Long> supervisorIds;
+    /**
      * 主管分配
      */
     private Boolean supervisorAssignment;

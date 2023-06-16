@@ -107,6 +107,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
         ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
+        ret.setSupervisorIds(supervisorIds);
         ret.setSupervisorAssignment(supervisorAssignment);
         ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
@@ -272,6 +273,8 @@ public class Node extends BaseModel {
         data.setFlowId(flowId);
         data.setPreName(preName);
         data.setNextName(nextName);
+        data.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
+        data.setSupervisorAssignment(supervisorAssignment);
         if (status != null) {
             data.setStatus(status.getCode());
         }
@@ -283,9 +286,11 @@ public class Node extends BaseModel {
                 .collect(Collectors.toList());
             data.setBindPosts(postVOList);
         }
+        data.setSupervisorIds(supervisorIds);
         data.setProcessedTime(processedTime);
 
         if (flow != null) {
+            data.setCode(flow.getTemplateCode());
             data.setMainFlowId(flow.getParentId());
             List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);

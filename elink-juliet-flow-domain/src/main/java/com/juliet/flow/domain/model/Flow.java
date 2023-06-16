@@ -70,7 +70,7 @@ public class Flow extends BaseModel {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
-        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
 
@@ -390,13 +390,9 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.IGNORE);
                 notifyNodeList.add(node);
             }
-//            if (standardNode.getStatus() != NodeStatusEnum.IGNORE && node.getStatus() == NodeStatusEnum.IGNORE) {
-//                if (node.getProcessedBy() == null) {
-//                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
-//                } else {
-//                    node.setStatus(NodeStatusEnum.ACTIVE);
-//                }
-//            }
+            if (standardNode.getStatus() != NodeStatusEnum.IGNORE && node.getStatus() == NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
         });
 
         return notifyNodeList;

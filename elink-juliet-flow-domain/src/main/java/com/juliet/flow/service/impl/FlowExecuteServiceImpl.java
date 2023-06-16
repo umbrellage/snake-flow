@@ -283,6 +283,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
         }
 
+
+
     }
 
     /**
@@ -312,11 +314,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
+        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
+        calibrateFlowList.add(flow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
-//        if (node.getStatus() == NodeStatusEnum.IGNORE) {
-//            return;
-//        }
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
@@ -335,6 +336,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 subFlow.modifyNodeStatus(node);
                 Node subNode = subFlow.findNode(node.getName());
                 subFlow.modifyNextNodeStatus(subNode.getId());
+                syncFlow(calibrateFlowList, subFlow);
                 flowRepository.add(subFlow);
                 // 发送消息提醒
                 List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
@@ -347,6 +349,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
                 flow.modifyNextNodeStatus(nodeId);
+                syncFlow(calibrateFlowList, flow);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
                     flow.setStatus(FlowStatusEnum.END);
@@ -371,6 +374,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 throw new ServiceException("该节点未被认领");
             }
             errorFlow.modifyNextNodeStatus(nodeId);
+            syncFlow(calibrateFlowList, errorFlow);
             if (errorFlow.isEnd()) {
                 errorFlow.setStatus(FlowStatusEnum.END);
                 // 如果子流程都结束了，那么主流程也肯定结束了
@@ -378,10 +382,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 flowRepository.update(flow);
             }
             flowRepository.update(errorFlow);
-
             // 异步发送消息提醒
             callback(errorFlow.anomalyNotifyList());
         }
+    }
+
+    public void syncFlow(List<Flow> calibrateFlowList, Flow standardFlow) {
+        calibrateFlowList.forEach(flow -> flow.calibrateFlow(standardFlow));
     }
 
     private void callback(List<NotifyDTO> list) {
