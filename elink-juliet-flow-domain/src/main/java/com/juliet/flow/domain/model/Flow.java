@@ -311,7 +311,7 @@ public class Flow extends BaseModel {
         }
         return nodes.stream()
             .filter(Node::isToBeExecuted)
-            .map(node -> node.toNotifyAnomaly(this))
+            .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
             .collect(Collectors.toList());
     }
 
@@ -351,6 +351,10 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                        if (node.getRuleAssignment()) {
+                            // FIXME: 2023/6/16 传入参数
+                            node.regularDistribution(Collections.emptyMap());
+                        }
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         }else {
@@ -377,18 +381,24 @@ public class Flow extends BaseModel {
     }
 
     /**
-     * 校准流程节点,并且返回需要被通知的节点
+     * 校准流程节点,并且返回需要被通知的待办
      * @param flow 标准流程，按照这个流程来校准
+     * @return 需要被通知的消息待办
      */
-    public List<Node> calibrateFlow(Flow flow) {
-        List<Node> notifyNodeList = new ArrayList<>();
+    public List<NotifyDTO> calibrateFlow(Flow flow) {
+        List<NotifyDTO> notifyNodeList = new ArrayList<>();
         Map<String, Node> nodeMap = flow.getNodes().stream()
             .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
             if (standardNode.getStatus() == NodeStatusEnum.IGNORE && node.getStatus() != NodeStatusEnum.IGNORE) {
+                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                    NotifyDTO cc = node.toNotifyCC(this, "已不会流经该节点，您不需要再处理该节点, 已将您的待办删除");
+                    notifyNodeList.add(cc);
+                    NotifyDTO delete = node.toNotifyDelete(this);
+                    notifyNodeList.add(delete);
+                }
                 node.setStatus(NodeStatusEnum.IGNORE);
-                notifyNodeList.add(node);
             }
             if (standardNode.getStatus() != NodeStatusEnum.IGNORE && node.getStatus() == NodeStatusEnum.IGNORE) {
                 node.setStatus(NodeStatusEnum.PROCESSED);

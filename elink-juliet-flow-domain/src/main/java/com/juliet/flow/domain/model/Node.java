@@ -105,36 +105,59 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
-        ret.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
         ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
         ret.setSupervisorIds(supervisorIds);
-        ret.setSupervisorAssignment(supervisorAssignment);
         ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
         ret.setMainFlowId(flow.getParentId());
-        ret.setType(NotifyTypeEnum.NORMAL);
+        if (supervisorAssignment) {
+            ret.setType(NotifyTypeEnum.SUPERVISOR_ASSIGNMENT);
+        }
+        if (selfAndSupervisorAssignment) {
+            ret.setType(NotifyTypeEnum.SELF_AND_SUPERVISOR_ASSIGNMENT);
+        }
         ret.setTenantId(getTenantId());
         ret.setPreprocessedBy(processedByList(flow));
         return ret;
     }
 
-    public NotifyDTO toNotifyAnomaly(Flow flow) {
+    public NotifyDTO toNotifyComplete(Flow flow) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
-        ret.setCode(flow.getTemplateCode());
-        ret.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
-        ret.setSupervisorAssignment(supervisorAssignment);
-        ret.setUserId(processedBy);
-        ret.setPostIdList(postIdList());
         ret.setMainFlowId(flow.getParentId());
-        ret.setType(NotifyTypeEnum.ANOMALY);
+        ret.setType(NotifyTypeEnum.COMPLETE);
         ret.setTenantId(getTenantId());
-        ret.setPreprocessedBy(processedByList(flow));
         return ret;
     }
+
+    public NotifyDTO toNotifyDelete(Flow flow) {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setMainFlowId(flow.getParentId());
+        ret.setType(NotifyTypeEnum.DELETE);
+        ret.setTenantId(getTenantId());
+        return ret;
+    }
+
+    public NotifyDTO toNotifyCC(Flow flow, String remark) {
+        NotifyDTO ret = new NotifyDTO();
+        ret.setNodeId(id);
+        ret.setNodeName(name);
+        ret.setFlowId(flowId);
+        ret.setUserId(processedBy);
+        ret.setMainFlowId(flow.getParentId());
+        ret.setType(NotifyTypeEnum.CC);
+        ret.setTenantId(getTenantId());
+        ret.setRemark(remark);
+        return ret;
+    }
+
+
 
     public List<String> postIdList() {
         return bindPosts.stream()

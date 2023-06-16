@@ -22,20 +22,11 @@ public class NotifyDTO {
      * 主管ID列表
      */
     private List<Long> supervisorIds;
-    /**
-     * 主管分配
-     */
-    private Boolean supervisorAssignment;
-
-    /**
-     * 认领+调整
-     */
-    private Boolean selfAndSupervisorAssignment;
     private String nodeName;
     private Long userId;
     private List<String> postIdList;
     private NotifyTypeEnum type;
     private List<ProcessedByVO> preprocessedBy;
     private Long tenantId;
-
+    private String remark;
 }

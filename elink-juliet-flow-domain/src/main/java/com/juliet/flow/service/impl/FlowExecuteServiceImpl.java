@@ -94,8 +94,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         flow.validate();
         flowRepository.add(flow);
-        CompletableFuture.runAsync(
-            () -> msgNotifyCallbacks.forEach(callback -> callback.notify(flow.anomalyNotifyList())));
+        callback(flow.normalNotifyList());
         return flow.getId();
     }
 
@@ -246,6 +245,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             return;
         }
         Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
+        callback(Collections.singletonList(currentFlowNode.toNotifyComplete(flow)));
         // 异常子流程
         List<Flow> subFlowList = new ArrayList<>();
         // 主流程
@@ -282,9 +282,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         for (Node node : nodeList) {
             task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
         }
-
-
-
     }
 
     /**
@@ -383,12 +380,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             flowRepository.update(errorFlow);
             // 异步发送消息提醒
-            callback(errorFlow.anomalyNotifyList());
+            callback(errorFlow.normalNotifyList());
         }
     }
 
     public void syncFlow(List<Flow> calibrateFlowList, Flow standardFlow) {
-        calibrateFlowList.forEach(flow -> flow.calibrateFlow(standardFlow));
+        List<NotifyDTO> notifyDTOList = calibrateFlowList.stream()
+            .map(flow -> flow.calibrateFlow(standardFlow))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toList());
+        callback(notifyDTOList);
     }
 
     private void callback(List<NotifyDTO> list) {
