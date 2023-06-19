@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.juliet.flow.client.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,11 +22,14 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class DefaultNotifyCallback implements MsgNotifyCallback {
 
+    @Value("{flow.callback.url:http://127.0.0.1:9400/todo/callback}")
+    private String url;
+
     @Override
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}", JSON.toJSONString(list));
         try {
-            String resp =  HttpUtil.postJson("http://127.0.0.1:9400/todo/callback", JSON.toJSONString(list));
+            String resp =  HttpUtil.postJson(url, JSON.toJSONString(list));
             log.info("notify callback response:{}", resp);
         } catch (IOException e) {
             throw new RuntimeException(e);
