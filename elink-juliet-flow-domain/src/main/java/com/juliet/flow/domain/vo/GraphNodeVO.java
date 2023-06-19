@@ -30,6 +30,10 @@ public class GraphNodeVO {
         private String text;
 
         private String name;
+
+        private boolean active;
+
+        private boolean disabled;
     }
 
     @Data

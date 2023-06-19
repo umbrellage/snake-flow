@@ -169,33 +169,8 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring.boot.version}</version>
-                    <configuration>
-                        <mainClass>com.juliet.flow.ElinkJulietFlowApplication</mainClass>
-                        <layout>ZIP</layout>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
                 </plugin>
             </plugins>
         </pluginManagement>
-
-<!--        <resources>-->
-<!--            <resource>-->
-<!--                <directory>src/main/resources</directory>-->
-<!--            </resource>-->
-<!--            <resource>-->
-<!--                <directory>${basedir}/elink-juliet-flow-domain/src/main/resources</directory>-->
-<!--            </resource>-->
-<!--            <resource>-->
-<!--                <directory>${basedir}/elink-juliet-flow-client/src/main/resources</directory>-->
-<!--            </resource>-->
-<!--        </resources>-->
     </build>
-
-
 </project>
