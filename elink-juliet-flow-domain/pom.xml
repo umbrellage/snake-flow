@@ -75,55 +75,6 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>mapper/**/*.xml</include>
-                    <include>logback.xml</include>
-                    <include>banner.txt</include>
-                    <!-- 如果各个环境的jks都是一样，则可以直接打入到启动jar包中 -->
-                    <!--<include>test.jks</include>-->
-                </includes>
-            </resource>
-
-            <!-- 过滤配置文件到config目录 -->
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-                <targetPath>config</targetPath>
-                <includes>
-                    <include>bootstrap.yml</include>
-                    <include>bootstrap-${profileActive}.yml</include>
-                    <include>**/*.properties</include>
-                    <!-- 如果各个环境的jks不一样，则配置到外部config目录中
-                        java代码中通过ClassPathFileUtil.getFile()获取 -->
-                    <include>test.jks</include>
-                    <include>test.txt</include>
-                </includes>
-            </resource>
-
-            <!-- 过滤脚本文件到bin目录 -->
-            <resource>
-                <directory>src/bin</directory>
-                <filtering>true</filtering>
-                <targetPath>bin</targetPath>
-                <includes>
-                    <include>*.bat</include>
-                    <include>*.sh</include>
-                </includes>
-            </resource>
-
-            <!-- 包含日志到logs目录 -->
-            <resource>
-                <directory>src/logs</directory>
-                <targetPath>logs</targetPath>
-                <includes>
-                    <include>*.log</include>
-                </includes>
-            </resource>
-        </resources>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -142,9 +93,6 @@
                         <manifest>
                             <!-- 项目启动类 -->
                             <mainClass>com.juliet.flow.ElinkJulietFlowApplication</mainClass>
-                            <!-- 依赖的jar的目录前缀 -->
-                            <!--<classpathPrefix>../lib</classpathPrefix>
-                            <addClasspath>true</addClasspath>
                             -->
                         </manifest>
                     </archive>
@@ -159,49 +107,8 @@
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                            <includeScope>compile</includeScope>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-
-            <!-- 打包时跳过测试 -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.1</version>
-                <configuration>
-                    <skipTests>true</skipTests>
-                </configuration>
             </plugin>
 
             <plugin>
@@ -223,6 +130,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>${basedir}/../elink-juliet-flow-client/src/main/resources</directory>
+            </resource>
+        </resources>
 
 
     </build>
