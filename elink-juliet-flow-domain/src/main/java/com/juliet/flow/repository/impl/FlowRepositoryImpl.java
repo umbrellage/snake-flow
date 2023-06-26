@@ -76,6 +76,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     public void addTemplate(FlowTemplate flowTemplate) {
         FlowTemplateEntity entity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         flowTemplateDao.insert(entity);
+        fillUserId(flowTemplate.getNodes(), flowTemplate.getCreateBy(), flowTemplate.getUpdateBy());
         addNodes(flowTemplate.getNodes(), flowTemplate.getTenantId(), 0L, entity.getId());
     }
 
@@ -90,12 +91,40 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public void updateTemplate(FlowTemplate flowTemplate) {
-        FlowTemplateEntity flowTemplateEntity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         FlowTemplate flowTemplateOld = queryTemplateById(flowTemplate.getId());
         BusinessAssert.assertNotNull(flowTemplateOld, StatusCode.ILLEGAL_PARAMS, "找不到模板，id：" + flowTemplate.getId());
+        flowTemplate.setCreateBy(flowTemplateOld.getCreateBy());
+        FlowTemplateEntity flowTemplateEntity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         flowTemplateDao.updateById(flowTemplateEntity);
         deleteNodes(flowTemplateOld.getNodes());
+        fillUserId(flowTemplate.getNodes(), flowTemplate.getCreateBy(), flowTemplate.getUpdateBy());
         addNodes(flowTemplate.getNodes(), flowTemplate.getTenantId(), 0L, flowTemplate.getId());
+    }
+
+    private void fillUserId(List<Node> nodes, Long createBy, Long updateBy) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        for (Node node : nodes) {
+            node.setCreateBy(createBy);
+            node.setUpdateBy(updateBy);
+            if (node.getForm() != null) {
+                node.getForm().setCreateBy(createBy);
+                node.getForm().setUpdateBy(updateBy);
+            }
+            if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
+                for (Field field : node.getForm().getFields()) {
+                    field.setCreateBy(createBy);
+                    field.setUpdateBy(updateBy);
+                }
+            }
+            if (!CollectionUtils.isEmpty(node.getBindPosts())) {
+                for (Post post : node.getBindPosts()) {
+                    post.setCreateBy(createBy);
+                    post.setUpdateBy(updateBy);
+                }
+            }
+        }
     }
 
     @Override

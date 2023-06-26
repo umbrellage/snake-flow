@@ -86,6 +86,8 @@ public class FlowEntityFactory {
 //                node.setId(IdGenerator.getId());
 //            }
 //        }
+        flowTemplateEntity.setCreateBy(flowTemplate.getCreateBy());
+        flowTemplateEntity.setUpdateBy(flowTemplate.getUpdateBy());
         flowTemplateEntity.setCode(flowTemplate.getCode());
         flowTemplateEntity.setStatus(flowTemplate.getStatus().getCode());
         return flowTemplateEntity;
