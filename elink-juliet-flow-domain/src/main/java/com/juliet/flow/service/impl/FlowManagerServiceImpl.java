@@ -66,7 +66,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     private boolean isActive(List<Node> nodes, String graphNodeId) {
         for (Node node : nodes) {
             if (graphNodeId.equals(node.getName())) {
-                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                if (node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
                     return true;
                 }
             }
