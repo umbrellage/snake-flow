@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "70021b50-db2c-489b-ad6d-028bd7b009ac",
-      "type": "start",
+      "type": "flowNode",
       "x": 240,
       "y": 250,
       "properties": {
@@ -13,13 +13,13 @@
       },
       "text": {
         "x": 240,
-        "y": 285,
+        "y": 250,
         "value": "开始"
       }
     },
     {
       "id": "f455be1d-9819-428c-9f8a-8f3cd851b275",
-      "type": "rect",
+      "type": "flowNode",
       "x": 410,
       "y": 250,
       "properties": {
@@ -34,7 +34,7 @@
     },
     {
       "id": "caa3d868-4216-4c46-b10b-64f5c9822654",
-      "type": "rect",
+      "type": "flowNode",
       "x": 600,
       "y": 130,
       "properties": {
@@ -49,7 +49,7 @@
     },
     {
       "id": "2ba54059-0af9-46b8-8e40-72616ab0d9c1",
-      "type": "rect",
+      "type": "flowNode",
       "x": 770,
       "y": 130,
       "properties": {
@@ -64,7 +64,7 @@
     },
     {
       "id": "fabd6846-1cd8-4b35-a743-31136a2bb357",
-      "type": "rect",
+      "type": "flowNode",
       "x": 930,
       "y": 130,
       "properties": {
@@ -79,7 +79,7 @@
     },
     {
       "id": "cd97dcda-533e-4713-83eb-025abc0cfa05",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1090,
       "y": 130,
       "properties": {
@@ -94,7 +94,7 @@
     },
     {
       "id": "7ec8176a-5200-4380-a681-2a26ec7a4b49",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1290,
       "y": 250,
       "properties": {
@@ -109,7 +109,7 @@
     },
     {
       "id": "f231744a-d49a-4a44-92a0-568797b8f15a",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1490,
       "y": 250,
       "properties": {
@@ -124,7 +124,7 @@
     },
     {
       "id": "999b28d5-ce23-44be-8c94-0acdde6c180e",
-      "type": "rect",
+      "type": "flowNode",
       "x": 600,
       "y": 250,
       "properties": {
@@ -139,7 +139,7 @@
     },
     {
       "id": "599a664a-6479-4820-95d2-2044b6b049a4",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1090,
       "y": 250,
       "properties": {
@@ -154,7 +154,7 @@
     },
     {
       "id": "6d6d5eb0-72ec-4a97-bc73-4c95984f0fd9",
-      "type": "rect",
+      "type": "flowNode",
       "x": 600,
       "y": 390,
       "properties": {
@@ -169,7 +169,7 @@
     },
     {
       "id": "789f4a72-f356-44ba-af0a-3cf3a53ee469",
-      "type": "end",
+      "type": "flowNode",
       "x": 1670,
       "y": 250,
       "properties": {
@@ -178,7 +178,7 @@
       },
       "text": {
         "x": 1670,
-        "y": 285,
+        "y": 250,
         "value": "结束"
       }
     }
