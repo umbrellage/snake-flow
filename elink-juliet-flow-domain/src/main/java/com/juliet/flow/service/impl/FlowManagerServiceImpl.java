@@ -1,7 +1,9 @@
 package com.juliet.flow.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
+import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.vo.GraphNodeVO;
 import com.juliet.flow.domain.vo.GraphVO;
 import com.juliet.flow.repository.FlowRepository;
@@ -18,6 +20,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -33,6 +36,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     @Override
     public GraphVO getGraph(Long id) {
         Flow flow = flowRepository.queryById(id);
+        // todo 判断flow是否存在
         GraphVO vo = null;
         String json = null;
         try {
@@ -54,12 +58,19 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (vo == null || CollectionUtils.isEmpty(vo.getNodes())) {
             return;
         }
-        for (GraphNodeVO nodeVO : vo.getNodes()) {
-            if (Arrays.asList("caa3d868-4216-4c46-b10b-64f5c9822654",
-                    "999b28d5-ce23-44be-8c94-0acdde6c180e",
-                    "6d6d5eb0-72ec-4a97-bc73-4c95984f0fd9").contains(nodeVO.getId())) {
-                nodeVO.getProperties().setActive(true);
+        for (GraphNodeVO graphNodeVO : vo.getNodes()) {
+            graphNodeVO.getProperties().setActive(isActive(flow.getNodes(), graphNodeVO.getId()));
+        }
+    }
+
+    private boolean isActive(List<Node> nodes, String graphNodeId) {
+        for (Node node : nodes) {
+            if (graphNodeId.equals(node.getName())) {
+                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                    return true;
+                }
             }
         }
+        return false;
     }
 }
