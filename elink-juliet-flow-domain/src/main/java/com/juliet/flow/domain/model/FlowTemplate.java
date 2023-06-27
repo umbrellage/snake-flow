@@ -5,6 +5,7 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -46,6 +47,7 @@ public class FlowTemplate extends BaseModel {
                 }
                 if (node.getType().equals(NodeTypeEnum.START)) {
                     node.setStatus(NodeStatusEnum.PROCESSED);
+                    node.setProcessedTime(LocalDateTime.now());
                     node.setProcessedBy(userId);
                 }
             });

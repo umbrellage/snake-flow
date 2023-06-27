@@ -1,6 +1,7 @@
 package com.juliet.flow.repository.trasnfer;
 
 import com.juliet.common.core.utils.StringUtils;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -298,6 +299,7 @@ public class FlowEntityFactory {
         node.setCreateBy(nodeEntity.getCreateBy());
         node.setUpdateBy(nodeEntity.getUpdateBy());
         node.setTenantId(nodeEntity.getTenantId());
+        node.setProcessedTime(JulietTimeMemo.toDateTime(nodeEntity.getUpdateTime()));
         return node;
     }
 

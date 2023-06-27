@@ -94,7 +94,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         flow.validate();
         flowRepository.add(flow);
-        callback(flow.normalNotifyList());
+        Flow dbFlow = flowRepository.queryById(flow.getId());
+        callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
 

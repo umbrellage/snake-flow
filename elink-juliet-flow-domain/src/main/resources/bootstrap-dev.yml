@@ -7,3 +7,7 @@ spring:
       config:
         # 配置中心地址
         server-addr: 172.16.1.151:8848
+
+#flow:
+#  callback:
+#    url: http://192.168.17.15:9400/todo/callback
