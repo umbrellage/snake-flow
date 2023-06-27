@@ -64,6 +64,7 @@ public class NodeEntity extends BaseEntity {
     /**
      * 主管ID列表
      */
+    @TableField(value = "supervisor_ids")
     private String supervisorIds;
 
     @TableField(value = "node_status")
