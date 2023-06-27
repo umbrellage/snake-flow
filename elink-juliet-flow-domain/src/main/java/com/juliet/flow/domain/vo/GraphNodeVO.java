@@ -24,6 +24,8 @@ public class GraphNodeVO {
 
     private Properties properties;
 
+    private Text text;
+
     @Data
     public static class Properties {
 
