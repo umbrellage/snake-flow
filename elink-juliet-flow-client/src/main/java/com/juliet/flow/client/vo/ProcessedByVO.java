@@ -16,14 +16,16 @@ import lombok.Setter;
 @Setter
 public class ProcessedByVO {
 
+    private Long nodeId;
     /**
      * 处理人
      */
     private Long processedBy;
     private LocalDateTime processedTime;
 
-    public static ProcessedByVO of(Long processedBy, LocalDateTime processedTime) {
+    public static ProcessedByVO of(Long nodeId, Long processedBy, LocalDateTime processedTime) {
         ProcessedByVO ret = new ProcessedByVO();
+        ret.setNodeId(nodeId);
         ret.setProcessedBy(processedBy);
         ret.setProcessedTime(processedTime);
         return ret;

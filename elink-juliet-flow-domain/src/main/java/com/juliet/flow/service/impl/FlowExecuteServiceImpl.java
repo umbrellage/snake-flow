@@ -281,7 +281,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .values());
 
         for (Node node : nodeList) {
-            task(mainFlow.getId(), node.getId(), node.getName(), node.getProcessedBy());
+            task(mainFlow.getId(), node.getId(), node.getProcessedBy());
         }
     }
 
@@ -299,12 +299,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      *
      * @param flowId   主流程节点
      * @param nodeId
-     * @param nodeName
      * @param userId
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void task(Long flowId, Long nodeId, String nodeName, Long userId) {
+    public synchronized void task(Long flowId, Long nodeId, Long userId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null || flow.hasParentFlow()) {
             log.error("流程存在异常{}", JSON.toJSONString(flow));

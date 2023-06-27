@@ -35,7 +35,7 @@ public class FlowTemplate extends BaseModel {
     public Flow toFlowInstance(Long userId) {
         Flow flow = new Flow();
         flow.setFlowTemplateId(this.id);
-
+        flow.setTenantId(getTenantId());
         Node start = nodes.stream()
             .filter(node -> node.getType().equals(NodeTypeEnum.START))
             .findAny()

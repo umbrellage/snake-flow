@@ -102,7 +102,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("执行一个节点任务")
     @Override
     public AjaxResult<Void> task(TaskDTO dto) {
-        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getNodeName(), dto.getUserId());
+        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
         return AjaxResult.success();
     }
 

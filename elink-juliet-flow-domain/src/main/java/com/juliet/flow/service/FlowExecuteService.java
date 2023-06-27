@@ -30,7 +30,7 @@ public interface FlowExecuteService {
 
     List<NodeVO> todoNodeList(UserDTO dto);
 
-    void task(Long flowId, Long nodeId, String nodeName, Long userId);
+    void task(Long flowId, Long nodeId, Long userId);
 
     FlowVO flow(Long flowId);
 

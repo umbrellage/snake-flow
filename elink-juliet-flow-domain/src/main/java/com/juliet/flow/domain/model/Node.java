@@ -327,7 +327,7 @@ public class Node extends BaseModel {
         return preNameList().stream()
             .map(flow::findNode)
             .filter(Objects::nonNull)
-            .map(node -> ProcessedByVO.of(node.getProcessedBy(), node.getProcessedTime()))
+            .map(node -> ProcessedByVO.of(node.getId(), node.getProcessedBy(), node.getProcessedTime()))
             .collect(Collectors.toList());
     }
 

@@ -48,6 +48,7 @@ public class Flow extends BaseModel {
 
     /**
      * 流程是否已经结束
+     *
      * @return
      */
     public boolean isFlowEnd() {
@@ -56,12 +57,13 @@ public class Flow extends BaseModel {
 
     /**
      * 是否是异常子流程
+     *
      * @return
      */
     public boolean hasParentFlow() {
         return parentId != null && parentId != 0;
     }
-    
+
 
     /**
      * 当前流程节点是否已经结束
@@ -70,7 +72,8 @@ public class Flow extends BaseModel {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
-        return nodes.stream().allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
+        return nodes.stream().allMatch(
+            node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
 
@@ -103,7 +106,6 @@ public class Flow extends BaseModel {
             .findAny()
             .orElse(null);
     }
-
 
 
     public Node findNode(Long nodeId) {
@@ -144,6 +146,7 @@ public class Flow extends BaseModel {
 
     /**
      * 前置节点是否已经处理
+     *
      * @param name
      * @return
      */
@@ -258,7 +261,7 @@ public class Flow extends BaseModel {
 //            if (nextNameList.contains(node.getName()) && node.getStatus() == NodeStatusEnum.PROCESSED) {
             if (nextNameList.contains(node.getName()) && node.getStatus() != NodeStatusEnum.NOT_ACTIVE) {
 
-                    node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+                node.setStatus(NodeStatusEnum.NOT_ACTIVE);
                 toBeProcessedNodeList.add(node);
             }
         });
@@ -269,6 +272,7 @@ public class Flow extends BaseModel {
 
     /**
      * 递归设置节点状态为忽略
+     *
      * @param ignoreNode 需要被忽略的节点
      */
     public void ignoreEqualAfterNode(Node ignoreNode) {
@@ -289,6 +293,7 @@ public class Flow extends BaseModel {
 
     /**
      * 通知待办列表
+     *
      * @return
      */
     public List<NotifyDTO> normalNotifyList() {
@@ -303,6 +308,7 @@ public class Flow extends BaseModel {
 
     /**
      * 异常通知列表
+     *
      * @return
      */
     public List<NotifyDTO> anomalyNotifyList() {
@@ -337,14 +343,17 @@ public class Flow extends BaseModel {
 
                 List<String> preNameList = node.preNameList();
                 boolean preHandled = nodes.stream().filter(handledNode -> preNameList.contains(handledNode.getName()))
-                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED || handledNode.getStatus() == NodeStatusEnum.IGNORE);
+                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED
+                        || handledNode.getStatus() == NodeStatusEnum.IGNORE);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     // FIXME: 2023/6/15 传入参数
-                    boolean flag = node.getAccessRule().accessRule(Collections.emptyMap());
-                    // 如果规则不匹配，递归修改后面节点的状态为忽略
-                    if (!flag) {
-                        ignoreEqualAfterNode(node);
+                    if (node.getAccessRule() != null) {
+                        boolean flag = node.getAccessRule().accessRule(Collections.emptyMap());
+                        // 如果规则不匹配，递归修改后面节点的状态为忽略
+                        if (!flag) {
+                            ignoreEqualAfterNode(node);
+                        }
                     }
                     if (node.getType() == NodeTypeEnum.END) {
                         node.setStatus(NodeStatusEnum.PROCESSED);
@@ -357,7 +366,7 @@ public class Flow extends BaseModel {
                         }
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
-                        }else {
+                        } else {
                             node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
                         }
                         return;
@@ -372,6 +381,7 @@ public class Flow extends BaseModel {
 
     /**
      * 判断该节点在当前流程中与该节点的相同的节点是否已完成
+     *
      * @param nodeName 节点名称
      * @return true 可以创建异常流程， false 不可以
      */
@@ -382,6 +392,7 @@ public class Flow extends BaseModel {
 
     /**
      * 校准流程节点,并且返回需要被通知的待办
+     *
      * @param flow 标准流程，按照这个流程来校准
      * @return 需要被通知的消息待办
      */
