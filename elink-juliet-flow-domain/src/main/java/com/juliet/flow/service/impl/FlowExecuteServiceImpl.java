@@ -218,9 +218,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public List<NodeVO> todoNodeList(UserDTO dto) {
         List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
-        List<Node> postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
-            .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
-            .collect(Collectors.toList());
+        List<Node> postIdNodeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(dto.getPostId())) {
+            postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
+                .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
+                .collect(Collectors.toList());
+        }
         List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList)
             .flatMap(Collection::stream)
             .map(Node::getFlowId)
