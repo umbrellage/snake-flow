@@ -50,6 +50,8 @@ public interface FlowRepository {
 
     List<Node> listNode(NodeQuery query);
 
+    List<Node> listNode(Long supervisorId);
+
     Node queryNodeById(Long nodeId);
 
 

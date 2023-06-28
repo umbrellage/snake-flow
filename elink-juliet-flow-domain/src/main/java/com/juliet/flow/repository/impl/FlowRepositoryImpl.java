@@ -245,6 +245,12 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public List<Node> listNode(Long supervisorId) {
+        // TODO: 2023/6/28
+        return Collections.emptyList();
+    }
+
+    @Override
     public Node queryNodeById(Long nodeId) {
         return FlowEntityFactory.toSingleNode(nodeDao.selectById(nodeId));
     }
