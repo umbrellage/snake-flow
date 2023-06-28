@@ -244,7 +244,9 @@ public class FlowAspect {
             return;
         }
         for (int i = 0; i < jsonArray.size(); i++) {
-            parseFieldByJsonObject(fields, jsonArray.getJSONObject(i), fieldPrefix);
+            if (jsonArray.get(i) instanceof JSONObject) {
+                parseFieldByJsonObject(fields, jsonArray.getJSONObject(i), fieldPrefix);
+            }
         }
     }
 
