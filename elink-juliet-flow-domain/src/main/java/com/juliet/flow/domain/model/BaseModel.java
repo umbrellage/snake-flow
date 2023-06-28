@@ -20,4 +20,6 @@ public class BaseModel {
     private Date createTime;
 
     private Date updateTime;
+
+
 }

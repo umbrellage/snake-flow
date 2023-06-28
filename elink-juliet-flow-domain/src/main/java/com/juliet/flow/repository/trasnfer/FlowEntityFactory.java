@@ -236,7 +236,7 @@ public class FlowEntityFactory {
         nodeEntity.setSupervisorAssignment(node.getSupervisorAssignment() != null && node.getSupervisorAssignment() ? 1 : 0);
         nodeEntity.setSelfAndSupervisorAssignment(node.getSelfAndSupervisorAssignment() != null && node.getSelfAndSupervisorAssignment() ? 1 : 0);
         nodeEntity.setRuleAssignment(node.getRuleAssignment() != null && node.getRuleAssignment() ? 1 : 0);
-        nodeEntity.setSupervisorIds(CollectionUtils.isEmpty(node.getSupervisorIds()) ? "" : node.getSupervisorIds().stream().map(String::valueOf).collect(Collectors.joining(",")));
+        nodeEntity.setSupervisorIds(node.supervisorIds());
 
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
@@ -289,7 +289,7 @@ public class FlowEntityFactory {
         node.setAccessRule(RuleFactory.getAccessRule(nodeEntity.getAccessRuleName()));
         node.setAssignRule(RuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
         if (StringUtils.isNotBlank(nodeEntity.getSupervisorIds())) {
-            node.setSupervisorIds(Arrays.stream(nodeEntity.getSupervisorIds().split(",")).map(Long::valueOf).collect(Collectors.toList()));
+            node.setSupervisorIds(nodeEntity.supervisorIds());
         } else {
             node.setSupervisorIds(Lists.newArrayList());
         }

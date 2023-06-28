@@ -3,9 +3,14 @@ package com.juliet.flow.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.juliet.flow.domain.model.Node;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
 import lombok.Data;
 
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author xujianjie
@@ -74,4 +79,21 @@ public class NodeEntity extends BaseEntity {
     private Integer type;
 
     private Long processedBy;
+
+    /**
+     * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法, 并考虑历史数据
+     * @see Node#formatOf
+     *
+     * @return
+     */
+    public List<Long> supervisorIds() {
+        if (StringUtils.isNotBlank(supervisorIds)) {
+            return Arrays.stream(supervisorIds.split(","))
+                .map(e -> StringUtils.remove(e, "^"))
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
 }

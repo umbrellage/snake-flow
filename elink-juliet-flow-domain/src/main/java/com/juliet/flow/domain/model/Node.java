@@ -9,6 +9,7 @@ import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
+import com.juliet.flow.domain.entity.NodeEntity;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -87,6 +88,32 @@ public class Node extends BaseModel {
      */
     private List<Long> supervisorIds;
 
+    public List<Long> getSupervisorIds() {
+        return supervisorIds;
+    }
+
+
+    public String supervisorIds() {
+        if (CollectionUtils.isEmpty(supervisorIds)) {
+            return "";
+        }
+        return supervisorIds.stream().map(this::formatOf).collect(Collectors.joining(","));
+    }
+
+    /**
+     * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法
+     * @see NodeEntity#supervisorIds()
+     *
+     * @param supervisorId
+     * @return
+     */
+    public String formatOf(Long supervisorId) {
+        if (supervisorId == null) {
+            return null;
+        }
+        return "^" + supervisorId + "^";
+    }
+
     /**
      * 处理人
      */
@@ -156,7 +183,6 @@ public class Node extends BaseModel {
         ret.setRemark(remark);
         return ret;
     }
-
 
 
     public List<String> postIdList() {

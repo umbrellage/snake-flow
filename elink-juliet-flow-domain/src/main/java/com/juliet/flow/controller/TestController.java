@@ -30,11 +30,7 @@ public class TestController {
 
     @ApiOperation("获取流程列表")
     @PostMapping("/test")
-    public AjaxResult moduleDelete(HttpServletRequest request, @RequestParam("name") String name, @RequestBody NodeQuery query1) {
-        NodeQuery query = new NodeQuery();
-        query.setPostIds(Arrays.asList("a111222"));
-        query.setUserId(1L);
-        query.setTenantId(2L);
-        return AjaxResult.success(flowRepository.listNode(query));
+    public AjaxResult moduleDelete(HttpServletRequest request, @RequestBody NodeQuery query1) {
+        return AjaxResult.success(flowRepository.listNode(query1));
     }
 }
