@@ -294,6 +294,9 @@ public class FlowAspect {
         if (julietFlowNodeId == null || julietFlowNodeId.trim().length() == 0) {
             return null;
         }
+        if ("null".equals(julietFlowNodeId)) {
+            return null;
+        }
         try {
             Long longJulietFlowNodeId = Long.parseLong(julietFlowNodeId);
             if (longJulietFlowNodeId <= 0) {
