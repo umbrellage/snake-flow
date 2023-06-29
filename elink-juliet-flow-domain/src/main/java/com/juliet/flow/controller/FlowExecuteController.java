@@ -133,7 +133,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @Override
     public AjaxResult graph(Long id, Long userId) {
-        return AjaxResult.success(flowManagerService.getGraph(id));
+        return AjaxResult.success(flowManagerService.getGraph(id, userId));
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
