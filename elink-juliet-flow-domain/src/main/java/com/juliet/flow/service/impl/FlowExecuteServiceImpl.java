@@ -204,6 +204,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             throw new ServiceException("流程不存在");
         }
         Node node = flow.findNodeThrow(nodeId);
+        node.setProcessedBy(userId);
         // 异步发送待办通知
         callback(Collections.singletonList(node.toNotifyNormal(flow)));
         if (flow.hasParentFlow()) {
