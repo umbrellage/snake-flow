@@ -1,5 +1,6 @@
 package com.juliet.flow.service.impl;
 
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
 import com.alibaba.fastjson2.JSON;
@@ -186,7 +187,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     .collect(Collectors.toList())
             )
             .flatMap(Collection::stream)
-            .collect(Collectors.collectingAndThen(toCollection(() ->
+            .collect(collectingAndThen(toCollection(() ->
                 new TreeSet<>(Comparator.comparing(NodeVO::getName))), ArrayList::new));
     }
 
@@ -238,7 +239,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         return Stream.of(userIdNodeList, postIdNodeList)
             .flatMap(Collection::stream)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
-            .collect(Collectors.toList());
+            .collect(collectingAndThen(toCollection(() -> new TreeSet<>(Comparator.comparing(NodeVO::getId))),
+                ArrayList::new));
     }
 
     @Override
@@ -274,7 +276,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             subFlowList.stream()
                 .filter(subFlow -> {
                     Node node = subFlow.findNode(currentFlowNode.getName());
-                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName()) && node.getStatus() != NodeStatusEnum.IGNORE;
+                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName())
+                        && node.getStatus() != NodeStatusEnum.IGNORE;
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }
@@ -302,7 +305,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      * 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理
      * </ul>
      *
-     * @param flowId   主流程节点
+     * @param flowId 主流程节点
      * @param nodeId
      * @param userId
      */
