@@ -41,8 +41,10 @@
         left join jbpm_flow_node_post t2 on t1.id = t2.node_id
         <where>
             <if test="query.userId!=null">
-                and (t1.processed_by = #{query.userId}
-                or t1.supervisor_ids like CONCAT('%^',#{query.userId},'^%'))
+                and t1.processed_by = #{query.userId}
+            </if>
+            <if test="query.supervisorId!=null">
+                and t1.supervisor_ids like CONCAT('%^',#{query.userId},'^%')
             </if>
             <if test="query.postIds!=null and query.postIds.size>0">
                 and t2.post_id in

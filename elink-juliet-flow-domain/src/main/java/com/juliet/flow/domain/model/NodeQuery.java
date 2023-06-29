@@ -23,6 +23,8 @@ public class NodeQuery {
 
     private Long userId;
 
+    private Long supervisorId;
+
     private List<String> postIds;
 
     private Long tenantId;
@@ -57,6 +59,16 @@ public class NodeQuery {
             .collect(Collectors.toList()));
         return data;
     }
+
+    public static NodeQuery findBySupervisorId(Long userId) {
+        NodeQuery data = new NodeQuery();
+        data.setSupervisorId(userId);
+        data.setStatusList(Stream.of(NodeStatusEnum.TO_BE_CLAIMED).map(NodeStatusEnum::getCode)
+            .collect(Collectors.toList()));
+        return data;
+    }
+
+
 
     public static NodeQuery findByPostId(List<Long> postIdList) {
         NodeQuery data = new NodeQuery();

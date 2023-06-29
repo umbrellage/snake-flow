@@ -222,13 +222,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public List<NodeVO> todoNodeList(UserDTO dto) {
         List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
+        List<Node> supervisorIdNodeList = flowRepository.listNode(NodeQuery.findBySupervisorId(dto.getUserId()));
         List<Node> postIdNodeList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(dto.getPostId())) {
             postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
                 .collect(Collectors.toList());
         }
-        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList)
+        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
             .flatMap(Collection::stream)
             .map(Node::getFlowId)
             .distinct()
@@ -237,7 +238,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
 
-        return Stream.of(userIdNodeList, postIdNodeList)
+        return Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
             .flatMap(Collection::stream)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(collectingAndThen(toCollection(() -> new TreeSet<>(Comparator.comparing(NodeVO::getId))),
