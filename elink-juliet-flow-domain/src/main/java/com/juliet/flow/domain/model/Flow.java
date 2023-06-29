@@ -360,10 +360,8 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        if (node.getRuleAssignment()) {
-                            // FIXME: 2023/6/16 传入参数
-                            node.regularDistribution(Collections.emptyMap());
-                        }
+                        // FIXME: 2023/6/16 传入参数
+                        node.regularDistribution(Collections.emptyMap());
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         } else {
