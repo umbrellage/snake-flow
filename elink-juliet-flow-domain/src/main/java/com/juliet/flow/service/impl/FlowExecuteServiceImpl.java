@@ -205,8 +205,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         Node node = flow.findNodeThrow(nodeId);
         node.setProcessedBy(userId);
-        // 异步发送待办通知
-        callback(Collections.singletonList(node.toNotifyNormal(flow)));
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
@@ -217,6 +215,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             flowRepository.update(subFlow);
         });
         flowRepository.update(flow);
+        // 异步发送待办通知
+        callback(Collections.singletonList(node.toNotifyNormal(flow)));
     }
 
     @Override
