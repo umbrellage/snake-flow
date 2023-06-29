@@ -19,7 +19,7 @@ public class BrandAssignRule extends BaseAssignRule {
 
     @Override
     public Long getAssignUserId(Map<String, Object> params) {
-        // TODO 分配规则
-        return 1680382104786L;
+        // TODO 分配规则 辅料开发账号
+        return 1680382106143L;
     }
 }
