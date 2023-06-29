@@ -1,6 +1,6 @@
 package com.juliet.flow.service;
 
-import com.juliet.flow.domain.vo.GraphVO;
+import com.juliet.flow.client.vo.GraphVO;
 
 /**
  * @author xujianjie
@@ -9,6 +9,8 @@ import com.juliet.flow.domain.vo.GraphVO;
 public interface FlowManagerService {
 
     GraphVO getGraph(Long id);
+
+    GraphVO getGraph(Long id, Long userId);
 
     GraphVO getTemplateGraph(Long templateId);
 }

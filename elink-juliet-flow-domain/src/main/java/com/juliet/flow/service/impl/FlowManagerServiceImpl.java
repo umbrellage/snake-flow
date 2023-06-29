@@ -4,22 +4,18 @@ import com.alibaba.fastjson.JSON;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
-import com.juliet.flow.domain.vo.GraphNodeVO;
-import com.juliet.flow.domain.vo.GraphVO;
+import com.juliet.flow.client.vo.GraphNodeVO;
+import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowManagerService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -50,6 +46,16 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     @Override
+    public GraphVO getGraph(Long id, Long userId) {
+        Flow flow = flowRepository.queryById(id);
+        GraphVO graphVO = getGraph(id);
+        for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
+            graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId));
+        }
+        return graphVO;
+    }
+
+    @Override
     public GraphVO getTemplateGraph(Long templateId) {
         return null;
     }
@@ -67,6 +73,17 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         for (Node node : nodes) {
             if (graphNodeId.equals(node.getName())) {
                 if (node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
+        for (Node node : flow.getNodes()) {
+            if (node.getName().equals(graphNodeVO.getId())) {
+                if (node.getStatus() == NodeStatusEnum.PROCESSED && node.getProcessedBy().equals(userId)) {
                     return true;
                 }
             }

@@ -1,4 +1,4 @@
-package com.juliet.flow.domain.vo;
+package com.juliet.flow.client.vo;
 
 import lombok.Data;
 
@@ -36,6 +36,8 @@ public class GraphNodeVO {
         private boolean active;
 
         private boolean disabled;
+
+        private boolean canClick;
     }
 
     @Data

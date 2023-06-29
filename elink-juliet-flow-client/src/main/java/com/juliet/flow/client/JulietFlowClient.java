@@ -7,6 +7,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -110,4 +111,8 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/flowList")
     AjaxResult<List<FlowVO>> flowList(@RequestBody FlowIdListDTO dto);
+
+
+    @GetMapping("/graph")
+    AjaxResult graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
 }

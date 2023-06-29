@@ -1,4 +1,4 @@
-package com.juliet.flow.domain.vo;
+package com.juliet.flow.client.vo;
 
 import lombok.Data;
 

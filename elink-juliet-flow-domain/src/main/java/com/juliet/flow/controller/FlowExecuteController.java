@@ -18,6 +18,7 @@ import com.juliet.flow.client.dto.FlowOpenResultDTO;
 import com.juliet.flow.domain.model.Field;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.service.FlowExecuteService;
+import com.juliet.flow.service.FlowManagerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.List;
@@ -41,6 +42,9 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @Autowired
     private FlowExecuteService flowExecuteService;
+
+    @Autowired
+    private FlowManagerService flowManagerService;
 
     /**
      * 流程实例还没创建，做预创建时的查询
@@ -125,6 +129,11 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<List<FlowVO>> flowList(FlowIdListDTO dto) {
         List<FlowVO> flowVOList = flowExecuteService.flowList(dto);
         return AjaxResult.success(flowVOList);
+    }
+
+    @Override
+    public AjaxResult graph(Long id, Long userId) {
+        return AjaxResult.success(flowManagerService.getGraph(id));
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
