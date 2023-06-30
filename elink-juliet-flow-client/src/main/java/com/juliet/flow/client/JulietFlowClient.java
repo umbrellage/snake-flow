@@ -3,6 +3,7 @@ package com.juliet.flow.client;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.*;
 import com.juliet.flow.client.vo.FlowVO;
+import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
@@ -114,5 +115,5 @@ public interface JulietFlowClient {
 
 
     @GetMapping("/graph")
-    AjaxResult graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
+    AjaxResult<GraphVO> graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
 }
