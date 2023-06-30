@@ -43,18 +43,6 @@ public class FlowTemplate extends BaseModel {
         start.setStatus(NodeStatusEnum.PROCESSED);
         start.setProcessedTime(LocalDateTime.now());
         start.setProcessedBy(userId);
-
-//        List<String> nextNameList = Arrays.stream(start.getNextName().split(",")).collect(Collectors.toList());
-//        nodes.forEach(node -> {
-//                if (nextNameList.contains(node.getName())) {
-//                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
-//                }
-//                if (node.getType().equals(NodeTypeEnum.START)) {
-//                    node.setStatus(NodeStatusEnum.PROCESSED);
-//                    node.setProcessedTime(LocalDateTime.now());
-//                    node.setProcessedBy(userId);
-//                }
-//            });
         flow.setNodes(nodes);
         flow.setTenantId(getTenantId());
         flow.setStatus(FlowStatusEnum.IN_PROGRESS);

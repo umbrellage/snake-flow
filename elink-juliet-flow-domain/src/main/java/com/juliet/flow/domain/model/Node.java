@@ -13,6 +13,7 @@ import com.juliet.flow.domain.entity.NodeEntity;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -371,6 +372,16 @@ public class Node extends BaseModel {
         node.accessRule = accessRule;
         node.submitRule = submitRule;
         node.processedBy = processedBy;
+        node.supervisorIds = supervisorIds;
+        node.assignRule = assignRule;
+        node.ruleAssignment = ruleAssignment;
+        node.selfAndSupervisorAssignment = selfAndSupervisorAssignment;
+        node.supervisorAssignment = supervisorAssignment;
+        node.setCreateBy(this.getCreateBy());
+        node.setUpdateBy(0L);
+        node.setCreateTime(new Date());
+        node.setUpdateTime(new Date());
+        node.setTenantId(this.getTenantId());
         return node;
     }
 
