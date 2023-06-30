@@ -255,7 +255,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             return;
         }
         Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
-        callback(Collections.singletonList(currentFlowNode.toNotifyComplete(flow)));
+//        callback(Collections.singletonList(currentFlowNode.toNotifyComplete(flow)));
         // 异常子流程
         List<Flow> subFlowList = new ArrayList<>();
         // 主流程
@@ -366,6 +366,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 flowRepository.update(flow);
                 // 发送消息提醒
                 callback(flow.normalNotifyList());
+                callback(Collections.singletonList(node.toNotifyComplete(flow)));
             }
         }
         if (node == null) {
@@ -391,6 +392,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             flowRepository.update(errorFlow);
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());
+            callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
         }
     }
 
