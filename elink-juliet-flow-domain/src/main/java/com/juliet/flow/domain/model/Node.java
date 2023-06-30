@@ -90,6 +90,12 @@ public class Node extends BaseModel {
      */
     private List<Long> supervisorIds;
 
+    /**
+     * 处理人
+     */
+    private Long processedBy;
+    private LocalDateTime processedTime;
+
     public List<Long> getSupervisorIds() {
         return supervisorIds;
     }
@@ -116,11 +122,7 @@ public class Node extends BaseModel {
         return "^" + supervisorId + "^";
     }
 
-    /**
-     * 处理人
-     */
-    private Long processedBy;
-    private LocalDateTime processedTime;
+
 
     public LocalDateTime getProcessedTime() {
         return JulietTimeMemo.toDateTime(getUpdateTime());

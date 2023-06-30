@@ -302,6 +302,8 @@ public class FlowEntityFactory {
         node.setUpdateBy(nodeEntity.getUpdateBy());
         node.setTenantId(nodeEntity.getTenantId());
         node.setProcessedTime(JulietTimeMemo.toDateTime(nodeEntity.getUpdateTime()));
+        node.setCreateTime(nodeEntity.getCreateTime());
+        node.setUpdateTime(nodeEntity.getUpdateTime());
         return node;
     }
 
