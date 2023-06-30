@@ -12,6 +12,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -257,6 +258,8 @@ public class Flow extends BaseModel {
         flow.setNodes(nodeList);
         flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
+        flow.setCreateTime(new Date());
+        flow.setUpdateTime(new Date());
         return flow;
     }
 

@@ -32,6 +32,8 @@ public class FlowEntityFactory {
         flow.setParentId(flowEntity.getParentId());
         flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));
         flow.setFlowTemplateId(flowEntity.getFlowTemplateId());
+        flow.setCreateTime(flowEntity.getCreateTime());
+        flow.setUpdateTime(flowEntity.getUpdateTime());
         return flow;
     }
 
