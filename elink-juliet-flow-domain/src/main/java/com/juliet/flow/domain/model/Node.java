@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -120,6 +121,10 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+
+    public LocalDateTime getProcessedTime() {
+        return JulietTimeMemo.toDateTime(getUpdateTime());
+    }
 
     public void regularDistribution(Map<String, Object> params) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
