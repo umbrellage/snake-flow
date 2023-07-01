@@ -55,6 +55,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         GraphVO graphVO = getGraph(id);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId));
+            graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
             graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
         }
@@ -95,6 +96,20 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                         return latestFlow.checkoutFlowNodeIsHandled(node.getName());
                     }
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canAdjustment(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
+        for (Node node : flow.getNodes()) {
+            if (node.getName().equals(graphNodeVO.getId())) {
+                if ((node.getSupervisorAssignment() != null && node.getSupervisorAssignment()) ||
+                        (node.getSelfAndSupervisorAssignment() != null && node.getSelfAndSupervisorAssignment())) {
+                    if (!CollectionUtils.isEmpty(node.getSupervisorIds())) {
+                        return node.getSupervisorIds().stream().anyMatch(supervisorId -> supervisorId.equals(userId));
+                    }
                 }
             }
         }
