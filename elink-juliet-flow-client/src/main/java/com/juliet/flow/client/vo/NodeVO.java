@@ -82,4 +82,14 @@ public class NodeVO {
         ret.setProcessedBy(processedBy);
         return ret;
     }
+
+    public String distinct() {
+        Long id;
+        if (mainFlowId != null) {
+            id = mainFlowId;
+        } else {
+            id = flowId;
+        }
+        return id + name;
+    }
 }
