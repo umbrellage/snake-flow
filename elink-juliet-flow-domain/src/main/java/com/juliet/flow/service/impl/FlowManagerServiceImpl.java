@@ -1,6 +1,7 @@
 package com.juliet.flow.service.impl;
 
 import com.alibaba.fastjson.JSON;
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
@@ -83,9 +84,13 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
+        Flow latestFlow = flowRepository.queryLatestByParentId(flow.getId());
         for (Node node : flow.getNodes()) {
             if (node.getName().equals(graphNodeVO.getId())) {
                 if (node.getStatus() == NodeStatusEnum.PROCESSED && node.getProcessedBy().equals(userId)) {
+                    if (latestFlow != null) {
+                        return latestFlow.checkoutFlowNodeIsHandled(node.getName());
+                    }
                     return true;
                 }
             }
