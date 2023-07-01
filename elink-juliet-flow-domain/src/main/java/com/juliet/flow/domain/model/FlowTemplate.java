@@ -7,6 +7,7 @@ import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.Data;
 
@@ -36,6 +37,11 @@ public class FlowTemplate extends BaseModel {
         Flow flow = new Flow();
         flow.setFlowTemplateId(this.id);
         flow.setTenantId(getTenantId());
+        nodes.forEach(node -> {
+            Date now = new Date();
+            node.setCreateTime(now);
+            node.setUpdateTime(now);
+        });
         Node start = nodes.stream()
             .filter(node -> node.getType().equals(NodeTypeEnum.START))
             .findAny()
