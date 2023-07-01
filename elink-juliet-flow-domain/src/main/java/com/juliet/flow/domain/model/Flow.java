@@ -53,7 +53,7 @@ public class Flow extends BaseModel {
      * @return
      */
     public boolean isFlowEnd() {
-        return status == FlowStatusEnum.END || isEnd();
+        return status == FlowStatusEnum.END;
     }
 
     /**
