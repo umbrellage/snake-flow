@@ -32,7 +32,10 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Override
     public GraphVO getGraph(Long id) {
-        Flow flow = flowRepository.queryById(id);
+        Flow flow = flowRepository.queryLatestByParentId(id);
+        if (flow == null) {
+            flow = flowRepository.queryById(id);
+        }
         // todo 判断flow是否存在
         GraphVO vo = null;
         String json = null;
