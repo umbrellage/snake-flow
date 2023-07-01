@@ -10,5 +10,5 @@ public abstract class BaseAssignRule {
 
     public abstract String getRuleName();
 
-    public abstract Long getAssignUserId(Map<String, Object> params);
+    public abstract Long getAssignUserId(Map<String, Object> params, Flow flow);
 }

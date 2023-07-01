@@ -374,7 +374,7 @@ public class Flow extends BaseModel {
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
                         // FIXME: 2023/6/16 传入参数
-                        node.regularDistribution(Collections.emptyMap());
+                        node.regularDistribution(Collections.emptyMap(), this);
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         } else {

@@ -136,9 +136,9 @@ public class Node extends BaseModel {
         return JulietTimeMemo.toDateTime(getUpdateTime());
     }
 
-    public void regularDistribution(Map<String, Object> params) {
+    public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
-            processedBy = assignRule.getAssignUserId(params);
+            processedBy = assignRule.getAssignUserId(params, flow);
         }
     }
 
