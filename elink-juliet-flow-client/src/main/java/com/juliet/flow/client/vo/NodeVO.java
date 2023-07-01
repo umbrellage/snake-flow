@@ -85,7 +85,7 @@ public class NodeVO {
 
     public String distinct() {
         Long id;
-        if (mainFlowId != null) {
+        if (mainFlowId != null && mainFlowId != 0) {
             id = mainFlowId;
         } else {
             id = flowId;
