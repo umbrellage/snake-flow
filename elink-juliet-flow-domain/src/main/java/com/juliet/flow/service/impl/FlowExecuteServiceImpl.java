@@ -26,6 +26,7 @@ import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowExecuteService;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -203,7 +204,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             throw new ServiceException("流程不存在");
         }
         Node node = flow.findNodeThrow(dto.getNodeId());
-        BusinessAssert.assertTrue(!node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
+        BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
         node.setProcessedBy(dto.getUserId());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
