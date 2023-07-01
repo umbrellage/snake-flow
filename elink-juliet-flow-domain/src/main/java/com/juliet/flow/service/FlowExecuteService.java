@@ -26,7 +26,7 @@ public interface FlowExecuteService {
 
     List<NodeVO> currentNodeList(Long flowId);
 
-    void claimTask(Long flowId, Long nodeId, Long userId);
+    void claimTask(TaskDTO dto);
 
     List<NodeVO> todoNodeList(UserDTO dto);
 

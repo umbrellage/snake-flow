@@ -94,7 +94,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("认领待办任务、修改待办人、分配一个待办人")
     @Override
     public AjaxResult<Void> claimTask(TaskDTO dto) {
-        flowExecuteService.claimTask(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
+        flowExecuteService.claimTask(dto);
         return AjaxResult.success();
     }
 

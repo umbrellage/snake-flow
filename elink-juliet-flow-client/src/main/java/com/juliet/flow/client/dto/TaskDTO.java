@@ -16,7 +16,10 @@ import java.util.List;
 public class TaskDTO {
     private Long flowId;
     private Long nodeId;
+    @Deprecated
     private String nodeName;
     private Long userId;
+    private Long localUser;
+    @Deprecated
     private List<Long> postIdList;
 }

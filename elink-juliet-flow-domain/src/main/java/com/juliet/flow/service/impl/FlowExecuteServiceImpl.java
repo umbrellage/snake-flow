@@ -18,6 +18,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.Node;
@@ -192,26 +193,25 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     /**
-     * @param flowId 可能是主流程id，也可能是异常流程id，如果是异常流程id，找到主流程然后认领主流程下所有异常流程的节点
-     * @param nodeId
-     * @param userId
+     * @param dto flowId 可能是主流程id，也可能是异常流程id，如果是异常流程id，找到主流程然后认领主流程下所有异常流程的节点
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void claimTask(Long flowId, Long nodeId, Long userId) {
-        Flow flow = flowRepository.queryById(flowId);
+    public void claimTask(TaskDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
             throw new ServiceException("流程不存在");
         }
-        Node node = flow.findNodeThrow(nodeId);
-        node.setProcessedBy(userId);
+        Node node = flow.findNodeThrow(dto.getNodeId());
+        BusinessAssert.assertTrue(!node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
+        node.setProcessedBy(dto.getUserId());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
-        flow.claimNode(node.getName(), userId);
+        flow.claimNode(node.getName(), dto.getUserId());
         List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
         subFlowList.forEach(subFlow -> {
-            subFlow.claimNode(node.getName(), userId);
+            subFlow.claimNode(node.getName(), dto.getUserId());
             flowRepository.update(subFlow);
         });
         flowRepository.update(flow);
