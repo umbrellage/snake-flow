@@ -21,6 +21,6 @@ public class BrandAssignRule extends BaseAssignRule {
     @Override
     public Long getAssignUserId(Map<String, Object> params, Flow flow) {
         // TODO 分配规则 辅料开发账号
-        return 1680382106143L;
+        return 13266131907L;
     }
 }
