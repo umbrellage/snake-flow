@@ -38,6 +38,12 @@ public class GraphNodeVO {
         private boolean disabled;
 
         private boolean canClick;
+
+        private String nodeId;
+
+        private String currentProcessUserId;
+
+        private String currentProcessUserName;
     }
 
     @Data

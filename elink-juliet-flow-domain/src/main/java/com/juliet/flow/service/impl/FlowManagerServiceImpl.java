@@ -51,6 +51,8 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         GraphVO graphVO = getGraph(id);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId));
+            graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
+            graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
         }
         return graphVO;
     }
@@ -89,5 +91,26 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             }
         }
         return false;
+    }
+
+    private Long getCurrentProcessBy(GraphNodeVO graphNodeVO, Flow flow) {
+        for (Node node : flow.getNodes()) {
+            if (node.getName().equals(graphNodeVO.getId())) {
+                if (node.getProcessedBy() != null && node.getProcessedBy() == 0L) {
+                    return null;
+                }
+                return node.getProcessedBy();
+            }
+        }
+        return null;
+    }
+
+    private Long getNodeIdByName(GraphNodeVO graphNodeVO, Flow flow) {
+        for (Node node : flow.getNodes()) {
+            if (node.getName().equals(graphNodeVO.getId())) {
+                return node.getId();
+            }
+        }
+        return null;
     }
 }

@@ -10,6 +10,7 @@ import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
+import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
@@ -132,7 +133,7 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult graph(Long id, Long userId) {
+    public AjaxResult<GraphVO> graph(Long id, Long userId) {
         return AjaxResult.success(flowManagerService.getGraph(id, userId));
     }
 
