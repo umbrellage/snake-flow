@@ -224,6 +224,8 @@ public class Flow extends BaseModel {
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
+        }else {
+            currentNode.setProcessedBy(userId);
         }
     }
 
