@@ -154,7 +154,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             log.error("流程ID列表为空");
             return Collections.emptyList();
         }
-        return flowRepository.queryByIdList(dto.getFlowIdList()).stream()
+        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
+        List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowIdList);
+
+        return Stream.of(mainFlowList, subFlowList).flatMap(Collection::stream)
             .map(Flow::flowVO)
             .collect(Collectors.toList());
     }
