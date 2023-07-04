@@ -351,6 +351,7 @@ public class Flow extends BaseModel {
         nodes.forEach(node -> {
             if (node.getId().equals(nodeId)) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
+                node.setUpdateTime(new Date());
             }
         });
         nodes.forEach(node -> {
