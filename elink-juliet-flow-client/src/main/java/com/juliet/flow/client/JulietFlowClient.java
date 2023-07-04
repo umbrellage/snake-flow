@@ -83,7 +83,7 @@ public interface JulietFlowClient {
      * @param dto
      * @return
      */
-    @PostMapping("/bpm/node")
+    @PostMapping("/bpm/new/node")
     AjaxResult<NodeVO> findNodeByFlowIdAndNodeId(@RequestBody TaskDTO dto);
 
     /**
