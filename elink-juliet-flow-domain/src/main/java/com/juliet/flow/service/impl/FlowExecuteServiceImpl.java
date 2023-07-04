@@ -71,7 +71,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             template = flowRepository.queryTemplateById(dto.getTemplateId());
         }
         if (StringUtils.isNotBlank(dto.getCode())) {
-            template = flowRepository.queryTemplateByCode(dto.getCode());
+            template = flowRepository.queryTemplateByCode(dto.getCode(), dto.getTenantId());
         }
 
         if (template == null) {
@@ -90,7 +90,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long startFlow(BpmDTO dto) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode());
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
         if (flowTemplate == null) {
             throw new ServiceException("流程模版不存在");
         }

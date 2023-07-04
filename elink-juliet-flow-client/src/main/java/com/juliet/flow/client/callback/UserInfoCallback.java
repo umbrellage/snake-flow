@@ -9,4 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface UserInfoCallback {
 
     Long getUserId(HttpServletRequest request);
+
+    Long getTenantId(HttpServletRequest request);
 }

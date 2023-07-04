@@ -92,6 +92,7 @@ public class FlowAspect {
         }
 
         Long userId = userInfoCallback.getUserId(request);
+        Long tenantId = userInfoCallback.getTenantId(request);
 
         boolean bpmInit = false;
         if (julietFlowId == null) {
@@ -99,7 +100,7 @@ public class FlowAspect {
                 throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
-            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId));
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId, tenantId));
             if (!isSuccess(initResult)) {
                 log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
                 throw new RuntimeException("juliet flow init error!");
@@ -151,10 +152,11 @@ public class FlowAspect {
         }
     }
 
-    private BpmDTO toBpmDTO(String julietFlowCode, Long userId) {
+    private BpmDTO toBpmDTO(String julietFlowCode, Long userId, Long tenantId) {
         BpmDTO bpmDTO = new BpmDTO();
         bpmDTO.setTemplateCode(julietFlowCode);
         bpmDTO.setUserId(userId);
+        bpmDTO.setTenantId(tenantId);
         return bpmDTO;
     }
 

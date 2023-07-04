@@ -17,4 +17,5 @@ public class BpmDTO {
      */
     private String templateCode;
     private Long userId;
+    private Long tenantId;
 }
