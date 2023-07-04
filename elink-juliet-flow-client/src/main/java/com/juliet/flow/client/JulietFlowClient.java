@@ -79,6 +79,14 @@ public interface JulietFlowClient {
     AjaxResult<NodeVO> node(@RequestBody TaskDTO dto);
 
     /**
+     * 获取节点
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/node")
+    AjaxResult<NodeVO> findNodeByFlowIdAndNodeId(@RequestBody TaskDTO dto);
+
+    /**
      * 执行一个节点任务
      * @param dto 必填
      * @return

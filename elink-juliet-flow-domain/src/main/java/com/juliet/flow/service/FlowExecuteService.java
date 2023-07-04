@@ -39,4 +39,6 @@ public interface FlowExecuteService {
     NodeVO node(TaskDTO dto);
 
     List<FlowVO> flowList(FlowIdListDTO dto);
+
+    NodeVO findNodeByFlowIdAndNodeId(TaskDTO dto);
 }

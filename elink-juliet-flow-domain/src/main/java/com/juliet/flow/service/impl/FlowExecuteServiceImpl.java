@@ -166,6 +166,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .collect(Collectors.toList());
     }
 
+    @Override
+    public NodeVO findNodeByFlowIdAndNodeId(TaskDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        Optional.ofNullable(flow).orElseThrow(() -> new ServiceException("找不到流程"));
+        Node node = flow.findNode(dto.getNodeId());
+        Optional.ofNullable(node).orElseThrow(() -> new ServiceException("找不到节点"));
+        return node.toNodeVo(flow);
+    }
+
 
     private List<Flow> findSubFlowList(Long id) {
         List<Flow> flowList = flowRepository.listFlowByParentId(id);
