@@ -141,11 +141,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .findAny()
                 .orElse(null);
         }
+        if (node == null) {
+            return null;
+        }
 
-        if (node != null && node.postAuthority(dto.getPostIdList())) {
+        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
-        return null;
+        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
     }
 
     @Override
@@ -154,7 +157,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             log.error("流程ID列表为空");
             return Collections.emptyList();
         }
-        return flowRepository.queryByIdList(dto.getFlowIdList()).stream()
+        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
+        List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowIdList);
+
+        return Stream.of(mainFlowList, subFlowList).flatMap(Collection::stream)
             .map(Flow::flowVO)
             .collect(Collectors.toList());
     }
