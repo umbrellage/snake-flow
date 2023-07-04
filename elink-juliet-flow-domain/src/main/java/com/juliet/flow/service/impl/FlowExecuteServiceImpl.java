@@ -141,11 +141,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .findAny()
                 .orElse(null);
         }
+        if (node == null) {
+            return null;
+        }
 
-        if (node != null && node.postAuthority(dto.getPostIdList())) {
+        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
-        return null;
+        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
     }
 
     @Override
