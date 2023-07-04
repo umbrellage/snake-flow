@@ -21,8 +21,8 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 public class DefaultNotifyCallback implements MsgNotifyCallback {
-    @Value("${flow.callback.url:http://127.0.0.1:9400/todo/callback}")
-//    @Value("${flow.callback.url:http://192.168.17.15:9400/todo/callback}")
+//    @Value("${flow.callback.url:http://127.0.0.1:9400/todo/callback}")
+    @Value("${flow.callback.url:http://172.16.1.157:9400/todo/callback}")
     private String url;
 
     @Override
@@ -38,6 +38,6 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     }
 
     public static void main(String[] args) throws IOException {
-        HttpUtil.postJson("http://192.168.17.15:9400/todo/callback", "[]");
+        HttpUtil.postJson("http://172.16.1.157:9400/todo/callback", "[]");
     }
 }
