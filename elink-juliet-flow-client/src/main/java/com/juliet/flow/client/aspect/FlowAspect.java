@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.util.StringUtil;
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
@@ -13,6 +14,8 @@ import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImp
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.TaskDTO;
+import com.juliet.flow.client.vo.NodeVO;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,6 +116,18 @@ public class FlowAspect {
             log.info("juliet flow init success!");
 //            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
         } else {
+            TaskDTO dto = new TaskDTO();
+            dto.setFlowId(julietFlowId);
+            dto.setNodeId(julietNodeId);
+            AjaxResult<NodeVO> result = julietFlowClient.node(dto);
+            if (result.getCode() == 200 && result.getData() != null) {
+                NodeVO nodeVO = result.getData();
+                if (!userId.equals(nodeVO.getProcessedBy())) {
+                    throw new ServiceException("当前用户没有操作权限");
+                }
+            } else {
+                throw new ServiceException("流程错误");
+            }
             log.info("juliet flow pre forward!");
             // todo 流程预校验
         }
