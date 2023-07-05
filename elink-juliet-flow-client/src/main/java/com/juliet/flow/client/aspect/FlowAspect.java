@@ -119,8 +119,8 @@ public class FlowAspect {
             TaskDTO dto = new TaskDTO();
             dto.setFlowId(julietFlowId);
             dto.setNodeId(julietNodeId);
-            dto.setUserId(userId);
-            AjaxResult<NodeVO> result = julietFlowClient.node(dto);
+//            dto.setUserId(userId);
+            AjaxResult<NodeVO> result = julietFlowClient.findNodeByFlowIdAndNodeId(dto);
             if (result.getCode() == 200 && result.getData() != null) {
                 NodeVO nodeVO = result.getData();
                 if (!userId.equals(nodeVO.getProcessedBy())) {
