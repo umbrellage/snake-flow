@@ -17,7 +17,7 @@ import org.apache.commons.collections4.CollectionUtils;
 @Data
 public class NodeQuery {
 
-    private final static int DEFAULT_PAGE_SIZE = 200;
+    private final static int DEFAULT_PAGE_SIZE = 1000;
 
     private final static int MAX_PAGE_SIZE = 1000;
 
