@@ -51,7 +51,6 @@ public class FlowAspect {
     private JulietFlowClient julietFlowClient;
 
 
-
     @Autowired
     private List<ControllerResponseCallback> callbacks;
 
@@ -100,7 +99,8 @@ public class FlowAspect {
         boolean bpmInit = false;
         if (julietFlowId == null) {
             if (julietFlowCode == null || julietFlowCode.length() == 0) {
-                throw new RuntimeException("By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
+                throw new RuntimeException(
+                    "By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
             AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId, tenantId));
@@ -110,7 +110,8 @@ public class FlowAspect {
             }
             julietFlowId = initResult.getData();
             if (julietFlowId == null) {
-                log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
+                log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
+                    julietFlowCode, initResult);
                 throw new RuntimeException("juliet flow init error! flow id is null!");
             }
             log.info("juliet flow init success!");
@@ -121,13 +122,13 @@ public class FlowAspect {
             dto.setNodeId(julietNodeId);
 //            dto.setUserId(userId);
             AjaxResult<NodeVO> result = julietFlowClient.findNodeByFlowIdAndNodeId(dto);
-            if (result.getCode() == 200 && result.getData() != null) {
-                NodeVO nodeVO = result.getData();
-                if (!userId.equals(nodeVO.getProcessedBy())) {
-                    throw new ServiceException("当前用户没有操作权限");
-                }
-            } else {
-                throw new ServiceException("流程错误");
+
+            if (result.getCode() != 200 || result.getData() == null) {
+                throw new ServiceException("当前用户没有操作权限");
+            }
+            NodeVO nodeVO = result.getData();
+            if (!userId.equals(nodeVO.getProcessedBy())) {
+                throw new ServiceException("当前用户没有操作权限");
             }
             log.info("juliet flow pre forward!");
             // todo 流程预校验
@@ -154,7 +155,7 @@ public class FlowAspect {
                     AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
                     if (!isSuccess(forwardResult)) {
                         log.error("business forward success but flow error! flow id:{}, request:{}, response:{}",
-                                julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
+                            julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
                     }
                     log.info("juliet flow forward success!");
                 }
@@ -323,7 +324,8 @@ public class FlowAspect {
             return longJulietFlowNodeId;
         } catch (Exception e) {
             log.error("julietFlowNodeId type must be Long!", e);
-            throw new RuntimeException("request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
+            throw new RuntimeException(
+                "request parameter `julietFlowNodeId` type must be Long! but " + julietFlowNodeId);
         }
     }
 
