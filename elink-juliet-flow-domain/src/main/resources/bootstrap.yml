@@ -6,9 +6,9 @@ server:
 spring:
   application:
     # 应用名称
-    name: elink-juliet-flow-domain
+    name: elink-juliet-flow
   profiles:
-    active: test
+    active: @profileActive@
   cloud:
     nacos:
       discovery:
