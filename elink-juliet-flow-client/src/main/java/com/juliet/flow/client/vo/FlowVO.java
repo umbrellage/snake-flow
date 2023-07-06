@@ -46,6 +46,10 @@ public class FlowVO {
 
     private List<FlowVO> subFlowList;
 
+    public boolean end() {
+        return status == 3;
+    }
+
 
     public List<Long> processedBy() {
         if (CollectionUtils.isNotEmpty(subFlowList)) {

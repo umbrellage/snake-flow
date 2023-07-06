@@ -117,6 +117,15 @@ public class FlowAspect {
             log.info("juliet flow init success!");
 //            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
         } else {
+            FlowIdDTO id = new FlowIdDTO();
+            id.setFlowId(julietFlowId);
+            AjaxResult<FlowVO> flowResult = julietFlowClient.flow(id);
+            if (flowResult.getCode() != 200 || flowResult.getData() == null) {
+                throw new ServiceException("当前用户没有操作权限");
+            }
+            if (flowResult.getData().end()) {
+                throw new ServiceException("流程已经结束");
+            }
             TaskDTO dto = new TaskDTO();
             dto.setFlowId(julietFlowId);
             dto.setNodeId(julietNodeId);
