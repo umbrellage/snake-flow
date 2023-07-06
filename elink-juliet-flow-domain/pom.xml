@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>com.juliet</groupId>
@@ -130,11 +130,31 @@
             </plugin>
         </plugins>
         <resources>
+            <!-- 过滤配置文件到config目录 -->
             <resource>
                 <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <targetPath>config</targetPath>
+                <includes>
+                    <include>bootstrap.yml</include>
+                    <include>bootstrap-${profileActive}.yml</include>
+                    <include>**/*.properties</include>
+                    <!-- 如果各个环境的jks不一样，则配置到外部config目录中
+                        java代码中通过ClassPathFileUtil.getFile()获取 -->
+                    <include>test.jks</include>
+                    <include>test.txt</include>
+                </includes>
             </resource>
+
+            <!-- 过滤脚本文件到bin目录 -->
             <resource>
-                <directory>${basedir}/../elink-juliet-flow-client/src/main/resources</directory>
+                <directory>src/bin</directory>
+                <filtering>true</filtering>
+                <targetPath>bin</targetPath>
+                <includes>
+                    <include>*.bat</include>
+                    <include>*.sh</include>
+                </includes>
             </resource>
         </resources>
 
