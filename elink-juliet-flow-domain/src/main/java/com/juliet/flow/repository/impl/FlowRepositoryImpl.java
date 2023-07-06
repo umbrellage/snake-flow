@@ -161,7 +161,9 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> queryByIdList(List<Long> idList) {
-        return assembleFlow(idList);
+        List<FlowEntity> flowList = flowDao.selectList(
+            Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
+        return assembleFlow(flowList);
     }
 
     @Override
@@ -197,6 +199,15 @@ public class FlowRepositoryImpl implements FlowRepository {
             flow.setNodes(nodes);
         });
         return flows;
+    }
+
+    @Override
+    public List<Flow> queryMainFlowById(Collection<Long> idList) {
+        List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+            .in(FlowEntity::getId, idList)
+            .eq(FlowEntity::getParentId, 0)
+        );
+        return assembleFlow(flowEntities);
     }
 
     @Override
@@ -325,15 +336,11 @@ public class FlowRepositoryImpl implements FlowRepository {
         return nodes;
     }
 
-    public List<Flow> assembleFlow(List<Long> flowIdList) {
-        if (CollectionUtils.isEmpty(flowIdList)) {
-            return Collections.emptyList();
-        }
-        List<FlowEntity> flowList = flowDao.selectList(
-            Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, flowIdList));
+    public List<Flow> assembleFlow(List<FlowEntity> flowList) {
         if (CollectionUtils.isEmpty(flowList)) {
             return Collections.emptyList();
         }
+        List<Long> flowIdList = flowList.stream().map(FlowEntity::getId).collect(Collectors.toList());
         List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
             .in(NodeEntity::getFlowId, flowIdList)
         );
