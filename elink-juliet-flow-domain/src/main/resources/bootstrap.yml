@@ -6,7 +6,7 @@ server:
 spring:
   application:
     # 应用名称
-    name: elink-juliet-flow
+    name: elink-juliet-flow-domain
   profiles:
     active: test
   cloud:
