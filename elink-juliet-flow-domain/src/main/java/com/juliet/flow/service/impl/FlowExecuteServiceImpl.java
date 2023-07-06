@@ -159,10 +159,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowIdList);
+        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
+            .stream().map(flow -> flow.flowVO(Collections.emptyList())).collect(Collectors.groupingBy(FlowVO::getParentId));
 
-        return Stream.of(mainFlowList, subFlowList).flatMap(Collection::stream)
-            .map(Flow::flowVO)
+        return mainFlowList.stream()
+            .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
     }
 
@@ -437,8 +438,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return null;
         }
-        FlowVO flowVO = flow.flowVO();
-        List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
+        List<FlowVO> flowList = flowRepository.listFlowByParentId(flowId)
+            .stream().map(e -> e.flowVO(Collections.emptyList())).collect(Collectors.toList());
+        FlowVO flowVO = flow.flowVO(flowList);
         flowVO.setHasSubFlow(CollectionUtils.isNotEmpty(flowList));
         flowVO.setSubFlowCount(flowList.size());
         return flowVO;

@@ -229,7 +229,7 @@ public class Flow extends BaseModel {
         }
     }
 
-    public FlowVO flowVO() {
+    public FlowVO flowVO(List<FlowVO> subFlowList) {
         FlowVO data = new FlowVO();
         data.setId(id);
         data.setName(name);
@@ -243,7 +243,7 @@ public class Flow extends BaseModel {
             data.setNodes(nodeVOList);
         }
         data.setStatus(status.getCode());
-
+        data.setSubFlowList(subFlowList);
         return data;
     }
 
