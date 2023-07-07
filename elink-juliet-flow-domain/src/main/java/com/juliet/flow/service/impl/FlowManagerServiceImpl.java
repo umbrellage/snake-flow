@@ -88,12 +88,12 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
-        Flow latestFlow = flowRepository.queryLatestByParentId(flow.getId());
+        List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
         for (Node node : flow.getNodes()) {
             if (node.getName().equals(graphNodeVO.getId())) {
                 if (node.getStatus() == NodeStatusEnum.PROCESSED && node.getProcessedBy().equals(userId)) {
-                    if (latestFlow != null) {
-                        return latestFlow.checkoutFlowNodeIsHandled(node.getName());
+                    if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(subList)) {
+                        return subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
                     }
                     return true;
                 }

@@ -361,9 +361,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (node.isProcessed()) {
                 // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
                 // 判断有没有必要创建一条异常流程
-                Flow latestFlow = flowRepository.queryLatestByParentId(node.getFlowId());
-                if (latestFlow != null) {
-                    boolean flag = latestFlow.checkoutFlowNodeIsHandled(node.getName());
+                List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
+                if (CollectionUtils.isNotEmpty(subList)) {
+                    boolean flag = subList.stream().allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
+//                    boolean flag = latestFlow.checkoutFlowNodeIsHandled(node.getName());
                     if (!flag) {
                         throw new ServiceException("有流程将经过当前节点，不可变更");
                     }
