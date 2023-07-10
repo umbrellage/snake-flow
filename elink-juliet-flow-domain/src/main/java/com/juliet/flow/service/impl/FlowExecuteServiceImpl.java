@@ -372,7 +372,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
                 if (CollectionUtils.isNotEmpty(subList)) {
                     boolean flag = subList.stream().allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
-//                    boolean flag = latestFlow.checkoutFlowNodeIsHandled(node.getName());
                     if (!flag) {
                         throw new ServiceException("有流程将经过当前节点，不可变更");
                     }

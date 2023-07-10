@@ -126,7 +126,10 @@ public class FlowAspect {
             if (flowResult.getData().end()) {
                 throw new ServiceException("流程已经结束");
             }
-            if (flowResult.getData().getSubFlowCount() >= 10) {
+            boolean flag = flowResult.getData().getNodes().stream()
+                .filter(nodeVO -> nodeVO.getId().equals(julietNodeId))
+                .anyMatch(obj -> true);
+            if (flowResult.getData().getSubFlowCount() >= 10 && flag) {
                 throw new ServiceException("当前已存在10条子流程，目前只允许创建10条.");
             }
             TaskDTO dto = new TaskDTO();
