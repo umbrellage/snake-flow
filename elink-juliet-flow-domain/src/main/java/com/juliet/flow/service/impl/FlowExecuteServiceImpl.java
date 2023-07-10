@@ -177,6 +177,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (node == null) {
             node = subFlowList.stream()
                 .map(e -> e.findNode(dto.getNodeId()))
+                .filter(Objects::nonNull)
                 .findAny()
                 .orElseThrow(() -> new ServiceException("找不到节点"));
         }
