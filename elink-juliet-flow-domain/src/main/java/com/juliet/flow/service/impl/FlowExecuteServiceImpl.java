@@ -225,19 +225,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Transactional(rollbackFor = Exception.class)
     public void claimTask(TaskDTO dto) {
         Flow flow = flowRepository.queryById(dto.getFlowId());
-        if (flow == null) {
-            throw new ServiceException("流程不存在");
+        Optional.ofNullable(flow).orElseThrow(() -> new ServiceException("找不到流程"));
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        Node node;
+        node = flow.findNode(dto.getNodeId());
+        if (node == null) {
+            node = subFlowList.stream()
+                .map(e -> e.findNode(dto.getNodeId()))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
         }
-        Node node = flow.findNodeThrow(dto.getNodeId());
         BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
         node.setProcessedBy(dto.getUserId());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
         flow.claimNode(node.getName(), dto.getUserId());
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        String nodeName = node.getName();
         subFlowList.forEach(subFlow -> {
-            subFlow.claimNode(node.getName(), dto.getUserId());
+            subFlow.claimNode(nodeName, dto.getUserId());
             flowRepository.update(subFlow);
         });
         flowRepository.update(flow);
