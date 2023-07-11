@@ -9,6 +9,7 @@ import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowManagerService;
+import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -54,7 +55,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         Flow flow = flowRepository.queryById(id);
         GraphVO graphVO = getGraph(id);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
-            graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId));
+            graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
             graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
@@ -87,13 +88,17 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         return false;
     }
 
-    private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
+    private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId, Consumer<String> consumer) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
         for (Node node : flow.getNodes()) {
             if (node.getName().equals(graphNodeVO.getId())) {
                 if (node.getStatus() == NodeStatusEnum.PROCESSED && node.getProcessedBy().equals(userId)) {
                     if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(subList)) {
-                        return subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
+                        boolean flag = subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
+                        if (!flag && consumer != null) {
+                            consumer.accept("有流程将经过当前节点，不可变更");
+                        }
+                        return flag;
                     }
                     return true;
                 }

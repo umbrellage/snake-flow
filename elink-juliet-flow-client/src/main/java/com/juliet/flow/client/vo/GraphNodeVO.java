@@ -39,6 +39,8 @@ public class GraphNodeVO {
 
         private boolean canClick;
 
+        private String clickRemark;
+
         private boolean canAdjustment;
 
         private String nodeId;
