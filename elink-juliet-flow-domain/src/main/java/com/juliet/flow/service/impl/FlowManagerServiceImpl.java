@@ -55,7 +55,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         Flow flow = flowRepository.queryById(id);
         GraphVO graphVO = getGraph(id);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
-            graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark));
+            graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
             graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
@@ -88,7 +88,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         return false;
     }
 
-    private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId, Consumer<String> consumer) {
+    private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId, Consumer<String> consumer, Consumer<Boolean> canClickError) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
         for (Node node : flow.getNodes()) {
             if (node.getName().equals(graphNodeVO.getId())) {
@@ -97,6 +97,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                         boolean flag = subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
                         if (!flag && consumer != null) {
                             consumer.accept("有流程将经过当前节点，不可变更");
+                            canClickError.accept(Boolean.TRUE);
                         }
                         return flag;
                     }
