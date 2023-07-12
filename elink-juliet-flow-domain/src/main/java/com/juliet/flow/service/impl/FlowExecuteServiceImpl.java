@@ -423,13 +423,24 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             errorFlow.modifyNextNodeStatus(nodeId);
             syncFlow(calibrateFlowList, errorFlow);
-            if (errorFlow.isEnd()) {
-                errorFlow.setStatus(FlowStatusEnum.END);
-                // 如果子流程都结束了，那么主流程也肯定结束了
+
+            if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
+                flow.setStatus(FlowStatusEnum.END);
+                exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
+                exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 flow.setStatus(FlowStatusEnum.END);
                 flowRepository.update(flow);
+            } else {
+                flowRepository.update(errorFlow);
             }
-            flowRepository.update(errorFlow);
+//            if (errorFlow.isEnd()) {
+//                errorFlow.setStatus(FlowStatusEnum.END);
+//                // 如果子流程都结束了，那么主流程也肯定结束了
+//                flow.setStatus(FlowStatusEnum.END);
+//                flowRepository.update(flow);
+//            }
+//            flowRepository.update(errorFlow);
+
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());
             callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
