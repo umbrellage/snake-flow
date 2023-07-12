@@ -37,6 +37,8 @@ public interface FlowRepository {
 
     List<Flow> queryByIdList(List<Long> idList);
 
+    List<Flow> listFlowByIdOrParentId(List<Long> idList);
+
     List<Flow> listFlowByParentId(Long id);
 
     List<Flow> listFlowByParentId(Collection<Long> idList);

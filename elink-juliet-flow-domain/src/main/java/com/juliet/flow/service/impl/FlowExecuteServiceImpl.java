@@ -47,6 +47,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -161,7 +162,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
         Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
             .stream().map(flow -> flow.flowVO(Collections.emptyList())).collect(Collectors.groupingBy(FlowVO::getParentId));
-
         return mainFlowList.stream()
             .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
