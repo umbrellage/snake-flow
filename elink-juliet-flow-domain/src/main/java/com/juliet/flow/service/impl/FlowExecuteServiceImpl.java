@@ -433,14 +433,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             } else {
                 flowRepository.update(errorFlow);
             }
-//            if (errorFlow.isEnd()) {
-//                errorFlow.setStatus(FlowStatusEnum.END);
-//                // 如果子流程都结束了，那么主流程也肯定结束了
-//                flow.setStatus(FlowStatusEnum.END);
-//                flowRepository.update(flow);
-//            }
-//            flowRepository.update(errorFlow);
-
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());
             callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
