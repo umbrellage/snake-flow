@@ -136,12 +136,10 @@ public class FlowAspect {
             TaskDTO dto = new TaskDTO();
             dto.setFlowId(julietFlowId);
             dto.setNodeId(julietNodeId);
-//            dto.setUserId(userId);
             AjaxResult<NodeVO> result = julietFlowClient.findNodeByFlowIdAndNodeId(dto);
-
             if (result.getCode() != 200 || result.getData() == null) {
                 log.error("error data:{}", result);
-                throw new ServiceException("内部服务异常");
+                throw new ServiceException(result.getMsg());
             }
             NodeVO nodeVO = result.getData();
             if (!userId.equals(nodeVO.getProcessedBy())) {

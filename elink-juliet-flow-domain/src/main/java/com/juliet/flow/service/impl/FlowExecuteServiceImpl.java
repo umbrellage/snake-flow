@@ -179,7 +179,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .map(e -> e.findNode(dto.getNodeId()))
                 .filter(Objects::nonNull)
                 .findAny()
-                .orElseThrow(() -> new ServiceException("找不到节点"));
+                .orElseThrow(() -> new ServiceException("当前用户没有操作权限"));
         }
         return node.toNodeVo(flow);
     }
