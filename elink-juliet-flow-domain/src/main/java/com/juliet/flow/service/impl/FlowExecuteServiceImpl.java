@@ -267,6 +267,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .map(Node::getFlowId)
             .distinct()
             .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(flowIdList)) {
+            return Collections.emptyList();
+        }
 
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
