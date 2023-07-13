@@ -1,9 +1,11 @@
 package com.juliet.flow.client.vo;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * FlowVO
@@ -42,8 +44,23 @@ public class FlowVO {
      */
     private Integer status;
 
+    private List<FlowVO> subFlowList;
+
+    public boolean end() {
+        return status == 3;
+    }
+
 
     public List<Long> processedBy() {
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            subFlowList.add(this);
+            return subFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO.getStatus() == 3)
+                .map(NodeVO::getProcessedBy)
+                .distinct()
+                .collect(Collectors.toList());
+        }
         return nodes.stream()
             .filter(nodeVO -> nodeVO.getStatus() == 3)
             .map(NodeVO::getProcessedBy)

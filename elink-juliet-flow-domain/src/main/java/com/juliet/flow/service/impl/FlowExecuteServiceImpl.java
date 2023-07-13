@@ -47,6 +47,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -159,10 +160,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowIdList);
-
-        return Stream.of(mainFlowList, subFlowList).flatMap(Collection::stream)
-            .map(Flow::flowVO)
+        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
+            .stream().map(flow -> flow.flowVO(Collections.emptyList())).collect(Collectors.groupingBy(FlowVO::getParentId));
+        return mainFlowList.stream()
+            .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
     }
 
@@ -170,8 +171,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     public NodeVO findNodeByFlowIdAndNodeId(TaskDTO dto) {
         Flow flow = flowRepository.queryById(dto.getFlowId());
         Optional.ofNullable(flow).orElseThrow(() -> new ServiceException("找不到流程"));
-        Node node = flow.findNode(dto.getNodeId());
-        Optional.ofNullable(node).orElseThrow(() -> new ServiceException("找不到节点"));
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        Node node;
+        node = flow.findNode(dto.getNodeId());
+        if (node == null) {
+            node = subFlowList.stream()
+                .map(e -> e.findNode(dto.getNodeId()))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElseThrow(() -> new ServiceException("当前用户没有操作权限"));
+        }
         return node.toNodeVo(flow);
     }
 
@@ -216,19 +225,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Transactional(rollbackFor = Exception.class)
     public void claimTask(TaskDTO dto) {
         Flow flow = flowRepository.queryById(dto.getFlowId());
-        if (flow == null) {
-            throw new ServiceException("流程不存在");
+        Optional.ofNullable(flow).orElseThrow(() -> new ServiceException("找不到流程"));
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        Node node;
+        node = flow.findNode(dto.getNodeId());
+        if (node == null) {
+            node = subFlowList.stream()
+                .map(e -> e.findNode(dto.getNodeId()))
+                .filter(Objects::nonNull)
+                .findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
         }
-        Node node = flow.findNodeThrow(dto.getNodeId());
         BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
         node.setProcessedBy(dto.getUserId());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
         flow.claimNode(node.getName(), dto.getUserId());
-        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        String nodeName = node.getName();
         subFlowList.forEach(subFlow -> {
-            subFlow.claimNode(node.getName(), dto.getUserId());
+            subFlow.claimNode(nodeName, dto.getUserId());
             flowRepository.update(subFlow);
         });
         flowRepository.update(flow);
@@ -251,6 +267,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .map(Node::getFlowId)
             .distinct()
             .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(flowIdList)) {
+            return Collections.emptyList();
+        }
 
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
@@ -353,9 +372,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (node.isProcessed()) {
                 // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
                 // 判断有没有必要创建一条异常流程
-                Flow latestFlow = flowRepository.queryLatestByParentId(node.getFlowId());
-                if (latestFlow != null) {
-                    boolean flag = latestFlow.checkoutFlowNodeIsHandled(node.getName());
+                List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
+                if (CollectionUtils.isNotEmpty(subList)) {
+                    boolean flag = subList.stream().allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
                     if (!flag) {
                         throw new ServiceException("有流程将经过当前节点，不可变更");
                     }
@@ -404,13 +423,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             errorFlow.modifyNextNodeStatus(nodeId);
             syncFlow(calibrateFlowList, errorFlow);
-            if (errorFlow.isEnd()) {
-                errorFlow.setStatus(FlowStatusEnum.END);
-                // 如果子流程都结束了，那么主流程也肯定结束了
+
+            if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
+                flow.setStatus(FlowStatusEnum.END);
+                exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
+                exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 flow.setStatus(FlowStatusEnum.END);
                 flowRepository.update(flow);
+            } else {
+                flowRepository.update(errorFlow);
             }
-            flowRepository.update(errorFlow);
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());
             callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
@@ -437,8 +459,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return null;
         }
-        FlowVO flowVO = flow.flowVO();
-        List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
+        List<FlowVO> flowList = flowRepository.listFlowByParentId(flowId)
+            .stream().map(e -> e.flowVO(Collections.emptyList())).collect(Collectors.toList());
+        FlowVO flowVO = flow.flowVO(flowList);
         flowVO.setHasSubFlow(CollectionUtils.isNotEmpty(flowList));
         flowVO.setSubFlowCount(flowList.size());
         return flowVO;
