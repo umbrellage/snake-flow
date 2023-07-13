@@ -18,6 +18,6 @@ public interface NodeDao extends BaseMapper<NodeEntity> {
 
     List<NodeEntity> listNode(@Param("query") NodeQuery query);
 
-    void insertBatch(List<NodeEntity> nodeEntities);
+    void insertBatch(@Param("nodeEntities") List<NodeEntity> nodeEntities);
 
 }

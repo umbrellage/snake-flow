@@ -132,9 +132,57 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <include>mapper/**/*.xml</include>
+                    <include>logback.xml</include>
+                    <include>banner.txt</include>
+                    <!-- 如果各个环境的jks都是一样，则可以直接打入到启动jar包中 -->
+                    <!--<include>test.jks</include>-->
+                </includes>
             </resource>
+
+            <!-- 过滤配置文件到config目录 -->
             <resource>
-                <directory>${basedir}/../elink-juliet-flow-client/src/main/resources</directory>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <targetPath>config</targetPath>
+                <includes>
+                    <include>bootstrap.yml</include>
+                    <include>bootstrap-${profileActive}.yml</include>
+                    <include>**/*.properties</include>
+                    <!-- 如果各个环境的jks不一样，则配置到外部config目录中
+                        java代码中通过ClassPathFileUtil.getFile()获取 -->
+                    <include>test.jks</include>
+                    <include>test.txt</include>
+                </includes>
+            </resource>
+
+            <!-- 过滤脚本文件到bin目录 -->
+            <resource>
+                <directory>src/bin</directory>
+                <filtering>true</filtering>
+                <targetPath>bin</targetPath>
+                <includes>
+                    <include>*.bat</include>
+                    <include>*.sh</include>
+                </includes>
+            </resource>
+
+            <!-- 包含日志到logs目录 -->
+            <resource>
+                <directory>src/logs</directory>
+                <targetPath>logs</targetPath>
+                <includes>
+                    <include>*.log</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.json</include>
+                </includes>
             </resource>
         </resources>
 
