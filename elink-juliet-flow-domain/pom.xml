@@ -133,6 +133,18 @@
             <!-- 过滤配置文件到config目录 -->
             <resource>
                 <directory>src/main/resources</directory>
+                <includes>
+                    <include>mapper/**/*.xml</include>
+                    <include>logback.xml</include>
+                    <include>banner.txt</include>
+                    <!-- 如果各个环境的jks都是一样，则可以直接打入到启动jar包中 -->
+                    <!--<include>test.jks</include>-->
+                </includes>
+            </resource>
+
+            <!-- 过滤配置文件到config目录 -->
+            <resource>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <targetPath>config</targetPath>
                 <includes>
@@ -154,6 +166,14 @@
                 <includes>
                     <include>*.bat</include>
                     <include>*.sh</include>
+                </includes>
+            </resource>
+
+            <resource>
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*.json</include>
                 </includes>
             </resource>
         </resources>
