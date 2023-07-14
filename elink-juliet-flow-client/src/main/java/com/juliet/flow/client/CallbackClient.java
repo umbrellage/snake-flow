@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author Geweilang
  * @date 2023/7/4
  */
-@FeignClient(name = "juliet-flow-callback", url = "${flow.callback.url:127.0.0.1:9400}")
+@FeignClient(name = "juliet-flow-callback")
 public interface CallbackClient {
 
     @PostMapping("/juliet/flow/callback/notify")
