@@ -1,6 +1,7 @@
 package com.juliet.flow.client.callback.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 import com.juliet.flow.client.utils.HttpUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,16 +30,21 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     @Override
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}, url{}", JSON.toJSONString(list), url);
-        try {
-            String param = JSON.toJSONString(list, "yyyy-MM-dd HH:mm:ss");
-            String resp =  HttpUtil.postJson(url, param);
-            log.info("notify callback response:{}", resp);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            String param = JSON.toJSONString(list, "yyyy-MM-dd HH:mm:ss");
+//            String resp =  HttpUtil.postJson(url, param);
+//            log.info("notify callback response:{}", resp);
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+        callbackClient.callback(list);
     }
 
     public static void main(String[] args) throws IOException {
         HttpUtil.postJson("http://172.16.1.157:9400/todo/callback", "[]");
     }
+
+    @Autowired
+    private CallbackClient callbackClient;
 }
