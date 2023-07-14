@@ -16,6 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "juliet-flow-callback")
 public interface CallbackClient {
 
-    @PostMapping("/juliet/flow/callback/notify")
+    @PostMapping("/todo/callback")
     AjaxResult<Void> callback(@RequestBody List<NotifyDTO> dto);
 }
