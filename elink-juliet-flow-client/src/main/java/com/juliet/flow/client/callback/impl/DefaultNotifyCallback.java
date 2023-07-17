@@ -1,6 +1,7 @@
 package com.juliet.flow.client.callback.impl;
 
 import com.alibaba.fastjson2.JSON;
+import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
@@ -38,7 +39,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-        callbackClient.callback(list);
+        AjaxResult<Void> result = callbackClient.callback(list);
+        log.info("callback result:{}", result);
     }
 
     public static void main(String[] args) throws IOException {
