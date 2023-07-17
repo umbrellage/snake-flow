@@ -39,8 +39,12 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-        AjaxResult<Void> result = callbackClient.callback(list);
-        log.info("callback result:{}", result);
+        try {
+            AjaxResult<Void> result = callbackClient.callback(list);
+            log.info("callback result:{}", result);
+        } catch (Exception e) {
+            log.error("callback error!", e);
+        }
     }
 
     public static void main(String[] args) throws IOException {
