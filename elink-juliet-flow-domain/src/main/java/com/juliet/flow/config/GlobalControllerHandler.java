@@ -34,7 +34,7 @@ public class GlobalControllerHandler {
         RequestAttributes ra = RequestContextHolder.getRequestAttributes();
         ServletRequestAttributes sra = (ServletRequestAttributes) ra;
         if (null == sra) {
-            throw new RuntimeException("invalid request");
+            return point.proceed();
         }
         HttpServletRequest request = sra.getRequest();
 //        HttpServletResponse response = sra.getResponse();
