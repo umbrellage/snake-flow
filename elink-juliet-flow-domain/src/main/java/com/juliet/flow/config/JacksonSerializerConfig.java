@@ -1,6 +1,5 @@
 package com.juliet.flow.config;
 
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.juliet.common.core.utils.DateUtils;
@@ -27,6 +26,7 @@ public class JacksonSerializerConfig {
             .serializerByType(Long.class, ToStringSerializer.instance)
             .serializerByType(Long.TYPE, ToStringSerializer.instance);
     }
+
 
 
 }

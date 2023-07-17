@@ -9,6 +9,7 @@ import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,7 @@ public class TestController {
     @Autowired
     FlowRepository flowRepository;
     @Autowired
-    private MsgNotifyCallback notifyCallback;
+    private List<MsgNotifyCallback> msgNotifyCallbacks;
 
     @ApiOperation("获取流程列表")
     @PostMapping("/test")
@@ -46,7 +47,8 @@ public class TestController {
     public AjaxResult send() {
         NotifyDTO notify = new NotifyDTO();
         notify.setNodeId(1111L);
-        notifyCallback.notify(Collections.singletonList(notify));
+        msgNotifyCallbacks.forEach(notifyCallback ->
+        notifyCallback.notify(Collections.singletonList(notify)));
         return AjaxResult.success();
     }
 }
