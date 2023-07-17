@@ -2,6 +2,7 @@ package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.CallbackClient;
+import com.juliet.flow.client.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
@@ -31,7 +32,7 @@ public class TestController {
     @Autowired
     FlowRepository flowRepository;
     @Autowired
-    private CallbackClient callbackClient;
+    private MsgNotifyCallback notifyCallback;
 
     @ApiOperation("获取流程列表")
     @PostMapping("/test")
@@ -45,7 +46,7 @@ public class TestController {
     public AjaxResult send() {
         NotifyDTO notify = new NotifyDTO();
         notify.setNodeId(1111L);
-        callbackClient.callback(Collections.singletonList(notify));
+        notifyCallback.notify(Collections.singletonList(notify));
         return AjaxResult.success();
     }
 }

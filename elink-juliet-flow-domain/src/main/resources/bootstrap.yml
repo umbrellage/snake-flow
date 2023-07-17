@@ -25,3 +25,13 @@ spring:
         shared-configs:
           - application-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
 
+# 全局配置
+logging:
+  level:
+    feign.Logger: debug
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: FULL
