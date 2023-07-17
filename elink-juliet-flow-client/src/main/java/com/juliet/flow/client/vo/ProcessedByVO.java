@@ -23,7 +23,7 @@ public class ProcessedByVO {
      * 处理人
      */
     private Long processedBy;
-    @JsonSerialize(using = DateTime2String.class)
+//    @JsonSerialize(using = DateTime2String.class)
     private LocalDateTime processedTime;
 
     public static ProcessedByVO of(Long nodeId, Long processedBy, LocalDateTime processedTime) {
