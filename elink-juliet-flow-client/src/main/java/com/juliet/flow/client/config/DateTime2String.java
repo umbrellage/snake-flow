@@ -22,7 +22,7 @@ public class DateTime2String extends JsonSerializer<LocalDateTime> {
     @Override
     public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
         if (value != null){
-            gen.writeNumber(JulietTimeMemo.format(value, DateUtils.YYYY_MM_DD_HH_MM_SS));
+            gen.writeString(JulietTimeMemo.format(value, DateUtils.YYYY_MM_DD_HH_MM_SS));
         }
     }
 }
