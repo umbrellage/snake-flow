@@ -1,8 +1,10 @@
 package com.juliet.flow.client.vo;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.flow.client.config.DateTime2String;
+import com.juliet.flow.client.config.String2DateTimeDes;
 import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.Getter;
@@ -23,7 +25,8 @@ public class ProcessedByVO {
      * 处理人
      */
     private Long processedBy;
-//    @JsonSerialize(using = DateTime2String.class)
+    @JsonSerialize(using = DateTime2String.class)
+    @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;
 
     public static ProcessedByVO of(Long nodeId, Long processedBy, LocalDateTime processedTime) {
