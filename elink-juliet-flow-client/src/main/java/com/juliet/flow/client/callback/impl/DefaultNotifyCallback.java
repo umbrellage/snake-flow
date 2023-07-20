@@ -30,8 +30,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 //    @Value("${flow.callback.url:http://172.16.1.157:9400/todo/callback}")
     private String url;
 
-    @Value(("${spring.rabbitmq.exchange.callback}"))
-    private String exchange;
+//    @Value(("${spring.rabbitmq.exchange.callback}"))
+//    private String exchange;
 
     @Autowired
     private AmqpTemplate rabbitMqTemplate;
@@ -47,14 +47,14 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }
-        try {
-            for (NotifyDTO notifyDTO : list) {
-                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
-                rabbitMqTemplate.convertAndSend(exchange, "default", dto);
-            }
-        } catch (Exception e) {
-            log.error("send callback msg to mq fail!", e);
-        }
+//        try {
+//            for (NotifyDTO notifyDTO : list) {
+//                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
+//                rabbitMqTemplate.convertAndSend(exchange, "default", dto);
+//            }
+//        } catch (Exception e) {
+//            log.error("send callback msg to mq fail!", e);
+//        }
 
 
 
