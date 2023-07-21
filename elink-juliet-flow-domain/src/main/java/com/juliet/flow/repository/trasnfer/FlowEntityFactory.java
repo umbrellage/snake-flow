@@ -242,6 +242,7 @@ public class FlowEntityFactory {
 
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
+        nodeEntity.setCustomStatus(node.getCustomStatus());
         nodeEntity.setProcessedBy(node.getProcessedBy() == null ? 0 : node.getProcessedBy());
         nodeEntity.setDelFlag(0);
         nodeEntity.setCreateBy(node.getCreateBy());
@@ -296,6 +297,7 @@ public class FlowEntityFactory {
             node.setSupervisorIds(Lists.newArrayList());
         }
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
+        node.setCustomStatus(nodeEntity.getCustomStatus());
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
         node.setProcessedBy(nodeEntity.getProcessedBy());
         node.setCreateBy(nodeEntity.getCreateBy());

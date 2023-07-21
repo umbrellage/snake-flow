@@ -37,6 +37,8 @@ public class NodeVO {
      */
     private Integer status;
 
+    private String customStatus;
+
     private Long flowId;
 
     private Long mainFlowId;

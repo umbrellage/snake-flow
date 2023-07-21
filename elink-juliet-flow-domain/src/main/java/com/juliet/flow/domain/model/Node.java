@@ -345,6 +345,7 @@ public class Node extends BaseModel {
         if (status != null) {
             data.setStatus(status.getCode());
         }
+        data.setCustomStatus(customStatus);
         Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
