@@ -73,4 +73,6 @@ public class NodeDTO {
 
     @NotNull
     private Integer status;
+
+    private String customStatus;
 }

@@ -52,6 +52,8 @@ public class Node extends BaseModel {
 
     private NodeStatusEnum status;
 
+    private String customStatus;
+
     private NodeTypeEnum type;
 
     private List<Post> bindPosts;
