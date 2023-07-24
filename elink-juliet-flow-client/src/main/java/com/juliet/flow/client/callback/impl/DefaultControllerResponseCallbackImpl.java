@@ -3,7 +3,6 @@ package com.juliet.flow.client.callback.impl;
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
-import com.juliet.flow.client.callback.MsgNotifyCallback;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

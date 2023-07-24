@@ -1,4 +1,4 @@
-package com.juliet.flow.client.callback;
+package com.juliet.flow.callback;
 
 
 import com.juliet.flow.client.dto.NotifyDTO;

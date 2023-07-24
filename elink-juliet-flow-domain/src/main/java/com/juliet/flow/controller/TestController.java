@@ -1,8 +1,7 @@
 package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.flow.client.CallbackClient;
-import com.juliet.flow.client.callback.MsgNotifyCallback;
+import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
@@ -16,10 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Arrays;
 
 /**
  * @author xujianjie
