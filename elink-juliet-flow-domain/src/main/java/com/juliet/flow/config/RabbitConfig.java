@@ -1,5 +1,6 @@
-package com.juliet.flow.client.config;
+package com.juliet.flow.config;
 
+import com.juliet.flow.client.config.FastJsonMessageConverter;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
