@@ -50,6 +50,23 @@ public class FlowVO {
         return status == 3;
     }
 
+    public List<String> flowCustomerStatus() {
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            subFlowList.add(this);
+            return subFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO.getStatus() == 3)
+                .map(NodeVO::getCustomStatus)
+                .distinct()
+                .collect(Collectors.toList());
+        }
+        return nodes.stream()
+            .filter(nodeVO -> nodeVO.getStatus() == 3)
+            .map(NodeVO::getCustomStatus)
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
 
     public List<Long> processedBy() {
         if (CollectionUtils.isNotEmpty(subFlowList)) {
