@@ -39,7 +39,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
         try {
             for (NotifyDTO notifyDTO : list) {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);
-                rabbitMqTemplate.convertAndSend(exchange, "default", dto);
+                rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
             }
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);

@@ -30,6 +30,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -45,11 +47,11 @@ import javax.servlet.http.HttpServletResponse;
 @Aspect
 @Component
 @Slf4j
+@Order(value = Ordered.LOWEST_PRECEDENCE)
 public class FlowAspect {
 
     @Autowired
     private JulietFlowClient julietFlowClient;
-
 
     @Autowired
     private List<ControllerResponseCallback> callbacks;
