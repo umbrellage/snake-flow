@@ -380,6 +380,7 @@ public class Node extends BaseModel {
         Node node = new Node();
         node.id = IdGenerator.getId();
         node.title = title;
+        node.customStatus = customStatus;
         node.name = name;
         node.preName = preName;
         node.nextName = nextName;
