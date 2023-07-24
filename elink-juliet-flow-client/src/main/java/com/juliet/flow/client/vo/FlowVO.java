@@ -1,6 +1,7 @@
 package com.juliet.flow.client.vo;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -43,6 +44,10 @@ public class FlowVO {
      * END(3, "已结束"),
      */
     private Integer status;
+    /**
+     * 最后操作人，流程未结束时最后操作人为空
+     */
+    private List<Long> theLastProcessedBy;
 
     private List<FlowVO> subFlowList;
 
@@ -66,7 +71,6 @@ public class FlowVO {
             .distinct()
             .collect(Collectors.toList());
     }
-
 
     public List<Long> processedBy() {
         if (CollectionUtils.isNotEmpty(subFlowList)) {

@@ -76,6 +76,7 @@ public class NodeVO {
     private Long processedBy;
     private LocalDateTime processedTime;
 
+
     public NodeSimpleVO toSimple() {
         NodeSimpleVO ret = new NodeSimpleVO();
         ret.setId(id);

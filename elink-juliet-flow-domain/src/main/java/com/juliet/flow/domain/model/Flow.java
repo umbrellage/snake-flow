@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.Data;
@@ -46,6 +47,21 @@ public class Flow extends BaseModel {
     private FlowStatusEnum status;
 
     private Long tenantId;
+
+    public List<Long> theLastProcessedBy() {
+        if (FlowStatusEnum.END != status) {
+            return Collections.emptyList();
+        }
+        Node end = nodes.stream()
+            .filter(e -> e.getType() == NodeTypeEnum.END).findAny()
+            .orElseThrow(() -> new ServiceException("不存在结束节点，流程异常"));
+        return end.preNameList().stream()
+            .map(this::findNode)
+            .map(Node::getProcessedBy)
+            .filter(Objects::nonNull)
+            .distinct()
+            .collect(Collectors.toList());
+    }
 
     /**
      * 流程是否已经结束
@@ -244,6 +260,8 @@ public class Flow extends BaseModel {
         }
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
+        data.setTheLastProcessedBy(theLastProcessedBy());
+
         return data;
     }
 
