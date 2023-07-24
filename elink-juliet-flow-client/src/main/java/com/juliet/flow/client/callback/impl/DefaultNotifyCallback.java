@@ -39,25 +39,6 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     @Override
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}, url{}", JSON.toJSONString(list), url);
-//        try {
-//            String param = JSON.toJSONString(list, "yyyy-MM-dd HH:mm:ss");
-//            String resp =  HttpUtil.postJson(url, param);
-//            log.info("notify callback response:{}", resp);
-//
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        try {
-//            for (NotifyDTO notifyDTO : list) {
-//                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
-//                rabbitMqTemplate.convertAndSend(exchange, "default", dto);
-//            }
-//        } catch (Exception e) {
-//            log.error("send callback msg to mq fail!", e);
-//        }
-
-
-
         try {
             AjaxResult<Void> result = callbackClient.callback(list);
             log.info("callback result:{}", result);
