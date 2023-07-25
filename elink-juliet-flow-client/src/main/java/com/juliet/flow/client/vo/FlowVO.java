@@ -51,6 +51,12 @@ public class FlowVO {
 
     private List<FlowVO> subFlowList;
 
+    /**
+     * 所有流程节点状态
+     */
+    private List<String> allFlowCustomerStatus;
+
+
     public boolean end() {
         return status == 3;
     }
