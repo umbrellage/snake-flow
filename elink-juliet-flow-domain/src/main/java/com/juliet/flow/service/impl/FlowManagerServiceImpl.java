@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
+import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
@@ -37,13 +38,21 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (flow == null) {
             flow = flowRepository.queryById(id);
         }
+        if (flow == null) {
+            throw new ServiceException("没有找到流程，id:" + id);
+        }
+        FlowTemplate flowTemplate = flowRepository.queryTemplateById(flow.getFlowTemplateId());
+        if (flowTemplate == null) {
+            throw new ServiceException("没有找到流程模板，流程id:" + id + " 模板id:" + flow.getFlowTemplateId());
+        }
         // todo 判断flow是否存在
         GraphVO vo = null;
         String json = null;
+        String jsonFilePath = findJsonFile(flowTemplate);
         try {
-            json = IOUtils.resourceToString("/graph/flow_touyang.json", Charsets.toCharset("UTF-8"));
+            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
         } catch (IOException e) {
-            log.error("read flow_touyang.json fail!", e);
+            log.error("read {} fail!", jsonFilePath, e);
         }
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
         fillFlowInfo(flow, vo);
@@ -74,7 +83,20 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
         for (GraphNodeVO graphNodeVO : vo.getNodes()) {
             graphNodeVO.getProperties().setActive(isActive(flow.getNodes(), graphNodeVO.getId()));
+            String text = getText(flow.getNodes(), graphNodeVO.getId());
+            if (text != null) {
+                graphNodeVO.getProperties().setText(text);
+            }
         }
+    }
+
+    private String getText(List<Node> nodes, String graphNodeId) {
+        for (Node node : nodes) {
+            if (graphNodeId.equals(node.getName())) {
+                return node.getTitle();
+            }
+        }
+        return null;
     }
 
     private boolean isActive(List<Node> nodes, String graphNodeId) {
@@ -142,5 +164,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             }
         }
         return null;
+    }
+
+    private String findJsonFile(FlowTemplate flowTemplate) {
+        return "/graph/" + flowTemplate.getCode() + ".json";
     }
 }

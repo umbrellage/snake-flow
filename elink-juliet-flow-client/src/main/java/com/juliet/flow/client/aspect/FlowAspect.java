@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.FlowContext;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
@@ -232,6 +233,14 @@ public class FlowAspect {
         }
         return map;
     }
+
+//    private Map<String, Object> parseRequestParamMap(JoinPoint joinPoint) {
+//        Map<String, Object> map = getMethodArgs(joinPoint);
+//        if (CollectionUtils.isEmpty(map)) {
+//            return Collections.emptyMap();
+//        }
+//        Map<String, Object> data = FlowContext.getAttachmentMap();
+//    }
 
     private List<String> parseRequestParams(JoinPoint joinPoint) {
         Map<String, Object> map = getMethodArgs(joinPoint);
