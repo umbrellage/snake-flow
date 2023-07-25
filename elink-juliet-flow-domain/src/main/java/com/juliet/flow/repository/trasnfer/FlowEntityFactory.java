@@ -242,7 +242,7 @@ public class FlowEntityFactory {
 
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
-        nodeEntity.setCustomStatus(node.getCustomStatus());
+        nodeEntity.setCustomStatus(node.getCustomStatus() == null ? "" : node.getCustomStatus());
         nodeEntity.setProcessedBy(node.getProcessedBy() == null ? 0 : node.getProcessedBy());
         nodeEntity.setDelFlag(0);
         nodeEntity.setCreateBy(node.getCreateBy());
