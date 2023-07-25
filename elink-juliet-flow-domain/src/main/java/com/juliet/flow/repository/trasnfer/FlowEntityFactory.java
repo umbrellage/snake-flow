@@ -24,10 +24,11 @@ import java.util.stream.Collectors;
  */
 public class FlowEntityFactory {
 
-    public static Flow toFlow(FlowEntity flowEntity) {
+    public static Flow toFlow(FlowEntity flowEntity, FlowTemplateEntity template) {
         Flow flow = new Flow();
         flow.setName(flowEntity.getName());
         flow.setTenantId(flowEntity.getTenantId());
+        flow.setTemplateCode(template.getCode());
         flow.setId(flowEntity.getId());
         flow.setParentId(flowEntity.getParentId());
         flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));

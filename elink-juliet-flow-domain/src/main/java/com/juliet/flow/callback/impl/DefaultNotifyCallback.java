@@ -56,6 +56,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     private NotifyMessageDTO toMessageDTO(NotifyDTO notifyDTO) {
         NotifyMessageDTO dto = new NotifyMessageDTO();
         dto.setFlowId(notifyDTO.getFlowId());
+        dto.setTemplateCode(notifyDTO.getCode());
         return dto;
     }
 }

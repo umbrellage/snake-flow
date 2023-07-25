@@ -83,7 +83,7 @@ public class Node extends BaseModel {
     private Boolean ruleAssignment;
 
     /**
-     * 分配规则
+     * 分配规则, 分配操作人
      */
     private BaseAssignRule assignRule;
 

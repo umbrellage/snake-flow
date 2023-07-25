@@ -9,5 +9,6 @@ import lombok.Data;
 @Data
 public class NotifyMessageDTO {
 
+    private String templateCode;
     private Long flowId;
 }

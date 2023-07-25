@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author xujianjie
  * @date 2023-04-23
  */
-@FeignClient(name = "elink-juliet-flow", path = "/juliet/flow/execute")
+@FeignClient(name = "elink-juliet-flow", path = "/juliet/flow/execute", url = "127.0.0.1:9601")
 public interface JulietFlowClient {
 
     @PostMapping("/open")
