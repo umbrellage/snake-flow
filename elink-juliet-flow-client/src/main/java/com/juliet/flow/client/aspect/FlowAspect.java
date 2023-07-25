@@ -184,6 +184,7 @@ public class FlowAspect {
                     // TODO 关闭流程
                 }
             }
+            FlowContext.clean();
         }
     }
 
@@ -198,6 +199,7 @@ public class FlowAspect {
     private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId, Long julietNodeId, Long userId) {
         NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
         nodeFieldDTO.setFieldCodeList(fields);
+        nodeFieldDTO.setData(FlowContext.getAttachmentMap());
         nodeFieldDTO.setNodeId(julietNodeId);
         nodeFieldDTO.setFlowId(julietFlowId);
         nodeFieldDTO.setUserId(userId);
@@ -233,14 +235,6 @@ public class FlowAspect {
         }
         return map;
     }
-
-//    private Map<String, Object> parseRequestParamMap(JoinPoint joinPoint) {
-//        Map<String, Object> map = getMethodArgs(joinPoint);
-//        if (CollectionUtils.isEmpty(map)) {
-//            return Collections.emptyMap();
-//        }
-//        Map<String, Object> data = FlowContext.getAttachmentMap();
-//    }
 
     private List<String> parseRequestParams(JoinPoint joinPoint) {
         Map<String, Object> map = getMethodArgs(joinPoint);
