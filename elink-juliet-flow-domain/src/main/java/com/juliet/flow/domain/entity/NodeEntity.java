@@ -28,8 +28,6 @@ public class NodeEntity extends BaseEntity {
     @TableField(value = "node_name")
     private String name;
 
-    private String alias;
-
     private String preName;
 
     private String nextName;
