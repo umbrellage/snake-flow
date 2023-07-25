@@ -6,7 +6,6 @@ import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
-import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +25,8 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/forward")
     AjaxResult<Void> forward(@RequestBody NodeFieldDTO dto);
 
-
+    @PostMapping("/customer/status")
+    AjaxResult<List<String>> customerStatus(@RequestBody FlowOpenDTO dto);
 
     /**
      * 根据字段列表查询节点

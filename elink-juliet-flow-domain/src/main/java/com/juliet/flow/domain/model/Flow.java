@@ -11,6 +11,7 @@ import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 流程
@@ -261,7 +263,6 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
-
         return data;
     }
 

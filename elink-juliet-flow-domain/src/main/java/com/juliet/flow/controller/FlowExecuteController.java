@@ -66,6 +66,11 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<List<String>> customerStatus(FlowOpenDTO dto) {
+        return AjaxResult.success(flowExecuteService.customerStatus(dto.getCode(), dto.getTenantId()));
+    }
+
+    @Override
     public AjaxResult<NodeVO> node(NodeFieldDTO dto) {
         NodeVO nodeVO = flowExecuteService.fieldNode(dto);
         return AjaxResult.success(nodeVO);
