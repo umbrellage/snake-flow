@@ -1,7 +1,6 @@
 package com.juliet.flow.client.vo;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -50,12 +49,6 @@ public class FlowVO {
     private List<Long> theLastProcessedBy;
 
     private List<FlowVO> subFlowList;
-
-    /**
-     * 所有流程节点状态
-     */
-    private List<String> allFlowCustomerStatus;
-
 
     public boolean end() {
         return status == 3;

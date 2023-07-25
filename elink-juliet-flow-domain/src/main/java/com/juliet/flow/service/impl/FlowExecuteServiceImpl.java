@@ -181,6 +181,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         return node.toNodeVo(flow);
     }
 
+    @Override
+    public List<String> customerStatus(String code, Long tenantId) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code, tenantId);
+        return flowTemplate.getNodes().stream()
+            .map(Node::getCustomStatus)
+            .filter(StringUtils::isNotBlank).distinct()
+            .collect(Collectors.toList());
+    }
+
 
     private List<Flow> findSubFlowList(Long id) {
         List<Flow> flowList = flowRepository.listFlowByParentId(id);

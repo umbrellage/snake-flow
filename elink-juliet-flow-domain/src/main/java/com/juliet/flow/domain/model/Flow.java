@@ -263,13 +263,6 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
-        List<String> flowCustomerStatus = nodes.stream()
-            .map(Node::getCustomStatus)
-            .filter(StringUtils::isNotBlank)
-            .distinct()
-            .collect(Collectors.toList());
-        data.setAllFlowCustomerStatus(flowCustomerStatus);
-
         return data;
     }
 
