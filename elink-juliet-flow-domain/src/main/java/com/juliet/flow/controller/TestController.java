@@ -9,12 +9,14 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -39,8 +41,10 @@ public class TestController {
 
 
     @ApiOperation("回调消息")
-    @GetMapping("/send")
-    public AjaxResult send() {
+    @PostMapping("/send")
+    public AjaxResult send(@RequestBody Object value) {
+        List<Long> a = (List<Long>) value;
+        System.out.println(a);
         NotifyDTO notify = new NotifyDTO();
         notify.setNodeId(1111L);
         msgNotifyCallbacks.forEach(notifyCallback ->

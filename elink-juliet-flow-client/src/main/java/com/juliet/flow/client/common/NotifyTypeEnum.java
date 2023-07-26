@@ -26,6 +26,8 @@ public enum NotifyTypeEnum {
 
     CC("抄送"),
 
+    END("流程结束"),
+
     ;
 
     private String msg;

@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -339,6 +340,16 @@ public class Flow extends BaseModel {
             .map(node -> node.toNotifyNormal(this))
             .collect(Collectors.toList());
     }
+
+    public NotifyDTO flowEndNotify() {
+        NotifyDTO dto = new NotifyDTO();
+        dto.setFlowId(id);
+        dto.setCode(templateCode);
+        dto.setType(NotifyTypeEnum.END);
+        return dto;
+    }
+
+
 
     /**
      * 异常通知列表

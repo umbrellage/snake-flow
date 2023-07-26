@@ -5,10 +5,12 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.NotifyMessageDTO;
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 
 import java.util.List;
 
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +47,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
             log.error("send callback msg to mq fail!", e);
         }
         try {
-            AjaxResult<Void> result = callbackClient.callback(list);
+            AjaxResult<Void> result = callbackClient.callback(list.stream().filter(e -> e.getType() != NotifyTypeEnum.END)
+                .collect(Collectors.toList()));
             log.info("callback result:{}", result);
         } catch (Exception e) {
             log.error("callback error!", e);
