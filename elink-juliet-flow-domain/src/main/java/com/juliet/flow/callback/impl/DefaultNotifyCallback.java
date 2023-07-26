@@ -37,7 +37,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 
     @Override
     public void notify(List<NotifyDTO> list) {
-        log.info("notify param:{}, url{}", JSON.toJSONString(list));
+        log.info("notify param:{}", JSON.toJSONString(list));
         try {
             for (NotifyDTO notifyDTO : list) {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);

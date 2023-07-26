@@ -408,6 +408,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                     flow.setStatus(FlowStatusEnum.END);
                     exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
                     exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
+                    log.info("流程结束发送通知");
                     callback(Collections.singletonList(flow.flowEndNotify()));
                 }
                 flowRepository.update(flow);
@@ -437,6 +438,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 flow.setStatus(FlowStatusEnum.END);
                 flowRepository.update(flow);
+                log.info("流程结束发送通知");
                 callback(Collections.singletonList(flow.flowEndNotify()));
             } else {
                 flowRepository.update(errorFlow);
