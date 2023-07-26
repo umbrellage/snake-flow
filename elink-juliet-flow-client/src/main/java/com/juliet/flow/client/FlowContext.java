@@ -11,6 +11,8 @@ import java.util.Map;
  */
 public class FlowContext {
 
+//    private final static String CURRENT_OPERATOR_NAME = "currentOperatorName";
+
     private static TransmittableThreadLocal<Map<String, Object>> LOCAL_CACHE = new TransmittableThreadLocal<>();
     public static void putAttachment(String key, Object value) {
         Map<String, Object> local = LOCAL_CACHE.get();

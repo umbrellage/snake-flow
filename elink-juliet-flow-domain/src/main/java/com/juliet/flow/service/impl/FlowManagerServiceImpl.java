@@ -86,6 +86,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             String text = getText(flow.getNodes(), graphNodeVO.getId());
             if (text != null) {
                 graphNodeVO.getProperties().setText(text);
+                if (graphNodeVO.getText() != null) {
+                    graphNodeVO.getText().setValue(text);
+                }
             }
         }
     }
