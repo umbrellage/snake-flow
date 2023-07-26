@@ -138,7 +138,8 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (flowEntity == null) {
             return null;
         }
-        Flow flow = FlowEntityFactory.toFlow(flowEntity);
+        FlowTemplateEntity template = flowTemplateDao.selectById(flowEntity.getFlowTemplateId());
+        Flow flow = FlowEntityFactory.toFlow(flowEntity, template);
         List<Node> nodes = getNodes(flowEntity.getId());
         flow.setNodes(nodes);
         return flow;
@@ -210,14 +211,6 @@ public class FlowRepositoryImpl implements FlowRepository {
                 .eq(FlowEntity::getParentId, 0)
         );
         return assembleFlow(flowEntities);
-    }
-
-    @Override
-    public Flow queryByCode(String code) {
-        FlowEntity flowEntity = flowDao.selectOne(Wrappers.<FlowEntity>lambdaQuery()
-                .eq(FlowEntity::getId, code)
-                .last("limit 1"));
-        return FlowEntityFactory.toFlow(flowEntity);
     }
 
     @Override
@@ -361,9 +354,10 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<FieldEntity> fieldEntities = parallelBatchQueryFieldEntities(formIdList);
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
 
+        FlowTemplateEntity template = flowTemplateDao.selectById(flowList.get(0).getFlowTemplateId());
         return flowList.stream()
                 .map(flowEntity -> {
-                    Flow flow = FlowEntityFactory.toFlow(flowEntity);
+                    Flow flow = FlowEntityFactory.toFlow(flowEntity, template);
 
                     List<Node> nodes = assembleNode(nodeMap.get(flowEntity.getId()), formEntities, fieldEntities, postEntities);
                     flow.setNodes(nodes);
