@@ -1,6 +1,7 @@
 package com.juliet.flow.client.vo;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -55,6 +56,9 @@ public class FlowVO {
     }
 
     public List<String> flowCustomerStatus() {
+        if (end()) {
+            return Collections.singletonList(nodes.get(nodes.size() - 1).getCustomStatus());
+        }
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.add(this);
             return subFlowList.stream().map(FlowVO::getNodes)
