@@ -59,13 +59,13 @@ public class FlowVO {
             subFlowList.add(this);
             return subFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
-                .filter(nodeVO -> nodeVO.getStatus() == 3)
+                .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
                 .map(NodeVO::getCustomStatus)
                 .distinct()
                 .collect(Collectors.toList());
         }
         return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 3)
+            .filter(nodeVO -> nodeVO.getStatus() == 3|| nodeVO.getStatus() == 2)
             .map(NodeVO::getCustomStatus)
             .distinct()
             .collect(Collectors.toList());
