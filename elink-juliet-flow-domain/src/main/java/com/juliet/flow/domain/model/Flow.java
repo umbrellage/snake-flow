@@ -371,7 +371,7 @@ public class Flow extends BaseModel {
      *
      * @param nodeId
      */
-    public void modifyNextNodeStatus(Long nodeId) {
+    public void modifyNextNodeStatus(Long nodeId, Map<String, Object> param) {
         Node currentNode = findNode(nodeId);
         if (currentNode == null) {
             return;
@@ -395,7 +395,7 @@ public class Flow extends BaseModel {
                 if (preHandled) {
                     // FIXME: 2023/6/15 传入参数
                     if (node.getAccessRule() != null) {
-                        boolean flag = node.getAccessRule().accessRule(Collections.emptyMap());
+                        boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
                         if (!flag) {
                             ignoreEqualAfterNode(node);

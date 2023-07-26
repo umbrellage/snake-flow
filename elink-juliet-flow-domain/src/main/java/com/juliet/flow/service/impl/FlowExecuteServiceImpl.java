@@ -94,7 +94,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         Node node = flow.startNode();
-        flow.modifyNextNodeStatus(node.getId());
+        flow.modifyNextNodeStatus(node.getId(), Collections.emptyMap());
         flow.validate();
         flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flow.getId());
@@ -335,7 +335,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .values());
 
         for (Node node : nodeList) {
-            task(mainFlow.getId(), node.getId(), node.getProcessedBy());
+            task(mainFlow.getId(), node.getId(), node.getProcessedBy(), dto.getData());
         }
     }
 
@@ -357,7 +357,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void task(Long flowId, Long nodeId, Long userId) {
+    public synchronized void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null || flow.hasParentFlow()) {
             log.error("流程存在异常{}", JSON.toJSONString(flow));
@@ -388,7 +388,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 Flow subFlow = flow.subFlow();
                 subFlow.modifyNodeStatus(node);
                 Node subNode = subFlow.findNode(node.getName());
-                subFlow.modifyNextNodeStatus(subNode.getId());
+                subFlow.modifyNextNodeStatus(subNode.getId(), data);
                 syncFlow(calibrateFlowList, subFlow);
                 flowRepository.add(subFlow);
                 // 发送消息提醒
@@ -401,7 +401,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                flow.modifyNextNodeStatus(nodeId);
+                flow.modifyNextNodeStatus(nodeId, data);
                 syncFlow(calibrateFlowList, flow);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
@@ -429,7 +429,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
                 throw new ServiceException("该节点未被认领");
             }
-            errorFlow.modifyNextNodeStatus(nodeId);
+            errorFlow.modifyNextNodeStatus(nodeId, data);
             syncFlow(calibrateFlowList, errorFlow);
 
             if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {

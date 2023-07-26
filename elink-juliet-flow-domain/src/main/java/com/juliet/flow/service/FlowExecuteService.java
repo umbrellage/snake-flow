@@ -10,6 +10,7 @@ import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author xujianjie
@@ -31,7 +32,7 @@ public interface FlowExecuteService {
 
     List<NodeVO> todoNodeList(UserDTO dto);
 
-    void task(Long flowId, Long nodeId, Long userId);
+    void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data);
 
     FlowVO flow(Long flowId);
 
