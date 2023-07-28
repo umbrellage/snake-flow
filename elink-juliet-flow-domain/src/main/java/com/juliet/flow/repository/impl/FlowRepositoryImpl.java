@@ -148,7 +148,8 @@ public class FlowRepositoryImpl implements FlowRepository {
             return null;
         }
         FlowTemplateEntity template = flowTemplateDao.selectById(flowEntity.getFlowTemplateId());
-        Flow flow = FlowEntityFactory.toFlow(flowEntity, template);
+        Flow flow = FlowEntityFactory.toFlow(flowEntity);
+        flow.setTemplateCode(template.getCode());
         List<Node> nodes = getNodes(flowEntity.getId());
         flow.setNodes(nodes);
         return flow;
@@ -363,11 +364,15 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<FieldEntity> fieldEntities = parallelBatchQueryFieldEntities(formIdList);
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
 
-        FlowTemplateEntity template = flowTemplateDao.selectById(flowList.get(0).getFlowTemplateId());
+        List<Long> flowTemplateIds = flowList.stream().map(FlowEntity::getFlowTemplateId).collect(Collectors.toList());
+        List<FlowTemplateEntity> flowTemplateEntities = flowTemplateDao.selectBatchIds(flowTemplateIds);
+        Map<Long, String> flowTemplateCodeMap = flowTemplateEntities.stream()
+                .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode));
+
         return flowList.stream()
                 .map(flowEntity -> {
-                    Flow flow = FlowEntityFactory.toFlow(flowEntity, template);
-
+                    Flow flow = FlowEntityFactory.toFlow(flowEntity);
+                    flow.setTemplateCode(flowTemplateCodeMap.get(flow.getFlowTemplateId()));
                     List<Node> nodes = assembleNode(nodeMap.get(flowEntity.getId()), formEntities, fieldEntities, postEntities);
                     flow.setNodes(nodes);
                     return flow;
