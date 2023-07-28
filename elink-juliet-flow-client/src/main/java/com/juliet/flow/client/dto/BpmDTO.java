@@ -3,6 +3,8 @@ package com.juliet.flow.client.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Map;
+
 /**
  * BpmDto
  * 发起新流程
@@ -18,4 +20,6 @@ public class BpmDTO {
     private String templateCode;
     private Long userId;
     private Long tenantId;
+
+    private Map<String, Object> data;
 }

@@ -12,6 +12,7 @@ import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
+import com.juliet.flow.client.common.FlowMode;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -106,18 +107,23 @@ public class FlowAspect {
                     "By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
-            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId, tenantId));
-            if (!isSuccess(initResult)) {
-                log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
-                throw new RuntimeException("juliet flow init error!");
+            BpmDTO bpmDTO = toBpmDTO(julietFlowCode, userId, tenantId);
+            if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
+                AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
+                if (!isSuccess(initResult)) {
+                    log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
+                    throw new RuntimeException("juliet flow init error!");
+                }
+                julietFlowId = initResult.getData();
+                if (julietFlowId == null) {
+                    log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
+                            julietFlowCode, initResult);
+                    throw new RuntimeException("juliet flow init error! flow id is null!");
+                }
+                log.info("juliet flow init success!");
+            } else {
+                FlowContext.setClient(julietFlowClient, bpmDTO);
             }
-            julietFlowId = initResult.getData();
-            if (julietFlowId == null) {
-                log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
-                    julietFlowCode, initResult);
-                throw new RuntimeException("juliet flow init error! flow id is null!");
-            }
-            log.info("juliet flow init success!");
 //            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
         } else {
             FlowIdDTO id = new FlowIdDTO();

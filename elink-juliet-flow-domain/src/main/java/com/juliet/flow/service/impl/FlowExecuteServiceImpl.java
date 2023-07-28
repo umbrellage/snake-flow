@@ -94,7 +94,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         Node node = flow.startNode();
-        flow.modifyNextNodeStatus(node.getId(), Collections.emptyMap());
+        flow.modifyNextNodeStatus(node.getId(), dto.getData());
         flow.validate();
         flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flow.getId());

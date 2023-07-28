@@ -1,6 +1,10 @@
 package com.juliet.flow.client;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
+import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.dto.BpmDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,8 +16,18 @@ import java.util.Map;
 public class FlowContext {
 
 //    private final static String CURRENT_OPERATOR_NAME = "currentOperatorName";
+    private static final Logger log = LoggerFactory.getLogger(FlowContext.class);
 
     private static TransmittableThreadLocal<Map<String, Object>> LOCAL_CACHE = new TransmittableThreadLocal<>();
+
+    private static TransmittableThreadLocal<BpmDTO> BPM_DTO_CACHE = new TransmittableThreadLocal<>();
+
+    private static JulietFlowClient julietFlowClient;
+
+    public static void setClient(JulietFlowClient client, BpmDTO bpmDTO) {
+        julietFlowClient = client;
+        BPM_DTO_CACHE.set(bpmDTO);
+    }
     public static void putAttachment(String key, Object value) {
         Map<String, Object> local = LOCAL_CACHE.get();
         if (local == null) {
@@ -37,5 +51,16 @@ public class FlowContext {
 
     public static void clean() {
         LOCAL_CACHE.set(new HashMap<>());
+    }
+
+    public static Long submit() {
+        BpmDTO bpmDTO = BPM_DTO_CACHE.get();
+        bpmDTO.setData(LOCAL_CACHE.get());
+        AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
+        if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
+            log.error("juliet flow init error! response:{}", initResult);
+            throw new RuntimeException("juliet flow init error!");
+        }
+        return initResult.getData();
     }
 }

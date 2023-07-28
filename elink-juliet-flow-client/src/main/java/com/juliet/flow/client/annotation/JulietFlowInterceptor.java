@@ -1,5 +1,7 @@
 package com.juliet.flow.client.annotation;
 
+import com.juliet.flow.client.common.FlowMode;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -22,4 +24,11 @@ public @interface JulietFlowInterceptor {
      * 流程标识
      */
     String code() default "";
+
+    /**
+     * 流程模式
+     */
+    FlowMode flowMode() default FlowMode.AUTO;
+
+
 }
