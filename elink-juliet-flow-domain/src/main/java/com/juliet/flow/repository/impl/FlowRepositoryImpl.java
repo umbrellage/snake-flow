@@ -47,6 +47,9 @@ public class FlowRepositoryImpl implements FlowRepository {
     private PostDao postDao;
 
     @Autowired
+    private SupplierDao supplierDao;
+
+    @Autowired
     private FlowTemplateDao flowTemplateDao;
 
     @Transactional(rollbackFor = Exception.class)
@@ -56,25 +59,31 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntity entity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.insert(entity);
         flow.setId(entity.getId());
-        addNodes(flow.getNodes(), flow.getTenantId(), entity.getId(), 0L);
+        addNodes(flow.getNodes(), entity.getId(), 0L);
     }
 
-    private void addNodes(List<Node> nodes, Long tenantId, Long flowId, Long flowTemplateId) {
-        List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes,
-                tenantId, flowId, flowTemplateId);
+    private void addNodes(List<Node> nodes, Long flowId, Long flowTemplateId) {
+        List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes, flowId, flowTemplateId);
         nodeDao.insertBatch(nodeEntities);
 
-        List<FormEntity> formEntities = FlowEntityFactory.transferFormEntities(nodes, tenantId);
+        List<FormEntity> formEntities = FlowEntityFactory.transferFormEntities(nodes);
         formDao.insertBatch(formEntities);
 
-        List<FieldEntity> fieldEntities = FlowEntityFactory.transferFieldEntities(nodes, tenantId);
+        List<FieldEntity> fieldEntities = FlowEntityFactory.transferFieldEntities(nodes);
         List<List<FieldEntity>> parts = Lists.partition(fieldEntities, 50);
         for (List<FieldEntity> part : parts) {
             fieldDao.insertBatch(part);
         }
 
-        List<PostEntity> postEntities = FlowEntityFactory.transferPostEntity(nodes, tenantId);
-        postDao.insertBatch(postEntities);
+        List<PostEntity> postEntities = FlowEntityFactory.transferPostEntity(nodes);
+        if (CollectionUtils.isNotEmpty(postEntities)) {
+            postDao.insertBatch(postEntities);
+        }
+
+        List<SupplierEntity> supplierEntities = FlowEntityFactory.transferSupplierEntity(nodes);
+        if (CollectionUtils.isNotEmpty(supplierEntities)) {
+            supplierDao.insertBatch(supplierEntities);
+        }
     }
 
     @Override
@@ -82,7 +91,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowTemplateEntity entity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         flowTemplateDao.insert(entity);
         fillUserId(flowTemplate.getNodes(), flowTemplate.getCreateBy(), flowTemplate.getUpdateBy());
-        addNodes(flowTemplate.getNodes(), flowTemplate.getTenantId(), 0L, entity.getId());
+        addNodes(flowTemplate.getNodes(), 0L, entity.getId());
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -91,7 +100,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntity flowEntity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.updateById(flowEntity);
         deleteNodes(flow.getNodes());
-        addNodes(flow.getNodes(), flow.getTenantId(), flow.getId(), 0L);
+        addNodes(flow.getNodes(), flow.getId(), 0L);
     }
 
     @Override
@@ -103,7 +112,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowTemplateDao.updateById(flowTemplateEntity);
         deleteNodes(flowTemplateOld.getNodes());
         fillUserId(flowTemplate.getNodes(), flowTemplate.getCreateBy(), flowTemplate.getUpdateBy());
-        addNodes(flowTemplate.getNodes(), flowTemplate.getTenantId(), 0L, flowTemplate.getId());
+        addNodes(flowTemplate.getNodes(), 0L, flowTemplate.getId());
     }
 
     private void fillUserId(List<Node> nodes, Long createBy, Long updateBy) {
@@ -116,11 +125,11 @@ public class FlowRepositoryImpl implements FlowRepository {
             if (node.getForm() != null) {
                 node.getForm().setCreateBy(createBy);
                 node.getForm().setUpdateBy(updateBy);
-            }
-            if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
-                for (Field field : node.getForm().getFields()) {
-                    field.setCreateBy(createBy);
-                    field.setUpdateBy(updateBy);
+                if (!CollectionUtils.isEmpty(node.getForm().getFields())) {
+                    for (Field field : node.getForm().getFields()) {
+                        field.setCreateBy(createBy);
+                        field.setUpdateBy(updateBy);
+                    }
                 }
             }
             if (!CollectionUtils.isEmpty(node.getBindPosts())) {

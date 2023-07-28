@@ -69,10 +69,21 @@ public class NodeDTO {
     @NotNull
     private Integer type;
 
+    /**
+     * 绑定的岗位ID
+     */
     private List<PostDTO> bindPosts;
+
+    /**
+     * 绑定的供应商
+     */
+    private List<SupplierDTO> bindSuppliers;
 
     @NotNull
     private Integer status;
 
     private String customStatus;
+
+    private String tenantId;
+
 }

@@ -57,6 +57,8 @@ public class Node extends BaseModel {
     private NodeTypeEnum type;
 
     private List<Post> bindPosts;
+
+    private List<Supplier> bindSuppliers;
     /**
      * 准入规则
      */
