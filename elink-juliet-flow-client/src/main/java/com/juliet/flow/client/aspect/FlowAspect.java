@@ -118,7 +118,6 @@ public class FlowAspect {
                 throw new RuntimeException("juliet flow init error! flow id is null!");
             }
             log.info("juliet flow init success!");
-//            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
         } else {
             FlowIdDTO id = new FlowIdDTO();
             id.setFlowId(julietFlowId);
@@ -149,7 +148,6 @@ public class FlowAspect {
                 throw new ServiceException("当前用户没有操作权限");
             }
             log.info("juliet flow pre forward!");
-            // todo 流程预校验
         }
 
         request.setAttribute(PARAM_NAME_JULIET_FLOW_ID, julietFlowId);
