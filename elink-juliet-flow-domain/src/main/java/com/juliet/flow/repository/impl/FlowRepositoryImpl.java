@@ -138,6 +138,12 @@ public class FlowRepositoryImpl implements FlowRepository {
                     post.setUpdateBy(updateBy);
                 }
             }
+            if (!CollectionUtils.isEmpty(node.getBindSuppliers())) {
+                for (Supplier supplier : node.getBindSuppliers()) {
+                    supplier.setCreateBy(createBy);
+                    supplier.setUpdateBy(updateBy);
+                }
+            }
         }
     }
 
