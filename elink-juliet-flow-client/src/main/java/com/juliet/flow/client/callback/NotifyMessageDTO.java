@@ -1,5 +1,6 @@
 package com.juliet.flow.client.callback;
 
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import lombok.Data;
 
 /**
@@ -11,4 +12,5 @@ public class NotifyMessageDTO {
 
     private String templateCode;
     private Long flowId;
+    private NotifyTypeEnum type;
 }
