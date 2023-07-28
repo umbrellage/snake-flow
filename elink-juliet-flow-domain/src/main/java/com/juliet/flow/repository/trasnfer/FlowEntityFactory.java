@@ -265,7 +265,7 @@ public class FlowEntityFactory {
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
 
-        nodeEntity.setAccessRuleName(node.getAccessRule() == null ? "" : "1");
+        nodeEntity.setAccessRuleName(node.getAccessRule() == null ? "" : node.getAccessRule().getRuleName());
         nodeEntity.setSubmitRuleName("");
         nodeEntity.setAssignRuleName(node.getAssignRule() == null ? "" : node.getAssignRule().getRuleName());
         nodeEntity.setSupervisorAssignment(node.getSupervisorAssignment() != null && node.getSupervisorAssignment() ? 1 : 0);
