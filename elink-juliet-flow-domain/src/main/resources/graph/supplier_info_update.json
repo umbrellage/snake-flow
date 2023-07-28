@@ -1,0 +1,281 @@
+{
+  "nodes": [
+    {
+      "id": "b",
+      "type": "flowNode",
+      "x": 360,
+      "y": 210,
+      "properties": {
+        "text": "发起变更",
+        "name": "b",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 360,
+        "y": 210,
+        "value": "发起变更"
+      }
+    },
+    {
+      "id": "c",
+      "type": "flowNode",
+      "x": 710,
+      "y": 120,
+      "properties": {
+        "text": "供应商管理员",
+        "name": "c",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 710,
+        "y": 120,
+        "value": "供应商管理员"
+      }
+    },
+    {
+      "id": "d",
+      "type": "flowNode",
+      "x": 630,
+      "y": 320,
+      "properties": {
+        "text": "供应商管理员",
+        "name": "d",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 630,
+        "y": 320,
+        "value": "供应商管理员"
+      }
+    },
+    {
+      "id": "e",
+      "type": "flowNode",
+      "x": 820,
+      "y": 320,
+      "properties": {
+        "text": "财务",
+        "name": "e",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 820,
+        "y": 320,
+        "value": "财务"
+      }
+    },
+    {
+      "id": "end",
+      "type": "flowNode",
+      "x": 1090,
+      "y": 210,
+      "properties": {
+        "text": "结束",
+        "name": "end",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 1090,
+        "y": 210,
+        "value": "结束"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e181a4ed-a091-46b3-94f0-3f1c7692991a",
+      "type": "polyline",
+      "sourceNodeId": "b",
+      "targetNodeId": "c",
+      "startPoint": {
+        "x": 410,
+        "y": 210
+      },
+      "endPoint": {
+        "x": 660,
+        "y": 120
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 410,
+          "y": 210
+        },
+        {
+          "x": 499,
+          "y": 210
+        },
+        {
+          "x": 499,
+          "y": 120
+        },
+        {
+          "x": 660,
+          "y": 120
+        }
+      ]
+    },
+    {
+      "id": "9a6ec943-7213-44bc-8ed1-c7d4f18f39fd",
+      "type": "polyline",
+      "sourceNodeId": "b",
+      "targetNodeId": "d",
+      "startPoint": {
+        "x": 410,
+        "y": 210
+      },
+      "endPoint": {
+        "x": 580,
+        "y": 320
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 410,
+          "y": 210
+        },
+        {
+          "x": 498,
+          "y": 210
+        },
+        {
+          "x": 498,
+          "y": 320
+        },
+        {
+          "x": 580,
+          "y": 320
+        }
+      ]
+    },
+    {
+      "id": "c19ecf30-83de-44bc-aa80-029fdd99eb1f",
+      "type": "polyline",
+      "sourceNodeId": "d",
+      "targetNodeId": "e",
+      "startPoint": {
+        "x": 680,
+        "y": 320
+      },
+      "endPoint": {
+        "x": 770,
+        "y": 320
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 680,
+          "y": 320
+        },
+        {
+          "x": 770,
+          "y": 320
+        }
+      ]
+    },
+    {
+      "id": "232b7937-fae1-430f-8198-62b47de1ed13",
+      "type": "polyline",
+      "sourceNodeId": "c",
+      "targetNodeId": "end",
+      "startPoint": {
+        "x": 760,
+        "y": 120
+      },
+      "endPoint": {
+        "x": 1040,
+        "y": 210
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 760,
+          "y": 120
+        },
+        {
+          "x": 790,
+          "y": 120
+        },
+        {
+          "x": 790,
+          "y": 121
+        },
+        {
+          "x": 901,
+          "y": 121
+        },
+        {
+          "x": 901,
+          "y": 210
+        },
+        {
+          "x": 1040,
+          "y": 210
+        }
+      ]
+    },
+    {
+      "id": "b9c23404-9721-4c09-869b-3ca0f130e278",
+      "type": "polyline",
+      "sourceNodeId": "e",
+      "targetNodeId": "end",
+      "startPoint": {
+        "x": 870,
+        "y": 320
+      },
+      "endPoint": {
+        "x": 1040,
+        "y": 210
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 870,
+          "y": 320
+        },
+        {
+          "x": 900,
+          "y": 320
+        },
+        {
+          "x": 900,
+          "y": 210
+        },
+        {
+          "x": 1040,
+          "y": 210
+        }
+      ]
+    }
+  ]
+}

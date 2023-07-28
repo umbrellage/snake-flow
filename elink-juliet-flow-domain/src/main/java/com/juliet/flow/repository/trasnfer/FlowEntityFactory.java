@@ -24,11 +24,10 @@ import java.util.stream.Collectors;
  */
 public class FlowEntityFactory {
 
-    public static Flow toFlow(FlowEntity flowEntity, FlowTemplateEntity template) {
+    public static Flow toFlow(FlowEntity flowEntity) {
         Flow flow = new Flow();
         flow.setName(flowEntity.getName());
         flow.setTenantId(flowEntity.getTenantId());
-        flow.setTemplateCode(template.getCode());
         flow.setId(flowEntity.getId());
         flow.setParentId(flowEntity.getParentId());
         flow.setStatus(FlowStatusEnum.findByCode(flowEntity.getStatus()));
@@ -97,13 +96,13 @@ public class FlowEntityFactory {
         return flowTemplateEntity;
     }
 
-    public static List<FormEntity> transferFormEntities(List<Node> nodes, Long tenantId) {
+    public static List<FormEntity> transferFormEntities(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return Lists.newArrayList();
         }
         List<FormEntity> formEntities = new ArrayList<>();
         for (Node node : nodes) {
-            FormEntity formEntity = toFormEntity(node.getForm(), tenantId, node.getId());
+            FormEntity formEntity = toFormEntity(node.getForm(), node.getTenantId(), node.getId());
             if (formEntity != null) {
                 formEntities.add(formEntity);
             }
@@ -137,7 +136,7 @@ public class FlowEntityFactory {
         return entity;
     }
 
-    public static List<FieldEntity> transferFieldEntities(List<Node> nodes, Long tenantId) {
+    public static List<FieldEntity> transferFieldEntities(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return Lists.newArrayList();
         }
@@ -145,7 +144,7 @@ public class FlowEntityFactory {
         for (Node node : nodes) {
             if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
                 for (Field field : node.getForm().getFields()) {
-                    FieldEntity entity = toFieldEntity(field, tenantId, node.getForm().getId());
+                    FieldEntity entity = toFieldEntity(field, node.getTenantId(), node.getForm().getId());
                     fieldEntities.add(entity);
                 }
             }
@@ -172,7 +171,7 @@ public class FlowEntityFactory {
         return entity;
     }
 
-    public static List<PostEntity> transferPostEntity(List<Node> nodes, Long tenantId) {
+    public static List<PostEntity> transferPostEntity(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return Lists.newArrayList();
         }
@@ -180,7 +179,7 @@ public class FlowEntityFactory {
         for (Node node : nodes) {
             if (!CollectionUtils.isEmpty(node.getBindPosts())) {
                 for (Post post : node.getBindPosts()) {
-                    postEntities.add(toPostEntity(post, tenantId, node.getId()));
+                    postEntities.add(toPostEntity(post, node.getTenantId(), node.getId()));
                 }
             }
         }
@@ -206,8 +205,40 @@ public class FlowEntityFactory {
         return entity;
     }
 
+    public static List<SupplierEntity> transferSupplierEntity(List<Node> nodes) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return Lists.newArrayList();
+        }
+        List<SupplierEntity> supplierEntities = new ArrayList<>();
+        for (Node node : nodes) {
+            if (!CollectionUtils.isEmpty(node.getBindSuppliers())) {
+                for (Supplier supplier : node.getBindSuppliers()) {
+                    supplierEntities.add(toSupplierEntity(supplier, node.getTenantId(), node.getId()));
+                }
+            }
+        }
+        return supplierEntities;
+    }
+
+    private static SupplierEntity toSupplierEntity(Supplier supplier, Long tenantId, Long nodeId) {
+        SupplierEntity entity = new SupplierEntity();
+        if (supplier.getId() == null) {
+            supplier.setId(IdGenerator.getId());
+        }
+        entity.setId(supplier.getId());
+        entity.setSupplierType(supplier.getSupplierType());
+        entity.setNodeId(nodeId);
+        entity.setTenantId(tenantId);
+        entity.setDelFlag(0);
+        Date now = new Date();
+        entity.setCreateTime(supplier.getCreateTime() == null ? now : supplier.getCreateTime());
+        entity.setUpdateTime(supplier.getUpdateTime() == null ? now : supplier.getUpdateTime());
+        entity.setCreateBy(supplier.getCreateBy());
+        entity.setUpdateBy(supplier.getUpdateBy());
+        return entity;
+    }
+
     public static List<NodeEntity> transferNodeEntities(List<Node> nodes,
-        Long tenantId,
         Long flowId,
         Long flowTemplateId) {
         if (CollectionUtils.isEmpty(nodes)) {
@@ -215,11 +246,11 @@ public class FlowEntityFactory {
         }
 
         return nodes.stream()
-            .map(node -> toNodeEntity(node, tenantId, flowId, flowTemplateId))
+            .map(node -> toNodeEntity(node, flowId, flowTemplateId))
             .collect(Collectors.toList());
     }
 
-    private static NodeEntity toNodeEntity(Node node, Long tenantId, Long flowId, Long flowTemplateId) {
+    private static NodeEntity toNodeEntity(Node node, Long flowId, Long flowTemplateId) {
         NodeEntity nodeEntity = new NodeEntity();
         if (node.getId() == null) {
             node.setId(IdGenerator.getId());
@@ -229,11 +260,11 @@ public class FlowEntityFactory {
         nodeEntity.setName(node.getName());
         nodeEntity.setPreName(node.getPreName());
         nodeEntity.setNextName(node.getNextName());
-        nodeEntity.setTenantId(tenantId);
+        nodeEntity.setTenantId(node.getTenantId());
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
 
-        nodeEntity.setAccessRuleName(node.getAccessRule() == null ? "" : "1");
+        nodeEntity.setAccessRuleName(node.getAccessRule() == null ? "" : node.getAccessRule().getRuleName());
         nodeEntity.setSubmitRuleName("");
         nodeEntity.setAssignRuleName(node.getAssignRule() == null ? "" : node.getAssignRule().getRuleName());
         nodeEntity.setSupervisorAssignment(node.getSupervisorAssignment() != null && node.getSupervisorAssignment() ? 1 : 0);
