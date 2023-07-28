@@ -369,6 +369,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         calibrateFlowList.add(flow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
+        boolean end = false;
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
@@ -405,14 +406,17 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 syncFlow(calibrateFlowList, flow);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
+                    end = true;
                     flow.setStatus(FlowStatusEnum.END);
                     exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
                     exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                     log.info("流程结束发送通知");
-                    callback(Collections.singletonList(flow.flowEndNotify()));
                 }
                 flowRepository.update(flow);
                 // 发送消息提醒
+                if (end) {
+                    callback(Collections.singletonList(flow.flowEndNotify()));
+                }
                 callback(flow.normalNotifyList());
                 callback(Collections.singletonList(node.toNotifyComplete(flow)));
             }
@@ -431,17 +435,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             }
             errorFlow.modifyNextNodeStatus(nodeId, data);
             syncFlow(calibrateFlowList, errorFlow);
-
             if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
                 flow.setStatus(FlowStatusEnum.END);
                 exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
                 exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 flow.setStatus(FlowStatusEnum.END);
                 flowRepository.update(flow);
+                end = true;
                 log.info("流程结束发送通知");
-                callback(Collections.singletonList(flow.flowEndNotify()));
             } else {
                 flowRepository.update(errorFlow);
+            }
+
+            if (end) {
+                callback(Collections.singletonList(flow.flowEndNotify()));
             }
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());

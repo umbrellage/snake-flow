@@ -176,6 +176,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.COMPLETE);
+        ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
         return ret;
     }
@@ -187,6 +188,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.DELETE);
+        ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
         return ret;
     }
@@ -201,6 +203,7 @@ public class Node extends BaseModel {
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
         ret.setRemark(remark);
+        ret.setCode(flow.getTemplateCode());
         return ret;
     }
 
