@@ -224,6 +224,10 @@ public class Node extends BaseModel {
         if (CollectionUtils.isEmpty(bindPosts)) {
             throw new ServiceException("当前节点没有绑定权限");
         }
+        // 如果存在-1,则任何人都可以发起
+        if (bindPosts.stream().anyMatch(bindPost -> "-1".equals(bindPost.getPostId()))) {
+            return true;
+        }
         List<Long> sourcePostIdList = bindPosts.stream()
             .map(Post::getPostId)
             .filter(Objects::nonNull)
