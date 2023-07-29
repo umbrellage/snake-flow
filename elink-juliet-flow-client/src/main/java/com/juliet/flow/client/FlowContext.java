@@ -54,13 +54,17 @@ public class FlowContext {
     }
 
     public static Long submit() {
-        BpmDTO bpmDTO = BPM_DTO_CACHE.get();
-        bpmDTO.setData(LOCAL_CACHE.get());
-        AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
-        if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
-            log.error("juliet flow init error! response:{}", initResult);
-            throw new RuntimeException("juliet flow init error!");
+        try {
+            BpmDTO bpmDTO = BPM_DTO_CACHE.get();
+            bpmDTO.setData(LOCAL_CACHE.get());
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
+            if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
+                log.error("juliet flow init error! response:{}", initResult);
+                throw new RuntimeException("juliet flow init error!");
+            }
+            return initResult.getData();
+        } finally {
+            clean();
         }
-        return initResult.getData();
     }
 }
