@@ -70,6 +70,10 @@
             <groupId>com.juliet.common.swagger</groupId>
             <artifactId>elink-common-swagger</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.juliet.common.mq</groupId>
+            <artifactId>elink-common-mq</artifactId>
+        </dependency>
     </dependencies>
 
 

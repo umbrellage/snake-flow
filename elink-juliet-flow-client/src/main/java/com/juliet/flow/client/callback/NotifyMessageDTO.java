@@ -13,5 +13,5 @@ public class NotifyMessageDTO {
     private String templateCode;
     private Long flowId;
     private NotifyTypeEnum type;
-    private Long tanentId;
+    private Long tenantId;
 }
