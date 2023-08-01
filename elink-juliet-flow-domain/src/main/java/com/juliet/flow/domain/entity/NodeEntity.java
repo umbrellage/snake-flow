@@ -75,6 +75,8 @@ public class NodeEntity extends BaseEntity {
     @TableField(value = "node_status")
     private Integer status;
 
+    private String customStatus;
+
     @TableField(value = "node_type")
     private Integer type;
 

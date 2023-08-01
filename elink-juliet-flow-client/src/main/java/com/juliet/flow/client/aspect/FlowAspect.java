@@ -6,11 +6,13 @@ import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.util.StringUtil;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.FlowContext;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
 import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
+import com.juliet.flow.client.common.FlowMode;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -30,6 +32,8 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -45,11 +49,11 @@ import javax.servlet.http.HttpServletResponse;
 @Aspect
 @Component
 @Slf4j
+@Order(value = Ordered.LOWEST_PRECEDENCE)
 public class FlowAspect {
 
     @Autowired
     private JulietFlowClient julietFlowClient;
-
 
     @Autowired
     private List<ControllerResponseCallback> callbacks;
@@ -103,19 +107,23 @@ public class FlowAspect {
                     "By use annotation of JulietFlowInterceptor, Required request header 'juliet-flow-code' or parameter 'julietFlowCode'");
             }
             bpmInit = true;
-            AjaxResult<Long> initResult = julietFlowClient.initBmp(toBpmDTO(julietFlowCode, userId, tenantId));
-            if (!isSuccess(initResult)) {
-                log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
-                throw new RuntimeException("juliet flow init error!");
+            BpmDTO bpmDTO = toBpmDTO(julietFlowCode, userId, tenantId);
+            if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
+                AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
+                if (!isSuccess(initResult)) {
+                    log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
+                    throw new RuntimeException("juliet flow init error!");
+                }
+                julietFlowId = initResult.getData();
+                if (julietFlowId == null) {
+                    log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
+                            julietFlowCode, initResult);
+                    throw new RuntimeException("juliet flow init error! flow id is null!");
+                }
+                log.info("juliet flow init success!");
+            } else {
+                FlowContext.setClient(julietFlowClient, bpmDTO);
             }
-            julietFlowId = initResult.getData();
-            if (julietFlowId == null) {
-                log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
-                    julietFlowCode, initResult);
-                throw new RuntimeException("juliet flow init error! flow id is null!");
-            }
-            log.info("juliet flow init success!");
-//            request.getParameterMap().put(PARAM_MAME_JULIET_FLOW_ID, new String[] {String.valueOf(julietFlowId)});
         } else {
             FlowIdDTO id = new FlowIdDTO();
             id.setFlowId(julietFlowId);
@@ -146,7 +154,6 @@ public class FlowAspect {
                 throw new ServiceException("当前用户没有操作权限");
             }
             log.info("juliet flow pre forward!");
-            // todo 流程预校验
         }
 
         request.setAttribute(PARAM_NAME_JULIET_FLOW_ID, julietFlowId);
@@ -181,6 +188,7 @@ public class FlowAspect {
                     // TODO 关闭流程
                 }
             }
+            FlowContext.clean();
         }
     }
 
@@ -195,6 +203,7 @@ public class FlowAspect {
     private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId, Long julietNodeId, Long userId) {
         NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
         nodeFieldDTO.setFieldCodeList(fields);
+        nodeFieldDTO.setData(FlowContext.getAttachmentMap());
         nodeFieldDTO.setNodeId(julietNodeId);
         nodeFieldDTO.setFlowId(julietFlowId);
         nodeFieldDTO.setUserId(userId);

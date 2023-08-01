@@ -2,6 +2,11 @@ package com.juliet.flow.client.vo;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.juliet.flow.client.config.DateTime2String;
+import com.juliet.flow.client.config.String2DateTimeDes;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +41,8 @@ public class NodeVO {
      * NOT_ACTIVE(1, "未激活"), TO_BE_CLAIMED(2, "待认领"), ACTIVE(3, "已认领"), PROCESSED(4, "已处理")
      */
     private Integer status;
+
+    private String customStatus;
 
     private Long flowId;
 
@@ -72,6 +79,9 @@ public class NodeVO {
      * 处理人
      */
     private Long processedBy;
+
+    @JsonSerialize(using = DateTime2String.class)
+    @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;
 
     public NodeSimpleVO toSimple() {

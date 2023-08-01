@@ -1,6 +1,8 @@
 package com.juliet.flow.client.dto;
 
 import java.util.List;
+import java.util.Map;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,4 +20,6 @@ public class NodeFieldDTO {
     private Long nodeId;
     private Long flowId;
     private Long userId;
+
+    private Map<String, Object> data;
 }

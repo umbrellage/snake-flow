@@ -1,16 +1,20 @@
 package com.juliet.flow.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.flow.client.CallbackClient;
-import com.juliet.flow.client.callback.MsgNotifyCallback;
+import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.domain.model.Flow;
+import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,8 +23,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
-
 /**
  * @author xujianjie
  * @date 2023-04-24
@@ -28,6 +30,7 @@ import java.util.Arrays;
 @Api(tags = "商品管理")
 @RequestMapping("/item")
 @RestController
+@Slf4j
 public class TestController {
 
     @Autowired
@@ -43,12 +46,11 @@ public class TestController {
 
 
     @ApiOperation("回调消息")
-    @GetMapping("/send")
+    @PostMapping("/send")
     public AjaxResult send() {
-        NotifyDTO notify = new NotifyDTO();
-        notify.setNodeId(1111L);
-        msgNotifyCallbacks.forEach(notifyCallback ->
-        notifyCallback.notify(Collections.singletonList(notify)));
+        Flow flow = flowRepository.queryById(1134501098053963776L);
+        flow.modifyNextNodeStatus(1134501098104295424L, Collections.emptyMap());
+        log.info(JSON.toJSONString(flow));
         return AjaxResult.success();
     }
 }

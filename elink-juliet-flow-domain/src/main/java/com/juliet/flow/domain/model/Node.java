@@ -52,9 +52,13 @@ public class Node extends BaseModel {
 
     private NodeStatusEnum status;
 
+    private String customStatus;
+
     private NodeTypeEnum type;
 
     private List<Post> bindPosts;
+
+    private List<Supplier> bindSuppliers;
     /**
      * 准入规则
      */
@@ -81,7 +85,7 @@ public class Node extends BaseModel {
     private Boolean ruleAssignment;
 
     /**
-     * 分配规则
+     * 分配规则, 分配操作人
      */
     private BaseAssignRule assignRule;
 
@@ -172,6 +176,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.COMPLETE);
+        ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
         return ret;
     }
@@ -183,6 +188,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.DELETE);
+        ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
         return ret;
     }
@@ -197,6 +203,7 @@ public class Node extends BaseModel {
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
         ret.setRemark(remark);
+        ret.setCode(flow.getTemplateCode());
         return ret;
     }
 
@@ -216,6 +223,10 @@ public class Node extends BaseModel {
     public boolean postAuthority(List<Long> postIdList) {
         if (CollectionUtils.isEmpty(bindPosts)) {
             throw new ServiceException("当前节点没有绑定权限");
+        }
+        // 如果存在-1,则任何人都可以发起
+        if (bindPosts.stream().anyMatch(bindPost -> "-1".equals(bindPost.getPostId()))) {
+            return true;
         }
         List<Long> sourcePostIdList = bindPosts.stream()
             .map(Post::getPostId)
@@ -343,6 +354,7 @@ public class Node extends BaseModel {
         if (status != null) {
             data.setStatus(status.getCode());
         }
+        data.setCustomStatus(customStatus);
         Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
@@ -377,6 +389,7 @@ public class Node extends BaseModel {
         Node node = new Node();
         node.id = IdGenerator.getId();
         node.title = title;
+        node.customStatus = customStatus;
         node.name = name;
         node.preName = preName;
         node.nextName = nextName;

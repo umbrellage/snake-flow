@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -9,16 +10,24 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
+
 import java.util.List;
+
+import org.apache.commons.compress.utils.Lists;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * 流程
@@ -47,6 +56,25 @@ public class Flow extends BaseModel {
 
     private Long tenantId;
 
+    public List<Long> theLastProcessedBy() {
+        if (FlowStatusEnum.END != status) {
+            return Collections.emptyList();
+        }
+        Node end = nodes.stream()
+                .filter(e -> e.getType() == NodeTypeEnum.END).findAny()
+                .orElseThrow(() -> new ServiceException("不存在结束节点，流程异常，流程id：" + id));
+        List<Node> nodeList = end.preNameList().stream()
+                .map(this::findNode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(nodeList)) {
+            throw new ServiceException("前置节点不存在，流程配置错误，流程id：" + id);
+        }
+        return nodeList.stream().map(Node::getProcessedBy).filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
     /**
      * 流程是否已经结束
      *
@@ -74,7 +102,7 @@ public class Flow extends BaseModel {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
         return nodes.stream().allMatch(
-            node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
+                node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
 
@@ -86,15 +114,15 @@ public class Flow extends BaseModel {
      */
     public Node findNode(List<String> fieldCodeList) {
         return nodes.stream().filter(node -> {
-                Form form = node.getForm();
-                List<String> codeList = form.getFields().stream()
-                    .map(Field::getCode)
-                    .collect(Collectors.toList());
+                    Form form = node.getForm();
+                    List<String> codeList = form.getFields().stream()
+                            .map(Field::getCode)
+                            .collect(Collectors.toList());
 
-                return codeList.containsAll(fieldCodeList) && fieldCodeList.size() == codeList.size();
-            })
-            .findAny()
-            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+                    return codeList.containsAll(fieldCodeList) && fieldCodeList.size() == codeList.size();
+                })
+                .findAny()
+                .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
     }
 
 
@@ -103,9 +131,9 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
-            .findAny()
-            .orElse(null);
+                .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
+                .findAny()
+                .orElse(null);
     }
 
 
@@ -114,8 +142,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElse(null);
+                .filter(node -> node.getId().equals(nodeId)).findAny()
+                .orElse(null);
     }
 
     public Node findNodeThrow(Long nodeId) {
@@ -123,8 +151,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(node -> node.getId().equals(nodeId)).findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
     }
 
     public Node findNode(String name) {
@@ -132,8 +160,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getName().equals(name)).findAny()
-            .orElse(null);
+                .filter(node -> node.getName().equals(name)).findAny()
+                .orElse(null);
     }
 
     public Node findNodeThrow(String name) {
@@ -141,16 +169,16 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getName().equals(name)).findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(node -> node.getName().equals(name)).findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
     }
 
     public Node startNode() {
         if (CollectionUtils.isNotEmpty(nodes)) {
             return nodes.stream()
-                .filter(node -> node.getType().equals(NodeTypeEnum.START))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("找不到开始节点"));
+                    .filter(node -> node.getType().equals(NodeTypeEnum.START))
+                    .findAny()
+                    .orElseThrow(() -> new ServiceException("找不到开始节点"));
         }
         throw new ServiceException("节点为空");
     }
@@ -183,8 +211,8 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(node -> nodeStatusList.contains(node.getStatus()))
-            .collect(Collectors.toList());
+                .filter(node -> nodeStatusList.contains(node.getStatus()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -200,7 +228,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNodeThrow(nodeId);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+                .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -220,11 +248,11 @@ public class Flow extends BaseModel {
         Node currentNode = findNode(nodeName);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+                .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
-        }else {
+        } else {
             currentNode.setProcessedBy(userId);
         }
     }
@@ -238,12 +266,13 @@ public class Flow extends BaseModel {
         data.setTenantId(tenantId);
         if (CollectionUtils.isNotEmpty(nodes)) {
             List<NodeVO> nodeVOList = nodes.stream()
-                .map(e -> e.toNodeVo(this))
-                .collect(Collectors.toList());
+                    .map(e -> e.toNodeVo(this))
+                    .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
+        data.setTheLastProcessedBy(theLastProcessedBy());
         return data;
     }
 
@@ -255,8 +284,8 @@ public class Flow extends BaseModel {
         flow.setFlowTemplateId(flowTemplateId);
         flow.setParentId(id);
         List<Node> nodeList = nodes.stream()
-            .map(Node::copyNode)
-            .collect(Collectors.toList());
+                .map(Node::copyNode)
+                .collect(Collectors.toList());
         flow.setNodes(nodeList);
         flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
@@ -294,12 +323,12 @@ public class Flow extends BaseModel {
         ignoreNode.setStatus(NodeStatusEnum.IGNORE);
         List<String> nextNameList = ignoreNode.nextNameList();
         List<Node> ignoreNodeList = nextNameList.stream()
-            .map(this::findNode)
-            .filter(node -> node.preNameList().stream()
                 .map(this::findNode)
-                .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
-            .distinct()
-            .collect(Collectors.toList());
+                .filter(node -> node.preNameList().stream()
+                        .map(this::findNode)
+                        .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
+                .distinct()
+                .collect(Collectors.toList());
 
         for (Node node : ignoreNodeList) {
             ignoreEqualAfterNode(node);
@@ -316,10 +345,19 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(Node::isTodoNode)
-            .map(node -> node.toNotifyNormal(this))
-            .collect(Collectors.toList());
+                .filter(Node::isTodoNode)
+                .map(node -> node.toNotifyNormal(this))
+                .collect(Collectors.toList());
     }
+
+    public NotifyDTO flowEndNotify() {
+        NotifyDTO dto = new NotifyDTO();
+        dto.setFlowId(id);
+        dto.setCode(templateCode);
+        dto.setType(NotifyTypeEnum.END);
+        return dto;
+    }
+
 
     /**
      * 异常通知列表
@@ -331,9 +369,9 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(Node::isToBeExecuted)
-            .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
-            .collect(Collectors.toList());
+                .filter(Node::isToBeExecuted)
+                .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -341,7 +379,7 @@ public class Flow extends BaseModel {
      *
      * @param nodeId
      */
-    public void modifyNextNodeStatus(Long nodeId) {
+    public void modifyNextNodeStatus(Long nodeId, Map<String, Object> param) {
         Node currentNode = findNode(nodeId);
         if (currentNode == null) {
             return;
@@ -359,13 +397,13 @@ public class Flow extends BaseModel {
 
                 List<String> preNameList = node.preNameList();
                 boolean preHandled = nodes.stream().filter(handledNode -> preNameList.contains(handledNode.getName()))
-                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED
-                        || handledNode.getStatus() == NodeStatusEnum.IGNORE);
+                        .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED
+                                || handledNode.getStatus() == NodeStatusEnum.IGNORE);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     // FIXME: 2023/6/15 传入参数
                     if (node.getAccessRule() != null) {
-                        boolean flag = node.getAccessRule().accessRule(Collections.emptyMap());
+                        boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
                         if (!flag) {
                             ignoreEqualAfterNode(node);
@@ -413,7 +451,7 @@ public class Flow extends BaseModel {
     public List<NotifyDTO> calibrateFlow(Flow flow) {
         List<NotifyDTO> notifyNodeList = new ArrayList<>();
         Map<String, Node> nodeMap = flow.getNodes().stream()
-            .collect(Collectors.toMap(Node::getName, Function.identity()));
+                .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
             if (standardNode.getStatus() == NodeStatusEnum.IGNORE && node.getStatus() != NodeStatusEnum.IGNORE) {

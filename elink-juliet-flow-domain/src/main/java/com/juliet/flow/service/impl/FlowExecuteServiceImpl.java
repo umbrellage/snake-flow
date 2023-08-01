@@ -5,7 +5,7 @@ import static java.util.stream.Collectors.toCollection;
 
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
-import com.juliet.flow.client.callback.MsgNotifyCallback;
+import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
@@ -26,13 +26,11 @@ import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowExecuteService;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -47,7 +45,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -97,7 +94,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         Node node = flow.startNode();
-        flow.modifyNextNodeStatus(node.getId());
+        flow.modifyNextNodeStatus(node.getId(), dto.getData());
         flow.validate();
         flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flow.getId());
@@ -182,6 +179,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .orElseThrow(() -> new ServiceException("当前用户没有操作权限"));
         }
         return node.toNodeVo(flow);
+    }
+
+    @Override
+    public List<String> customerStatus(String code, Long tenantId) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code, tenantId);
+        return flowTemplate.getNodes().stream()
+            .map(Node::getCustomStatus)
+            .filter(StringUtils::isNotBlank).distinct()
+            .collect(Collectors.toList());
     }
 
 
@@ -329,7 +335,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .values());
 
         for (Node node : nodeList) {
-            task(mainFlow.getId(), node.getId(), node.getProcessedBy());
+            task(mainFlow.getId(), node.getId(), node.getProcessedBy(), dto.getData());
         }
     }
 
@@ -351,7 +357,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void task(Long flowId, Long nodeId, Long userId) {
+    public synchronized void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null || flow.hasParentFlow()) {
             log.error("流程存在异常{}", JSON.toJSONString(flow));
@@ -363,6 +369,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         calibrateFlowList.add(flow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
+        boolean end = false;
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
@@ -382,7 +389,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 Flow subFlow = flow.subFlow();
                 subFlow.modifyNodeStatus(node);
                 Node subNode = subFlow.findNode(node.getName());
-                subFlow.modifyNextNodeStatus(subNode.getId());
+                subFlow.modifyNextNodeStatus(subNode.getId(), data);
                 syncFlow(calibrateFlowList, subFlow);
                 flowRepository.add(subFlow);
                 // 发送消息提醒
@@ -395,16 +402,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                flow.modifyNextNodeStatus(nodeId);
+                flow.modifyNextNodeStatus(nodeId, data);
                 syncFlow(calibrateFlowList, flow);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
+                    end = true;
                     flow.setStatus(FlowStatusEnum.END);
                     exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
                     exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
+                    log.info("流程结束发送通知");
                 }
                 flowRepository.update(flow);
                 // 发送消息提醒
+                if (end) {
+                    callback(Collections.singletonList(flow.flowEndNotify()));
+                }
                 callback(flow.normalNotifyList());
                 callback(Collections.singletonList(node.toNotifyComplete(flow)));
             }
@@ -421,17 +433,22 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
                 throw new ServiceException("该节点未被认领");
             }
-            errorFlow.modifyNextNodeStatus(nodeId);
+            errorFlow.modifyNextNodeStatus(nodeId, data);
             syncFlow(calibrateFlowList, errorFlow);
-
             if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
                 flow.setStatus(FlowStatusEnum.END);
                 exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
                 exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
                 flow.setStatus(FlowStatusEnum.END);
                 flowRepository.update(flow);
+                end = true;
+                log.info("流程结束发送通知");
             } else {
                 flowRepository.update(errorFlow);
+            }
+
+            if (end) {
+                callback(Collections.singletonList(flow.flowEndNotify()));
             }
             // 异步发送消息提醒
             callback(errorFlow.normalNotifyList());

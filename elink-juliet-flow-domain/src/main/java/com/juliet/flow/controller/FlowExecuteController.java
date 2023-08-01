@@ -22,6 +22,8 @@ import com.juliet.flow.service.FlowExecuteService;
 import com.juliet.flow.service.FlowManagerService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -63,6 +65,11 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<Void> forward(NodeFieldDTO dto) {
         flowExecuteService.forward(dto);
         return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<List<String>> customerStatus(FlowOpenDTO dto) {
+        return AjaxResult.success(flowExecuteService.customerStatus(dto.getCode(), dto.getTenantId()));
     }
 
     @Override
@@ -113,7 +120,7 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("执行一个节点任务")
     @Override
     public AjaxResult<Void> task(TaskDTO dto) {
-        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId());
+        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId(), Collections.emptyMap());
         return AjaxResult.success();
     }
 
@@ -126,7 +133,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("获取流程")
     @Override
-    public AjaxResult<FlowVO> flow(FlowIdDTO dto) {
+    public AjaxResult<FlowVO> flow(@RequestBody FlowIdDTO dto) {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
         return AjaxResult.success(flowVO);
     }
