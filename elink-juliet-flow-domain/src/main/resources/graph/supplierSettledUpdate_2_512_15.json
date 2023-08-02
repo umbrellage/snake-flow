@@ -1,0 +1,585 @@
+{
+  "nodes": [
+    {
+      "id": "供应商提交",
+      "type": "rect",
+      "x": 350,
+      "y": 170,
+      "properties": {
+      },
+      "text": {
+        "x": 350,
+        "y": 170,
+        "value": "供应商提交"
+      }
+    },
+    {
+      "id": "资料初审",
+      "type": "rect",
+      "x": 500,
+      "y": 170,
+      "properties": {
+        "text": "资料初审",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 500,
+        "y": 170,
+        "value": "资料初审"
+      }
+    },
+    {
+      "id": "供应商补充信息",
+      "type": "rect",
+      "x": 650,
+      "y": 170,
+      "properties": {
+        "text": "供应商补充信息",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 650,
+        "y": 170,
+        "value": "供应商补充信息"
+      }
+    },
+    {
+      "id": "资质要求",
+      "type": "rect",
+      "x": 840,
+      "y": -10,
+      "properties": {
+        "text": "资质要求",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 840,
+        "y": -10,
+        "value": "资质要求"
+      }
+    },
+    {
+      "id": "业务部评估",
+      "type": "rect",
+      "x": 840,
+      "y": 110,
+      "properties": {
+        "text": "业务部评估",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 840,
+        "y": 110,
+        "value": "业务部评估"
+      }
+    },
+    {
+      "id": "品质部评估",
+      "type": "rect",
+      "x": 840,
+      "y": 230,
+      "properties": {
+        "text": "品质部评估",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 840,
+        "y": 230,
+        "value": "品质部评估"
+      }
+    },
+    {
+      "id": "财务部评估",
+      "type": "rect",
+      "x": 840,
+      "y": 360,
+      "properties": {
+        "text": "财务部评估",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 840,
+        "y": 360,
+        "value": "财务部评估"
+      }
+    },
+    {
+      "id": "总经理审核",
+      "type": "rect",
+      "x": 1050,
+      "y": 180,
+      "properties": {
+        "text": "总经理审核",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 1050,
+        "y": 180,
+        "value": "总经理审核"
+      }
+    },
+    {
+      "id": "end",
+      "type": "rect",
+      "x": 1200,
+      "y": 180,
+      "properties": {
+        "text": "结束",
+        "name": "",
+        "region": "",
+        "type": "",
+        "a": {
+          "a1": "",
+          "a2": ""
+        }
+      },
+      "text": {
+        "x": 1200,
+        "y": 180,
+        "value": "结束"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "b9ffaa4b-6598-4ad5-9074-06fdca72ce28",
+      "type": "polyline",
+      "sourceNodeId": "供应商提交",
+      "targetNodeId": "资料初审",
+      "startPoint": {
+        "x": 400,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 450,
+        "y": 170
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 400,
+          "y": 170
+        },
+        {
+          "x": 430,
+          "y": 170
+        },
+        {
+          "x": 430,
+          "y": 170
+        },
+        {
+          "x": 420,
+          "y": 170
+        },
+        {
+          "x": 420,
+          "y": 170
+        },
+        {
+          "x": 450,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "id": "204e68c2-ec85-4fd1-be09-aacc6b4300b8",
+      "type": "polyline",
+      "sourceNodeId": "资料初审",
+      "targetNodeId": "供应商补充信息",
+      "startPoint": {
+        "x": 550,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 600,
+        "y": 170
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 550,
+          "y": 170
+        },
+        {
+          "x": 580,
+          "y": 170
+        },
+        {
+          "x": 580,
+          "y": 170
+        },
+        {
+          "x": 570,
+          "y": 170
+        },
+        {
+          "x": 570,
+          "y": 170
+        },
+        {
+          "x": 600,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "id": "24a4bfa8-2f2d-4cdc-82de-47ca1fd30a26",
+      "type": "polyline",
+      "sourceNodeId": "总经理审核",
+      "targetNodeId": "end",
+      "startPoint": {
+        "x": 1100,
+        "y": 180
+      },
+      "endPoint": {
+        "x": 1150,
+        "y": 180
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 1100,
+          "y": 180
+        },
+        {
+          "x": 1130,
+          "y": 180
+        },
+        {
+          "x": 1130,
+          "y": 180
+        },
+        {
+          "x": 1120,
+          "y": 180
+        },
+        {
+          "x": 1120,
+          "y": 180
+        },
+        {
+          "x": 1150,
+          "y": 180
+        }
+      ]
+    },
+    {
+      "id": "705c3619-a15a-4d7d-b8fe-344f8730fa77",
+      "type": "polyline",
+      "sourceNodeId": "供应商补充信息",
+      "targetNodeId": "资质要求",
+      "startPoint": {
+        "x": 700,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 790,
+        "y": -10
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 700,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": -10
+        },
+        {
+          "x": 790,
+          "y": -10
+        }
+      ]
+    },
+    {
+      "id": "a087710e-2a78-4b43-869c-a88d7e71cd28",
+      "type": "polyline",
+      "sourceNodeId": "供应商补充信息",
+      "targetNodeId": "业务部评估",
+      "startPoint": {
+        "x": 700,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 790,
+        "y": 110
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 700,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 110
+        },
+        {
+          "x": 790,
+          "y": 110
+        }
+      ]
+    },
+    {
+      "id": "7fdc150e-128e-4198-bd93-a31bd9eec5bb",
+      "type": "polyline",
+      "sourceNodeId": "供应商补充信息",
+      "targetNodeId": "品质部评估",
+      "startPoint": {
+        "x": 700,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 790,
+        "y": 230
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 700,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 230
+        },
+        {
+          "x": 790,
+          "y": 230
+        }
+      ]
+    },
+    {
+      "id": "6e73025b-f8d2-4bf7-b020-a7b4b2d8609f",
+      "type": "polyline",
+      "sourceNodeId": "供应商补充信息",
+      "targetNodeId": "财务部评估",
+      "startPoint": {
+        "x": 700,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 790,
+        "y": 360
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 700,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 170
+        },
+        {
+          "x": 745,
+          "y": 360
+        },
+        {
+          "x": 790,
+          "y": 360
+        }
+      ]
+    },
+    {
+      "id": "5b5e1211-e1b4-46e6-883b-abbbc37cc86a",
+      "type": "polyline",
+      "sourceNodeId": "财务部评估",
+      "targetNodeId": "总经理审核",
+      "startPoint": {
+        "x": 890,
+        "y": 360
+      },
+      "endPoint": {
+        "x": 1000,
+        "y": 180
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 890,
+          "y": 360
+        },
+        {
+          "x": 970,
+          "y": 360
+        },
+        {
+          "x": 970,
+          "y": 180
+        },
+        {
+          "x": 1000,
+          "y": 180
+        }
+      ]
+    },
+    {
+      "id": "7bd3b2bd-681b-4eb3-a1ac-7a62de9b6f55",
+      "type": "polyline",
+      "sourceNodeId": "品质部评估",
+      "targetNodeId": "总经理审核",
+      "startPoint": {
+        "x": 890,
+        "y": 230
+      },
+      "endPoint": {
+        "x": 1000,
+        "y": 180
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 890,
+          "y": 230
+        },
+        {
+          "x": 970,
+          "y": 230
+        },
+        {
+          "x": 970,
+          "y": 180
+        },
+        {
+          "x": 1000,
+          "y": 180
+        }
+      ]
+    },
+    {
+      "id": "3001c2c9-ec7a-4aba-90b7-6b79ee0b6038",
+      "type": "polyline",
+      "sourceNodeId": "业务部评估",
+      "targetNodeId": "总经理审核",
+      "startPoint": {
+        "x": 890,
+        "y": 110
+      },
+      "endPoint": {
+        "x": 1000,
+        "y": 180
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 890,
+          "y": 110
+        },
+        {
+          "x": 970,
+          "y": 110
+        },
+        {
+          "x": 970,
+          "y": 180
+        },
+        {
+          "x": 1000,
+          "y": 180
+        }
+      ]
+    },
+    {
+      "id": "afd6e1d3-4394-4fe6-9c05-dc0aea3c63c1",
+      "type": "polyline",
+      "sourceNodeId": "资质要求",
+      "targetNodeId": "总经理审核",
+      "startPoint": {
+        "x": 890,
+        "y": -10
+      },
+      "endPoint": {
+        "x": 1000,
+        "y": 180
+      },
+      "properties": {
+      },
+      "pointsList": [
+        {
+          "x": 890,
+          "y": -10
+        },
+        {
+          "x": 970,
+          "y": -10
+        },
+        {
+          "x": 970,
+          "y": 180
+        },
+        {
+          "x": 1000,
+          "y": 180
+        }
+      ]
+    }
+  ]
+}
