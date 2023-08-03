@@ -152,7 +152,10 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
-        ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
+        if (CollectionUtils.isNotEmpty(form.getFields())) {
+            ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
+        }
+
         ret.setSupervisorIds(supervisorIds);
         ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
