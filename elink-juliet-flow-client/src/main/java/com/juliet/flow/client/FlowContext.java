@@ -3,6 +3,7 @@ package com.juliet.flow.client;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
+import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,5 +67,29 @@ public class FlowContext {
         } finally {
             clean();
         }
+    }
+
+    public static Long submit(String templateCode, Long userId, Long tenantId, Map<String, Object> data) {
+        try {
+            BpmDTO bpmDTO = new BpmDTO();
+            bpmDTO.setTemplateCode(templateCode);
+            bpmDTO.setUserId(userId);
+            bpmDTO.setTenantId(tenantId);
+            if (data != null && data.size() > 0) {
+                bpmDTO.setData(data);
+            }
+            AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
+            if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
+                log.error("juliet flow init error! response:{}", initResult);
+                throw new RuntimeException("juliet flow init error!");
+            }
+            return initResult.getData();
+        } finally {
+            clean();
+        }
+    }
+
+    public static Long submit(String templateCode, Long userId, Long tenantId) {
+        return submit(templateCode, userId, tenantId, null);
     }
 }
