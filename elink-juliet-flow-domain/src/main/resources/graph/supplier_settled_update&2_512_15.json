@@ -2,7 +2,7 @@
   "nodes": [
     {
       "id": "供应商提交",
-      "type": "rect",
+      "type": "flowNode",
       "x": 350,
       "y": 170,
       "properties": {
@@ -15,7 +15,7 @@
     },
     {
       "id": "资料初审",
-      "type": "rect",
+      "type": "flowNode",
       "x": 500,
       "y": 170,
       "properties": {
@@ -36,7 +36,7 @@
     },
     {
       "id": "供应商补充信息",
-      "type": "rect",
+      "type": "flowNode",
       "x": 650,
       "y": 170,
       "properties": {
@@ -57,7 +57,7 @@
     },
     {
       "id": "资质要求",
-      "type": "rect",
+      "type": "flowNode",
       "x": 840,
       "y": -10,
       "properties": {
@@ -78,7 +78,7 @@
     },
     {
       "id": "业务部评估",
-      "type": "rect",
+      "type": "flowNode",
       "x": 840,
       "y": 110,
       "properties": {
@@ -99,7 +99,7 @@
     },
     {
       "id": "品质部评估",
-      "type": "rect",
+      "type": "flowNode",
       "x": 840,
       "y": 230,
       "properties": {
@@ -120,7 +120,7 @@
     },
     {
       "id": "财务部评估",
-      "type": "rect",
+      "type": "flowNode",
       "x": 840,
       "y": 360,
       "properties": {
@@ -141,7 +141,7 @@
     },
     {
       "id": "总经理审核",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1050,
       "y": 180,
       "properties": {
@@ -162,7 +162,7 @@
     },
     {
       "id": "end",
-      "type": "rect",
+      "type": "flowNode",
       "x": 1200,
       "y": 180,
       "properties": {
