@@ -100,6 +100,8 @@ public class Node extends BaseModel {
     private Long processedBy;
     private LocalDateTime processedTime;
 
+    private String remark;
+
     public boolean ifLeaderAdjust(Long userId) {
         // userId为null或者为0说明不是主管调整处理人，放行不需要校验
         if (userId == null || userId == 0L) {
@@ -376,7 +378,7 @@ public class Node extends BaseModel {
             data.setPreprocessedBy(preProcessedBy);
         }
         data.setTenantId(getTenantId());
-
+        data.setRemark(remark);
         return data;
     }
 

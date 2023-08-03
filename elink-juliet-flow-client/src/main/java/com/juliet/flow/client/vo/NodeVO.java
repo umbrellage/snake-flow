@@ -80,6 +80,8 @@ public class NodeVO {
      */
     private Long processedBy;
 
+    private String remark;
+
     @JsonSerialize(using = DateTime2String.class)
     @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;
@@ -90,6 +92,7 @@ public class NodeVO {
         ret.setName(name);
         ret.setFlowId(flowId);
         ret.setProcessedBy(processedBy);
+
         return ret;
     }
 

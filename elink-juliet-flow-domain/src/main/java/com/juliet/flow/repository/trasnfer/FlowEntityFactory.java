@@ -282,6 +282,7 @@ public class FlowEntityFactory {
         Date now = new Date();
         nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
         nodeEntity.setUpdateTime(node.getUpdateTime() == null ? now : node.getUpdateTime());
+        nodeEntity.setRemark(node.getRemark());
         return nodeEntity;
     }
 
@@ -338,6 +339,7 @@ public class FlowEntityFactory {
         node.setProcessedTime(JulietTimeMemo.toDateTime(nodeEntity.getUpdateTime()));
         node.setCreateTime(nodeEntity.getCreateTime());
         node.setUpdateTime(nodeEntity.getUpdateTime());
+        node.setRemark(nodeEntity.getRemark());
         return node;
     }
 
