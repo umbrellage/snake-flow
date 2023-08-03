@@ -29,4 +29,5 @@ public class NotifyDTO {
     private List<ProcessedByVO> preprocessedBy;
     private Long tenantId;
     private String remark;
+
 }
