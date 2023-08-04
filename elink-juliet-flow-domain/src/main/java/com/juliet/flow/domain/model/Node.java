@@ -213,6 +213,9 @@ public class Node extends BaseModel {
 
 
     public List<String> postIdList() {
+        if (CollectionUtils.isEmpty(bindPosts)) {
+            return Collections.emptyList();
+        }
         return bindPosts.stream()
             .map(Post::getPostId)
             .collect(Collectors.toList());
