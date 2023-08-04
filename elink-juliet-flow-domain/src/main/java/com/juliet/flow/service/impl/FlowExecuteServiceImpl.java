@@ -23,9 +23,11 @@ import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
+import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
+import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowExecuteService;
 
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Autowired
     private List<MsgNotifyCallback> msgNotifyCallbacks;
+    @Autowired
+    private HistoryRepository historyRepository;
 
     @Override
     public NodeVO queryStartNodeById(FlowOpenDTO dto) {
@@ -203,14 +207,17 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
     }
 
-    private void rollback(TaskExecute dto) {
+    @Transactional(rollbackFor = Exception.class)
+    public void rollback(TaskExecute dto) {
         RollbackDTO rollback = (RollbackDTO) dto;
         Flow flow = flowRepository.queryById(rollback.getFlowId());
         if (flow == null) {
             throw new ServiceException("流程不存在，检查下流程id");
         }
-        flow.rollback(rollback);
+        Node node = flow.rollback(rollback);
         flowRepository.update(flow);
+        History history = History.of(rollback, node.getId(), node.getTenantId());
+        historyRepository.add(history);
     }
 
 

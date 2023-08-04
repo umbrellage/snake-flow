@@ -125,12 +125,5 @@ public interface JulietFlowClient {
     @GetMapping("/graph")
     AjaxResult<GraphVO> graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
 
-    /**
-     * 获取流程信息
-     * @param dto
-     * @return
-     */
-    @PostMapping("/bpm/execute")
-    AjaxResult<Void> execute(@RequestBody TaskExecute dto);
 
 }

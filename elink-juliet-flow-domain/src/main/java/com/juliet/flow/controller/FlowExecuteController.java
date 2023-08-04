@@ -150,12 +150,6 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(flowManagerService.getGraph(id, userId));
     }
 
-    @Override
-    public AjaxResult<Void> execute(TaskExecute dto) {
-        flowExecuteService.execute(dto);
-        return AjaxResult.success();
-    }
-
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
         if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {
