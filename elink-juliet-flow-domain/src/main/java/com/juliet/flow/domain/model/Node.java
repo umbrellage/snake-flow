@@ -416,4 +416,16 @@ public class Node extends BaseModel {
         return node;
     }
 
+    public NotifyDTO delete(Flow flow) {
+        NotifyDTO data = new NotifyDTO();
+        data.setNodeId(id);
+        data.setCode(flow.getTemplateCode());
+        data.setType(NotifyTypeEnum.DELETE);
+        data.setTenantId(flow.getTenantId());
+        data.setFlowId(flowId);
+        return data;
+    }
+
+
+
 }

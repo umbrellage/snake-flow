@@ -6,6 +6,7 @@ import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
+import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -45,4 +46,6 @@ public interface FlowExecuteService {
     NodeVO findNodeByFlowIdAndNodeId(TaskDTO dto);
 
     List<String> customerStatus(String code, Long tenantId);
+
+    void execute(TaskExecute dto);
 }

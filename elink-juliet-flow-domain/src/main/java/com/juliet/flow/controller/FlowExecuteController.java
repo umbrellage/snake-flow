@@ -152,7 +152,8 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @Override
     public AjaxResult<Void> execute(TaskExecute dto) {
-        return null;
+        flowExecuteService.execute(dto);
+        return AjaxResult.success();
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
