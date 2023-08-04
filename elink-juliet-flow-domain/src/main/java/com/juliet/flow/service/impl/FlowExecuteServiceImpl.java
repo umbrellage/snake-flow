@@ -11,7 +11,9 @@ import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskDTO;
+import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -188,6 +190,27 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .map(Node::getCustomStatus)
             .filter(StringUtils::isNotBlank).distinct()
             .collect(Collectors.toList());
+    }
+
+    @Override
+    public void execute(TaskExecute dto) {
+        switch (dto.getTaskType()) {
+            case ROLLBACK:
+                rollback(dto);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void rollback(TaskExecute dto) {
+        RollbackDTO rollback = (RollbackDTO) dto;
+        Flow flow = flowRepository.queryById(rollback.getFlowId());
+        if (flow == null) {
+            throw new ServiceException("流程不存在，检查下流程id");
+        }
+        flow.rollback(rollback);
+        flowRepository.update(flow);
     }
 
 
