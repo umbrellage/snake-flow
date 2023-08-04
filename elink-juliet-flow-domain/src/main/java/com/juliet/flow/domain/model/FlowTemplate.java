@@ -46,7 +46,8 @@ public class FlowTemplate extends BaseModel {
             .filter(node -> node.getType().equals(NodeTypeEnum.START))
             .findAny()
             .orElseThrow(() -> new ServiceException("找不到开始节点"));
-        start.setStatus(NodeStatusEnum.PROCESSED);
+//        start.setStatus(NodeStatusEnum.PROCESSED);
+        start.setStatus(NodeStatusEnum.ACTIVE);
         start.setProcessedTime(LocalDateTime.now());
         start.setProcessedBy(userId);
         flow.setNodes(nodes);

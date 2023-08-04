@@ -92,6 +92,11 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(flowId);
     }
 
+    @Override
+    public AjaxResult<Long> initBmpOnlyFlow(BpmDTO dto) {
+        return null;
+    }
+
     @ApiOperation("获取当前流程所在的节点")
     @Override
     public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {

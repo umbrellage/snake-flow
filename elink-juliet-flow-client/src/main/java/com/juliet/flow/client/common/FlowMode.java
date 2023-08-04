@@ -7,5 +7,7 @@ package com.juliet.flow.client.common;
 public enum FlowMode {
 
     AUTO,
-    MANUAL;
+    MANUAL,
+    ONLY_FLOW,
+    ;
 }

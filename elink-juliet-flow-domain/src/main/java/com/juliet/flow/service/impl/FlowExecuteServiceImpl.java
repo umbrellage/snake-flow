@@ -109,6 +109,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
+    public Long startOnlyFlow(BpmDTO dto) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
+        if (flowTemplate == null) {
+            throw new ServiceException("流程模版不存在");
+        }
+        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
+        flow.validate();
+        flowRepository.add(flow);
+        Flow dbFlow = flowRepository.queryById(flow.getId());
+        callback(dbFlow.normalNotifyList());
+        return flow.getId();
+    }
+
+    @Override
     public boolean flowEnd(Long flowId) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null) {

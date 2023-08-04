@@ -54,6 +54,14 @@ public interface JulietFlowClient {
     AjaxResult<Long> initBmp(@RequestBody BpmDTO dto);
 
     /**
+     * 发起一个新的流程
+     * @param dto templateId 必填
+     * @return 流程实例id
+     */
+    @PostMapping("/init/bpm/onlyFlow")
+    AjaxResult<Long> initBmpOnlyFlow(@RequestBody BpmDTO dto);
+
+    /**
      * 获取当前所在的节点
      * @param dto flowId 必填
      *

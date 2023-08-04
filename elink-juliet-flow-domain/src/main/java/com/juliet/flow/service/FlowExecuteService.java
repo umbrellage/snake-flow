@@ -23,6 +23,8 @@ public interface FlowExecuteService {
 
     Long startFlow(BpmDTO dto);
 
+    Long startOnlyFlow(BpmDTO dto);
+
     boolean flowEnd(Long flowId);
 
     void forward(NodeFieldDTO dto);
