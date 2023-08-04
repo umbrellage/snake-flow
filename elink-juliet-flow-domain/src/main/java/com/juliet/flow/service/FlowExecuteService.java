@@ -4,6 +4,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.TaskExecute;
@@ -50,4 +51,6 @@ public interface FlowExecuteService {
     List<String> customerStatus(String code, Long tenantId);
 
     void execute(TaskExecute dto);
+
+    void invalid(InvalidDTO dto);
 }

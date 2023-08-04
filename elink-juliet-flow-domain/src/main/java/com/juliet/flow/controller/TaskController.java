@@ -1,6 +1,7 @@
 package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
@@ -26,6 +27,13 @@ public class TaskController {
     @PostMapping("/bpm/rollback")
     public AjaxResult<Void> rollback(@RequestBody RollbackDTO dto) {
         flowExecuteService.execute(dto);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("作废")
+    @PostMapping("/bpm/invalid")
+    public AjaxResult<Void> invalid(@RequestBody InvalidDTO dto) {
+        flowExecuteService.invalid(dto);
         return AjaxResult.success();
     }
 

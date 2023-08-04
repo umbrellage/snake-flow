@@ -48,9 +48,9 @@ public class History {
 
     public static History of(RollbackDTO dto, Long targetNodeId, Long tenantId) {
         History data = new History();
-        data.setFlowId(dto.getFlowId());
+        data.setFlowId(Long.valueOf(dto.getFlowId()));
         data.setAction(OperateTypeEnum.ROLLBACK.getCode());
-        data.setSourceNodeId(dto.getNodeId());
+        data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
         data.setComment(dto.getReason());

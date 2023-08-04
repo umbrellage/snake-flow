@@ -9,6 +9,7 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
@@ -221,10 +222,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
     }
 
+    @Override
+    public void invalid(InvalidDTO dto) {
+        // TODO: 2023/8/4
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public void rollback(TaskExecute dto) {
         RollbackDTO rollback = (RollbackDTO) dto;
-        Flow flow = flowRepository.queryById(rollback.getFlowId());
+        Flow flow = flowRepository.queryById(Long.valueOf(rollback.getFlowId()));
         if (flow == null) {
             throw new ServiceException("流程不存在，检查下流程id");
         }

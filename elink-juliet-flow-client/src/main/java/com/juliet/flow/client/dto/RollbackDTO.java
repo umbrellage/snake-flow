@@ -13,8 +13,8 @@ import lombok.Data;
 @Data
 public class RollbackDTO implements TaskExecute {
     private final OperateTypeEnum taskType = OperateTypeEnum.ROLLBACK;
-    private Long flowId;
-    private Long nodeId;
+    private String flowId;
+    private String nodeId;
     /**
      * 操作人
      */
