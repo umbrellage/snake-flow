@@ -23,8 +23,4 @@ public class BrandAssignRule extends BaseAssignRule {
         return null;
     }
 
-    @Override
-    public AssignSupplier getAssignSupplier(Map<String, Object> params, Flow flow) {
-        return null;
-    }
 }
