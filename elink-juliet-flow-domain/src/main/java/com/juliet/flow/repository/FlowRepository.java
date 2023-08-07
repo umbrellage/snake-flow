@@ -55,7 +55,7 @@ public interface FlowRepository {
 
     List<Node> listNode(NodeQuery query);
 
-    List<Node> listNode(List<Long> supplierId);
+    List<Node> listNode(Long supplierId, String supplierType);
 
     Node queryNodeById(Long nodeId);
 
