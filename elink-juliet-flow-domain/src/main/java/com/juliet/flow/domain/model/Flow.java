@@ -404,7 +404,6 @@ public class Flow extends BaseModel {
                         || handledNode.getStatus() == NodeStatusEnum.IGNORE);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
-                    // FIXME: 2023/6/15 传入参数
                     if (node.getAccessRule() != null) {
                         boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
@@ -417,8 +416,7 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        // FIXME: 2023/6/16 传入参数
-                        node.regularDistribution(Collections.emptyMap(), this);
+                        node.regularDistribution(param, this);
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         } else {
