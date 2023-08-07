@@ -427,7 +427,7 @@ public class FlowEntityFactory {
     }
 
     public static void fillNodeSupplier(List<Node> nodes, List<SupplierEntity> supplierEntities) {
-        if (CollectionUtils.isEmpty(nodes)) {
+        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(supplierEntities)) {
             return;
         }
         for (Node node : nodes) {
