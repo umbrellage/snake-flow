@@ -14,6 +14,7 @@ import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.trasnfer.FlowEntityFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -277,12 +278,14 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
-    public List<Node> listNode(List<Long> supplierId) {
-        if (CollectionUtils.isEmpty(supplierId)) {
+    public List<Node> listNode(Long supplierId, String supplierType) {
+        if (supplierId == null || StringUtils.isBlank(supplierType)) {
             return Collections.emptyList();
         }
         List<Long> nodeIdList = supplierDao.selectList(
-                Wrappers.<SupplierEntity>lambdaQuery().in(SupplierEntity::getSupplierId, supplierId))
+                Wrappers.<SupplierEntity>lambdaQuery().eq(SupplierEntity::getSupplierId, supplierId)
+                    .eq(SupplierEntity::getSupplierType, supplierType)
+            )
             .stream()
             .map(SupplierEntity::getNodeId)
             .collect(Collectors.toList());
