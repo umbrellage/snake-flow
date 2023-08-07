@@ -22,4 +22,9 @@ public class BrandAssignRule extends BaseAssignRule {
     public Long getAssignUserId(Map<String, Object> params, Flow flow) {
         return null;
     }
+
+    @Override
+    public AssignSupplier getAssignSupplier(Map<String, Object> params, Flow flow) {
+        return null;
+    }
 }

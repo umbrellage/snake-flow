@@ -28,4 +28,9 @@ public class InitiateAssignRule extends BaseAssignRule {
         Node node = flow.startNode();
         return node.getProcessedBy();
     }
+
+    @Override
+    public AssignSupplier getAssignSupplier(Map<String, Object> params, Flow flow) {
+        return null;
+    }
 }
