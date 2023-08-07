@@ -57,6 +57,6 @@ public interface FlowRepository {
 
     Node queryNodeById(Long nodeId);
 
-
+    void deleteFlow(Long id);
 
 }

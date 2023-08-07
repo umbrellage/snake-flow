@@ -491,7 +491,7 @@ public class Flow extends BaseModel {
             throw new ServiceException("都到开始节点了，你还想退回？想啥呢");
         }
         // 上一个节点
-        if (dto.getRollbackType() == 0) {
+        if (dto.getRollbackType() == 1) {
             List<Node> notifyNode = node.preNameList().stream()
                 .map(this::findNode)
                 .peek(preNode -> preNode.setStatus(NodeStatusEnum.ACTIVE))
@@ -500,7 +500,7 @@ public class Flow extends BaseModel {
             return notifyNode.get(0);
         }
         // 发起节点
-        if (dto.getRollbackType() == 1) {
+        if (dto.getRollbackType() == 0) {
             nodes.forEach(thisNode -> thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE));
             this.startNode().setStatus(NodeStatusEnum.ACTIVE);
             return startNode();

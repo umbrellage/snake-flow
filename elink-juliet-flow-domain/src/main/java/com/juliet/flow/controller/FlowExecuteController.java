@@ -92,6 +92,11 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(flowId);
     }
 
+    @Override
+    public AjaxResult<Long> initBmpOnlyFlow(BpmDTO dto) {
+        return AjaxResult.success(flowExecuteService.startOnlyFlow(dto));
+    }
+
     @ApiOperation("获取当前流程所在的节点")
     @Override
     public AjaxResult<List<NodeVO>> currentNodeList(FlowIdDTO dto) {
@@ -148,12 +153,6 @@ public class FlowExecuteController implements JulietFlowClient {
     @Override
     public AjaxResult<GraphVO> graph(Long id, Long userId) {
         return AjaxResult.success(flowManagerService.getGraph(id, userId));
-    }
-
-    @Override
-    public AjaxResult<Void> execute(TaskExecute dto) {
-        flowExecuteService.execute(dto);
-        return AjaxResult.success();
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {

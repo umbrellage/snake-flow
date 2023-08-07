@@ -281,6 +281,19 @@ public class FlowRepositoryImpl implements FlowRepository {
         return FlowEntityFactory.toSingleNode(nodeDao.selectById(nodeId));
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void deleteFlow(Long id) {
+        flowDao.deleteById(id);
+        flowDao.delete(Wrappers.<FlowEntity>lambdaQuery().eq(FlowEntity::getParentId, id));
+        List<Long> idList = flowDao.selectList(
+                        Wrappers.<FlowEntity>lambdaQuery().select(FlowEntity::getId).eq(FlowEntity::getParentId, id))
+                .stream()
+                .map(FlowEntity::getId)
+                .collect(Collectors.toList());
+        nodeDao.delete(Wrappers.<NodeEntity>lambdaQuery().in(NodeEntity::getFlowId, idList));
+    }
+
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
@@ -355,11 +368,13 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
                 .in(NodeEntity::getFlowId, flowIdList)
         );
-        Map<Long, List<NodeEntity>> nodeMap = nodeEntityList.stream().collect(Collectors.groupingBy(NodeEntity::getFlowId));
+        Map<Long, List<NodeEntity>> nodeMap = nodeEntityList.stream()
+                .collect(Collectors.groupingBy(NodeEntity::getFlowId));
         List<Long> nodeIdList = nodeEntityList.stream().map(NodeEntity::getId).collect(Collectors.toList());
 
-        Future<List<PostEntity>> futurePostEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() -> postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
-                .in(PostEntity::getNodeId, nodeIdList)));
+        Future<List<PostEntity>> futurePostEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
+                () -> postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
+                        .in(PostEntity::getNodeId, nodeIdList)));
 
         Future<List<SupplierEntity>> futureSupplierEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() -> supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
                 .in(SupplierEntity::getNodeId, nodeIdList)));
@@ -388,7 +403,6 @@ public class FlowRepositoryImpl implements FlowRepository {
                     return flow;
                 })
                 .collect(Collectors.toList());
-
     }
 
     private List<FieldEntity> parallelBatchQueryFieldEntities(List<Long> formIdList) {
@@ -396,8 +410,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<List<Long>> parts = Lists.partition(formIdList, batchSize);
         List<Future<List<FieldEntity>>> futures = new ArrayList<>();
         for (List<Long> part : parts) {
-            Future<List<FieldEntity>> futureFieldEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() -> fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
-                    .in(FieldEntity::getFormId, part)));
+            Future<List<FieldEntity>> futureFieldEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
+                    () -> fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
+                            .in(FieldEntity::getFormId, part)));
             futures.add(futureFieldEntities);
         }
         List<FieldEntity> fieldEntities = new ArrayList<>();

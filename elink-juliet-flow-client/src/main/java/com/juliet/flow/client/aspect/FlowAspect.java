@@ -19,11 +19,14 @@ import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.juliet.flow.client.vo.FlowVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
+import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -109,19 +112,12 @@ public class FlowAspect {
             bpmInit = true;
             BpmDTO bpmDTO = toBpmDTO(julietFlowCode, userId, tenantId);
             if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
-                AjaxResult<Long> initResult = julietFlowClient.initBmp(bpmDTO);
-                if (!isSuccess(initResult)) {
-                    log.error("juliet flow init error! julietFlowCode:{}, response:{}", julietFlowCode, initResult);
-                    throw new RuntimeException("juliet flow init error!");
-                }
-                julietFlowId = initResult.getData();
-                if (julietFlowId == null) {
-                    log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
-                            julietFlowCode, initResult);
-                    throw new RuntimeException("juliet flow init error! flow id is null!");
-                }
-                log.info("juliet flow init success!");
-            } else {
+                julietFlowId = function(julietFlowClient::initBmp, bpmDTO);
+            }
+            if (julietFlowInterceptor.flowMode() == FlowMode.ONLY_FLOW) {
+                julietFlowId = function(julietFlowClient::initBmpOnlyFlow, bpmDTO);
+            }
+            if(julietFlowInterceptor.flowMode() == FlowMode.MANUAL) {
                 FlowContext.setClient(julietFlowClient, bpmDTO);
             }
         } else {
@@ -208,6 +204,22 @@ public class FlowAspect {
         nodeFieldDTO.setFlowId(julietFlowId);
         nodeFieldDTO.setUserId(userId);
         return nodeFieldDTO;
+    }
+
+    public Long function(Function<BpmDTO, AjaxResult<Long>> function, BpmDTO dto) {
+        AjaxResult<Long> result = function.apply(dto);
+        if (!isSuccess(result)) {
+            log.error("juliet flow init error! julietFlowCode:{}, response:{}", dto.getTemplateCode(), result);
+            throw new RuntimeException("juliet flow init error!");
+        }
+        Long julietFlowId = result.getData();
+        if (julietFlowId == null) {
+            log.error("juliet flow init error! julietFlowId is null! julietFlowCode:{}, response:{}",
+                dto.getTemplateCode(), result);
+            throw new RuntimeException("juliet flow init error! flow id is null!");
+        }
+        log.info("juliet flow init success!");
+        return julietFlowId;
     }
 
     private boolean responseIsSuccess(Object object) {

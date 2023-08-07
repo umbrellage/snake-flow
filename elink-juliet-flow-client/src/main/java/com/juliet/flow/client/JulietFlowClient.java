@@ -54,6 +54,14 @@ public interface JulietFlowClient {
     AjaxResult<Long> initBmp(@RequestBody BpmDTO dto);
 
     /**
+     * 发起一个新的流程
+     * @param dto templateId 必填
+     * @return 流程实例id
+     */
+    @PostMapping("/init/bpm/onlyFlow")
+    AjaxResult<Long> initBmpOnlyFlow(@RequestBody BpmDTO dto);
+
+    /**
      * 获取当前所在的节点
      * @param dto flowId 必填
      *
@@ -125,12 +133,5 @@ public interface JulietFlowClient {
     @GetMapping("/graph")
     AjaxResult<GraphVO> graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
 
-    /**
-     * 获取流程信息
-     * @param dto
-     * @return
-     */
-    @PostMapping("/bpm/execute")
-    AjaxResult<Void> execute(@RequestBody TaskExecute dto);
 
 }
