@@ -55,6 +55,8 @@ public interface FlowRepository {
 
     List<Node> listNode(NodeQuery query);
 
+    List<Node> listNode(List<Long> supplierId);
+
     Node queryNodeById(Long nodeId);
 
     void deleteFlow(Long id);

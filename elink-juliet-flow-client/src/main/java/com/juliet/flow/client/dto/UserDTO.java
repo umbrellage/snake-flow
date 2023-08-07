@@ -17,4 +17,5 @@ public class UserDTO {
     private Long userId;
     private Long tenantId;
     private List<Long> postId;
+    private List<Long> supplierId;
 }
