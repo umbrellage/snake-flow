@@ -318,7 +318,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
                 .collect(Collectors.toList());
         }
-        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
+        List<Node> supplierNodeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(dto.getSupplierId())) {
+            supplierNodeList = flowRepository.listNode(dto.getSupplierId()).stream()
+                .filter(node -> node.getProcessedBy() == null || node.getProcessedBy() == 0L)
+                .collect(Collectors.toList());;
+        }
+        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(Node::getFlowId)
             .distinct()
