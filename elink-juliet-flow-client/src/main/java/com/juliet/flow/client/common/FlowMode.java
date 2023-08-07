@@ -8,6 +8,5 @@ public enum FlowMode {
 
     AUTO,
     MANUAL,
-    ONLY_FLOW,
     ;
 }

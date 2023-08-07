@@ -114,9 +114,6 @@ public class FlowAspect {
             if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
                 julietFlowId = function(julietFlowClient::initBmp, bpmDTO);
             }
-            if (julietFlowInterceptor.flowMode() == FlowMode.ONLY_FLOW) {
-                julietFlowId = function(julietFlowClient::initBmpOnlyFlow, bpmDTO);
-            }
             if(julietFlowInterceptor.flowMode() == FlowMode.MANUAL) {
                 FlowContext.setClient(julietFlowClient, bpmDTO);
             }
