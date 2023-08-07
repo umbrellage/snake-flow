@@ -20,6 +20,13 @@ public class UserDTO {
     private List<Long> postId;
     private SupplierDTO supplier;
 
+    public static SupplierDTO of(String supplierType, Long supplierId) {
+        SupplierDTO dto = new SupplierDTO();
+        dto.setSupplierId(supplierId);
+        dto.setSupplierType(supplierType);
+        return dto;
+    }
+
     public String supplierType() {
         return supplier != null ? supplier.getSupplierType() : null;
     }
@@ -28,7 +35,7 @@ public class UserDTO {
         return supplier != null ? supplier.getSupplierId() : null;
     }
     @Data
-    class SupplierDTO {
+    static class SupplierDTO {
         private Long supplierId;
         private String supplierType;
     }
