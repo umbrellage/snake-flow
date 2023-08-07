@@ -20,11 +20,11 @@
 
     <insert id="insertBatch"  parameterType="com.juliet.flow.domain.entity.SupplierEntity">
         INSERT INTO <include refid="tableName" /> (
-        id, node_id, supplier_type, tenant_id, del_flag, create_time, update_time, create_by, update_by
+        id, node_id, supplier_type, supplier_id, tenant_id, del_flag, create_time, update_time, create_by, update_by
         )
         values
         <foreach collection="supplierEntities" item="entity" separator=",">
-            (#{entity.id}, #{entity.nodeId}, #{entity.supplierType}, #{entity.tenantId}, 0, #{entity.createTime}, #{entity.updateTime}, #{entity.createBy},#{entity.updateBy})
+            (#{entity.id}, #{entity.nodeId}, #{entity.supplierType}, #{entity.supplierId}, #{entity.tenantId}, 0, #{entity.createTime}, #{entity.updateTime}, #{entity.createBy},#{entity.updateBy})
         </foreach>
     </insert>
 

@@ -12,4 +12,6 @@ public class SupplierDTO {
     private String id;
 
     private String supplierType;
+
+    private String supplierId;
 }

@@ -162,6 +162,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         Supplier supplier = new Supplier();
         supplier.setId(supplierDTO.getId() == null ? null : Long.valueOf(supplierDTO.getId()));
         supplier.setSupplierType(supplierDTO.getSupplierType());
+        supplier.setSupplierId(Long.valueOf(supplierDTO.getSupplierId()));
         supplier.setCreateBy(createBy);
         supplier.setUpdateBy(updateBy);
         supplier.setTenantId(nodeTenantId);

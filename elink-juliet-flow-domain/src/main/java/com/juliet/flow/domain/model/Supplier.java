@@ -12,4 +12,6 @@ public class Supplier extends BaseModel {
     private Long id;
 
     private String supplierType;
+
+    private Long supplierId;
 }

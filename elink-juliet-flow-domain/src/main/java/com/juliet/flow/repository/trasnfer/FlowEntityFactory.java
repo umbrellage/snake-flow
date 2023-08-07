@@ -55,6 +55,11 @@ public class FlowEntityFactory {
                         bindPost.setId(null);
                     }
                 }
+                if (!CollectionUtils.isEmpty(node.getBindSuppliers())) {
+                    for (Supplier bindSupplier : node.getBindSuppliers()) {
+                        bindSupplier.setId(null);
+                    }
+                }
             });
         }
     }
@@ -227,6 +232,7 @@ public class FlowEntityFactory {
         }
         entity.setId(supplier.getId());
         entity.setSupplierType(supplier.getSupplierType());
+        entity.setSupplierId(supplier.getSupplierId());
         entity.setNodeId(nodeId);
         entity.setTenantId(tenantId);
         entity.setDelFlag(0);
@@ -318,9 +324,9 @@ public class FlowEntityFactory {
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
 
-        node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment().intValue() == 1);
-        node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment().intValue() == 1);
-        node.setRuleAssignment(nodeEntity.getRuleAssignment().intValue() == 1);
+        node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment() == 1);
+        node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment() == 1);
+        node.setRuleAssignment(nodeEntity.getRuleAssignment() == 1);
         node.setAccessRule(RuleFactory.getAccessRule(nodeEntity.getAccessRuleName()));
         node.setAssignRule(RuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
         if (StringUtils.isNotBlank(nodeEntity.getSupervisorIds())) {
@@ -418,5 +424,31 @@ public class FlowEntityFactory {
         post.setUpdateBy(postEntity.getUpdateBy());
         post.setTenantId(postEntity.getTenantId());
         return post;
+    }
+
+    public static void fillNodeSupplier(List<Node> nodes, List<SupplierEntity> supplierEntities) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return;
+        }
+        for (Node node : nodes) {
+            List<SupplierEntity> bindSupplierEntities = supplierEntities.stream()
+                    .filter(postEntity -> postEntity.getNodeId().equals(node.getId()))
+                    .collect(Collectors.toList());
+            if (!CollectionUtils.isEmpty(bindSupplierEntities)) {
+                node.setBindSuppliers(
+                        bindSupplierEntities.stream().map(FlowEntityFactory::toSupplier).collect(Collectors.toList()));
+            }
+        }
+    }
+
+    private static Supplier toSupplier(SupplierEntity supplierEntity) {
+        Supplier supplier = new Supplier();
+        supplier.setId(supplierEntity.getId());
+        supplier.setSupplierType(supplierEntity.getSupplierType());
+        supplier.setSupplierId(supplierEntity.getSupplierId());
+        supplier.setCreateBy(supplierEntity.getCreateBy());
+        supplier.setUpdateBy(supplierEntity.getUpdateBy());
+        supplier.setTenantId(supplierEntity.getTenantId());
+        return supplier;
     }
 }

@@ -12,7 +12,7 @@ import java.util.List;
  * @date 2023-05-09
  */
 @Mapper
-public interface SupplierDao extends BaseMapper<PostEntity> {
+public interface SupplierDao extends BaseMapper<SupplierEntity> {
 
     void insertBatch(List<SupplierEntity> supplierEntities);
 }

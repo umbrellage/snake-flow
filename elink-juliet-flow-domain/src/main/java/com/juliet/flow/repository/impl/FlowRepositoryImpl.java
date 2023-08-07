@@ -361,6 +361,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         Future<List<PostEntity>> futurePostEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() -> postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
                 .in(PostEntity::getNodeId, nodeIdList)));
 
+        Future<List<SupplierEntity>> futureSupplierEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() -> supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
+                .in(SupplierEntity::getNodeId, nodeIdList)));
+
         List<FormEntity> formEntities = formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
                 .in(FormEntity::getNodeId, nodeIdList));
         List<Long> formIdList = formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList());
@@ -369,6 +372,7 @@ public class FlowRepositoryImpl implements FlowRepository {
 //            .in(FieldEntity::getFormId, formIdList));
         List<FieldEntity> fieldEntities = parallelBatchQueryFieldEntities(formIdList);
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
+        List<SupplierEntity> supplierEntities = ThreadPoolFactory.get(futureSupplierEntities);
 
         List<Long> flowTemplateIds = flowList.stream().map(FlowEntity::getFlowTemplateId).collect(Collectors.toList());
         List<FlowTemplateEntity> flowTemplateEntities = flowTemplateDao.selectBatchIds(flowTemplateIds);
@@ -379,7 +383,7 @@ public class FlowRepositoryImpl implements FlowRepository {
                 .map(flowEntity -> {
                     Flow flow = FlowEntityFactory.toFlow(flowEntity);
                     flow.setTemplateCode(flowTemplateCodeMap.get(flow.getFlowTemplateId()));
-                    List<Node> nodes = assembleNode(nodeMap.get(flowEntity.getId()), formEntities, fieldEntities, postEntities);
+                    List<Node> nodes = assembleNode(nodeMap.get(flowEntity.getId()), formEntities, fieldEntities, postEntities, supplierEntities);
                     flow.setNodes(nodes);
                     return flow;
                 })
@@ -411,13 +415,15 @@ public class FlowRepositoryImpl implements FlowRepository {
      * 组装Node
      */
     private List<Node> assembleNode(List<NodeEntity> nodeEntities, List<FormEntity> formEntities,
-                                    List<FieldEntity> fieldEntities, List<PostEntity> postEntities) {
+                                    List<FieldEntity> fieldEntities, List<PostEntity> postEntities, List<SupplierEntity> supplierEntities) {
         List<Node> nodes = FlowEntityFactory.toNodes(nodeEntities);
         FlowEntityFactory.fillNodeForm(nodes, formEntities);
         // 填充字段信息
         FlowEntityFactory.fillNodeField(nodes, fieldEntities);
         // 填充岗位信息
         FlowEntityFactory.fillNodePost(nodes, postEntities);
+        // 填充绑定的供应商信息
+        FlowEntityFactory.fillNodeSupplier(nodes, supplierEntities);
         return nodes;
     }
 }
