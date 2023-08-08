@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface FlowRepository {
 
-    void add(Flow flow);
+    Long add(Flow flow);
 
     void addTemplate(FlowTemplate flowTemplate);
 

@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,5 +22,5 @@ public class BpmDTO {
     private Long userId;
     private Long tenantId;
 
-    private Map<String, Object> data;
+    private Map<String, Object> data  = new HashMap<>();
 }
