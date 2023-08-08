@@ -12,6 +12,7 @@ import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
+import com.juliet.flow.constant.FlowConstant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -405,6 +406,8 @@ public class Flow extends BaseModel {
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getAccessRule() != null) {
+                        param.put(FlowConstant.INNER_FLOW, this);
+                        param.put(FlowConstant.CURRENT_NODE, node);
                         boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
                         if (!flag) {

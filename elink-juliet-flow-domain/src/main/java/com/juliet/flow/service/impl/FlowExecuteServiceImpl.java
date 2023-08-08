@@ -100,12 +100,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             throw new ServiceException("流程模版不存在");
         }
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
-        Node node = flow.startNode();
-        flow.modifyNextNodeStatus(node.getId(), dto.getData());
-        flow.validate();
-        flowRepository.add(flow);
-        Flow dbFlow = flowRepository.queryById(flow.getId());
+
+        Long flowId = flowRepository.add(flow);
+        Flow dbFlow = flowRepository.queryById(flowId);
+        Node node = dbFlow.startNode();
+        dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        flowRepository.update(dbFlow);
         callback(dbFlow.normalNotifyList());
+
+//        Node node = flow.startNode();
+//        flow.modifyNextNodeStatus(node.getId(), dto.getData());
+//        flow.validate();
+//        flowRepository.add(flow);
+//        Flow dbFlow = flowRepository.queryById(flow.getId());
+//        callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
 
