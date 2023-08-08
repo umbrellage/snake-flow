@@ -347,7 +347,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
 
-        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
+        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
