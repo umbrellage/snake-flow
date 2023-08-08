@@ -105,6 +105,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
         dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        log.info("init flow:{}", JSON.toJSONString(dbFlow));
         flowRepository.update(dbFlow);
         callback(dbFlow.normalNotifyList());
 
