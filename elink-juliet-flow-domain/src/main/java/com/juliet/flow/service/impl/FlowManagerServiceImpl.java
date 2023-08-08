@@ -82,8 +82,8 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             return;
         }
         for (GraphNodeVO graphNodeVO : vo.getNodes()) {
-            graphNodeVO.getProperties().setActive(isActive(flow.getNodes(), graphNodeVO.getId()));
-            String text = getText(flow.getNodes(), graphNodeVO.getId());
+            graphNodeVO.getProperties().setActive(isActive(flow.getNodes(), graphNodeVO));
+            String text = getText(flow.getNodes(), graphNodeVO);
             if (text != null) {
                 graphNodeVO.getProperties().setText(text);
                 if (graphNodeVO.getText() != null) {
@@ -93,18 +93,18 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
     }
 
-    private String getText(List<Node> nodes, String graphNodeId) {
+    private String getText(List<Node> nodes, GraphNodeVO graphNodeVO) {
         for (Node node : nodes) {
-            if (graphNodeId.equals(node.getName())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 return node.getTitle();
             }
         }
         return null;
     }
 
-    private boolean isActive(List<Node> nodes, String graphNodeId) {
+    private boolean isActive(List<Node> nodes, GraphNodeVO graphNodeVO) {
         for (Node node : nodes) {
-            if (graphNodeId.equals(node.getName())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 if (node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
                     return true;
                 }
@@ -116,7 +116,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     private boolean canClick(GraphNodeVO graphNodeVO, Flow flow, Long userId, Consumer<String> consumer, Consumer<Boolean> canClickError) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
         for (Node node : flow.getNodes()) {
-            if (node.getName().equals(graphNodeVO.getId())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 if (node.getStatus() == NodeStatusEnum.PROCESSED && node.getProcessedBy().equals(userId)) {
                     if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(subList)) {
                         boolean flag = subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
@@ -136,7 +136,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean canAdjustment(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
         for (Node node : flow.getNodes()) {
-            if (node.getName().equals(graphNodeVO.getId())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 if ((node.getSupervisorAssignment() != null && node.getSupervisorAssignment()) ||
                         (node.getSelfAndSupervisorAssignment() != null && node.getSelfAndSupervisorAssignment())) {
                     if (!CollectionUtils.isEmpty(node.getSupervisorIds())) {
@@ -150,7 +150,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private Long getCurrentProcessBy(GraphNodeVO graphNodeVO, Flow flow) {
         for (Node node : flow.getNodes()) {
-            if (node.getName().equals(graphNodeVO.getId())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 if (node.getProcessedBy() != null && node.getProcessedBy() == 0L) {
                     return null;
                 }
@@ -162,7 +162,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private Long getNodeIdByName(GraphNodeVO graphNodeVO, Flow flow) {
         for (Node node : flow.getNodes()) {
-            if (node.getName().equals(graphNodeVO.getId())) {
+            if (isNodeMatched(node, graphNodeVO)) {
                 return node.getId();
             }
         }
@@ -170,6 +170,13 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private String findJsonFile(FlowTemplate flowTemplate) {
+        if (flowTemplate.getCode().startsWith("supplier_settled")) {
+            return "/graph/supplier_settled.json";
+        }
         return "/graph/" + flowTemplate.getCode() + ".json";
+    }
+
+    private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
+        return node.getName().equals(graphNodeVO.getId()) || node.getName().equals(graphNodeVO.getProperties().getName());
     }
 }
