@@ -477,7 +477,7 @@ public class Flow extends BaseModel {
         if (canNotRollback) {
             throw new ServiceException("该流程不支持退回操作");
         }
-        Node node = findNode(dto.getNodeId());
+        Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
             return null;

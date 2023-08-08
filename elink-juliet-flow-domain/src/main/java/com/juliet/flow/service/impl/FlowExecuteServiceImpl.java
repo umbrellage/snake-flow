@@ -163,11 +163,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (node == null) {
             return null;
         }
+        return node.toNodeVo(null);
 
-        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
-            return node.toNodeVo(null);
-        }
-        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
+        //  不做岗位的校验了
+//        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
+//            return node.toNodeVo(null);
+//        }
+//        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
     }
 
     @Override
