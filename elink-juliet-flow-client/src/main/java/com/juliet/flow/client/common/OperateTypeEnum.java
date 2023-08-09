@@ -1,5 +1,7 @@
 package com.juliet.flow.client.common;
 
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.Getter;
 
 /**
@@ -24,5 +26,12 @@ public enum OperateTypeEnum {
 
     OperateTypeEnum(Integer code) {
         this.code = code;
+    }
+
+    public static OperateTypeEnum of(Integer code) {
+        return Arrays.stream(OperateTypeEnum.values())
+            .filter(type -> Objects.equals(type.code, code))
+            .findAny()
+            .orElse(null);
     }
 }

@@ -571,9 +571,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return null;
         }
+        // TODO: 2023/8/9 目前历史记录只塞了主流程
+        List<History> historyList = historyRepository.queryByFlowId(flowId);
+
         List<FlowVO> flowList = flowRepository.listFlowByParentId(flowId)
             .stream().map(e -> e.flowVO(Collections.emptyList())).collect(Collectors.toList());
-        FlowVO flowVO = flow.flowVO(flowList);
+
+        FlowVO flowVO = flow.flowVO(flowList, historyList);
         flowVO.setHasSubFlow(CollectionUtils.isNotEmpty(flowList));
         flowVO.setSubFlowCount(flowList.size());
         return flowVO;

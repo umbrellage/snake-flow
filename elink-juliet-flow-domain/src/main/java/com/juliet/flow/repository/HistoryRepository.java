@@ -1,6 +1,7 @@
 package com.juliet.flow.repository;
 
 import com.juliet.flow.domain.model.History;
+import java.util.List;
 
 /**
  * HistoryRepository
@@ -11,4 +12,6 @@ import com.juliet.flow.domain.model.History;
 public interface HistoryRepository {
 
     void add(History dto);
+
+    List<History> queryByFlowId(Long flowId);
 }

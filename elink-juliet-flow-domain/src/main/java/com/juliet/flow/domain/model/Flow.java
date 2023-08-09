@@ -2,6 +2,7 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -295,6 +296,22 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
+        return data;
+    }
+
+    public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
+        FlowVO data = flowVO(subFlowList);
+        Map<Long, History> historyMap = historyList.stream()
+            .filter(history -> history.getTargetNodeId() != null)
+            .collect(Collectors.toMap(History::getTargetNodeId, Function.identity(),
+                (x, y) -> x.getCreateTime().isAfter(y.getCreateTime()) ? x : y));
+        data.getNodes().forEach(node -> {
+            History history = historyMap.get(node.getId());
+            if (history != null) {
+                node.setRemark(history.getComment());
+                node.setOperateType(OperateTypeEnum.of(history.getAction()));
+            }
+        });
         return data;
     }
 

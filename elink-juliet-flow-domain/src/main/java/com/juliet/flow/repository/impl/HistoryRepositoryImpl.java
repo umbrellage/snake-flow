@@ -1,9 +1,15 @@
 package com.juliet.flow.repository.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.juliet.flow.dao.HistoryDao;
+import com.juliet.flow.domain.entity.HistoryEntity;
 import com.juliet.flow.domain.model.History;
 import com.juliet.flow.repository.HistoryRepository;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,6 +18,7 @@ import org.springframework.stereotype.Service;
  * @author Geweilang
  * @date 2023/8/4
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HistoryRepositoryImpl implements HistoryRepository {
@@ -22,6 +29,20 @@ public class HistoryRepositoryImpl implements HistoryRepository {
             return;
         }
         historyDao.insert(dto.to());
+    }
+
+    @Override
+    public List<History> queryByFlowId(Long flowId) {
+        if (flowId == null) {
+            log.error("query history error, flowId is null");
+            return Collections.emptyList();
+        }
+        List<HistoryEntity> historyEntityList = historyDao.selectList(
+            Wrappers.<HistoryEntity>lambdaQuery().eq(HistoryEntity::getFlowId, flowId));
+
+        return historyEntityList.stream()
+            .map(History::of)
+            .collect(Collectors.toList());
     }
 
 
