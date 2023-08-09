@@ -32,6 +32,8 @@ public class DataReviewRule extends BaseRule {
         Map<String, Object> map = (Map<String, Object>) params.get("supplierSettled");
         Boolean isLink = (Boolean) map.get("isLink");
 
+
+
         return isLink || node.preNameList().stream()
             .allMatch(name -> flow.findNode(name).getStatus() == NodeStatusEnum.PROCESSED);
     }
