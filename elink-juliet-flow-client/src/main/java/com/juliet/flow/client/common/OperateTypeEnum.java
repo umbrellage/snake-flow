@@ -15,6 +15,8 @@ public enum OperateTypeEnum {
      */
     ROLLBACK(1),
 
+    REJECT(2),
+
     ;
 
 

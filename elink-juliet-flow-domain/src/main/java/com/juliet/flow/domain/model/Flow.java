@@ -79,6 +79,15 @@ public class Flow extends BaseModel {
             .collect(Collectors.toList());
     }
 
+    public void reject() {
+        nodes.forEach(node -> {
+            if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
+        });
+        status = FlowStatusEnum.END;
+    }
+
     /**
      * 流程是否已经结束
      *

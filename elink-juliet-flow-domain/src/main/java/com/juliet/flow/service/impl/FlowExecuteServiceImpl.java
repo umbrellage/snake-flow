@@ -12,6 +12,7 @@ import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.TaskExecute;
@@ -190,7 +191,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
         Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
-            .stream().map(flow -> flow.flowVO(Collections.emptyList())).collect(Collectors.groupingBy(FlowVO::getParentId));
+            .stream().map(flow -> flow.flowVO(Collections.emptyList()))
+            .collect(Collectors.groupingBy(FlowVO::getParentId));
         return mainFlowList.stream()
             .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
@@ -228,6 +230,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             case ROLLBACK:
                 rollback(dto);
                 break;
+            case REJECT:
+                reject(dto);
             default:
                 break;
         }
@@ -235,7 +239,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     public void invalid(InvalidDTO dto) {
-        // TODO: 2023/8/4
+        flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void reject(TaskExecute dto) {
+        RejectDTO reject = (RejectDTO) dto;
+        Flow flow = flowRepository.queryById(Long.valueOf(reject.getFlowId()));
+        if (flow == null) {
+            throw new ServiceException("流程不存在");
+        }
+        List<NotifyDTO> notifyList = flow.getNodes().stream()
+            .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE ||
+                node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .map(node -> node.toNotifyComplete(flow))
+            .collect(Collectors.toList());
+        flow.reject();
+        flowRepository.update(flow);
+        History history = History.of(reject, null, flow.getTenantId());
+        historyRepository.add(history);
+        callback(notifyList);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -448,7 +471,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 // 判断有没有必要创建一条异常流程
                 List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
                 if (CollectionUtils.isNotEmpty(subList)) {
-                    boolean flag = subList.stream().allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
+                    boolean flag = subList.stream()
+                        .allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
                     if (!flag) {
                         throw new ServiceException("有流程将经过当前节点，不可变更");
                     }

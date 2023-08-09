@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.flow.client.common.OperateTypeEnum;
+import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.domain.entity.HistoryEntity;
 import java.time.LocalDateTime;
@@ -50,6 +51,18 @@ public class History {
         History data = new History();
         data.setFlowId(Long.valueOf(dto.getFlowId()));
         data.setAction(OperateTypeEnum.ROLLBACK.getCode());
+        data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
+        data.setTargetNodeId(targetNodeId);
+        data.setAssignee(dto.getUserId());
+        data.setComment(dto.getReason());
+        data.setTenantId(tenantId);
+        return data;
+    }
+
+    public static History of(RejectDTO dto, Long targetNodeId, Long tenantId) {
+        History data = new History();
+        data.setFlowId(Long.valueOf(dto.getFlowId()));
+        data.setAction(OperateTypeEnum.REJECT.getCode());
         data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());

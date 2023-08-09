@@ -133,5 +133,12 @@ public interface JulietFlowClient {
     @GetMapping("/graph")
     AjaxResult<GraphVO> graph(@RequestParam(value = "id", required = true) Long id, @RequestParam(value = "userId", required = false) Long userId);
 
+    /**
+     * 拒绝
+     * @param dto
+     * @return
+     */
+    @PostMapping("/bpm/reject")
+    AjaxResult<Void> reject(@RequestBody RejectDTO dto);
 
 }
