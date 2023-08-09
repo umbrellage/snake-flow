@@ -100,12 +100,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             throw new ServiceException("流程模版不存在");
         }
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
-        Node node = flow.startNode();
-        flow.modifyNextNodeStatus(node.getId(), dto.getData());
-        flow.validate();
-        flowRepository.add(flow);
-        Flow dbFlow = flowRepository.queryById(flow.getId());
+
+        Long flowId = flowRepository.add(flow);
+        Flow dbFlow = flowRepository.queryById(flowId);
+        Node node = dbFlow.startNode();
+        dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        log.info("init flow:{}", JSON.toJSONString(dbFlow));
+        flowRepository.update(dbFlow);
         callback(dbFlow.normalNotifyList());
+
+//        Node node = flow.startNode();
+//        flow.modifyNextNodeStatus(node.getId(), dto.getData());
+//        flow.validate();
+//        flowRepository.add(flow);
+//        Flow dbFlow = flowRepository.queryById(flow.getId());
+//        callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
 
@@ -163,11 +172,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (node == null) {
             return null;
         }
+        return node.toNodeVo(null);
 
-        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
-            return node.toNodeVo(null);
-        }
-        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
+        //  不做岗位的校验了
+//        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
+//            return node.toNodeVo(null);
+//        }
+//        return node.postAuthority(dto.getPostIdList()) ? node.toNodeVo(null) : null;
     }
 
     @Override
@@ -318,7 +329,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
                 .collect(Collectors.toList());
         }
-        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
+        List<Node> supplierNodeList = new ArrayList<>();
+        if (dto.getSupplier() != null) {
+            supplierNodeList = flowRepository.listNode(dto.supplierId(), dto.supplierType()).stream()
+                .filter(node -> node.getProcessedBy() == null || node.getProcessedBy() == 0L)
+                .collect(Collectors.toList());
+        }
+        List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(Node::getFlowId)
             .distinct()
@@ -330,7 +347,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
 
-        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
+        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());

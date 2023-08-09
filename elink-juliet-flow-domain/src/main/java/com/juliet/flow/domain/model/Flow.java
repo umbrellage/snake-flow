@@ -12,6 +12,7 @@ import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
+import com.juliet.flow.constant.FlowConstant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -404,8 +405,9 @@ public class Flow extends BaseModel {
                         || handledNode.getStatus() == NodeStatusEnum.IGNORE);
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
-                    // FIXME: 2023/6/15 传入参数
                     if (node.getAccessRule() != null) {
+                        param.put(FlowConstant.INNER_FLOW, this);
+                        param.put(FlowConstant.CURRENT_NODE, node);
                         boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
                         if (!flag) {
@@ -417,8 +419,7 @@ public class Flow extends BaseModel {
                         return;
                     }
                     if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        // FIXME: 2023/6/16 传入参数
-                        node.regularDistribution(Collections.emptyMap(), this);
+                        node.regularDistribution(param, this);
                         if (node.nodeTodo()) {
                             node.setStatus(NodeStatusEnum.ACTIVE);
                         } else {
@@ -479,7 +480,7 @@ public class Flow extends BaseModel {
         if (canNotRollback) {
             throw new ServiceException("该流程不支持退回操作");
         }
-        Node node = findNode(dto.getNodeId());
+        Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
             return null;

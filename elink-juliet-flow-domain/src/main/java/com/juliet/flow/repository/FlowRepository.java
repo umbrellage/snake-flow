@@ -18,7 +18,7 @@ import java.util.List;
  */
 public interface FlowRepository {
 
-    void add(Flow flow);
+    Long add(Flow flow);
 
     void addTemplate(FlowTemplate flowTemplate);
 
@@ -54,6 +54,8 @@ public interface FlowRepository {
     void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id);
 
     List<Node> listNode(NodeQuery query);
+
+    List<Node> listNode(Long supplierId, String supplierType);
 
     Node queryNodeById(Long nodeId);
 

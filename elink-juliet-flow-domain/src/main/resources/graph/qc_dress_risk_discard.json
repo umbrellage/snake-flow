@@ -43,7 +43,7 @@
       }
     },
     {
-      "id": "d",
+      "id": "end",
       "type": "flowNode",
       "x": 670,
       "y": 110,
@@ -61,27 +61,6 @@
         "x": 670,
         "y": 110,
         "value": ""
-      }
-    },
-    {
-      "id": "end",
-      "type": "flowNode",
-      "x": 900,
-      "y": 110,
-      "properties": {
-        "text": "完成",
-        "name": "",
-        "region": "",
-        "type": "",
-        "a": {
-          "a1": "",
-          "a2": ""
-        }
-      },
-      "text": {
-        "x": 900,
-        "y": 110,
-        "value": "完成"
       }
     }
   ],
@@ -115,7 +94,7 @@
       "id": "976d9c43-8598-4ee9-b629-8cd8bb63ceb3",
       "type": "polyline",
       "sourceNodeId": "c",
-      "targetNodeId": "d",
+      "targetNodeId": "end",
       "startPoint": {
         "x": 500,
         "y": 110
@@ -132,31 +111,6 @@
         },
         {
           "x": 620,
-          "y": 110
-        }
-      ]
-    },
-    {
-      "id": "5d9ab5be-ec66-476b-a2f5-ced35d19abe4",
-      "type": "polyline",
-      "sourceNodeId": "d",
-      "targetNodeId": "end",
-      "startPoint": {
-        "x": 720,
-        "y": 110
-      },
-      "endPoint": {
-        "x": 850,
-        "y": 110
-      },
-      "properties": {},
-      "pointsList": [
-        {
-          "x": 720,
-          "y": 110
-        },
-        {
-          "x": 850,
           "y": 110
         }
       ]

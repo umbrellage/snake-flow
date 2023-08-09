@@ -4,6 +4,7 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
@@ -144,9 +145,15 @@ public class Node extends BaseModel {
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             processedBy = assignRule.getAssignUserId(params, flow);
+            SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
+            if (supplierDTO != null) {
+                Supplier supplier = new Supplier();
+                supplier.setSupplierId(Long.valueOf(supplierDTO.getSupplierId()));
+                supplier.setSupplierType(supplierDTO.getSupplierType());
+                bindSuppliers = Collections.singletonList(supplier);
+            }
         }
     }
-
 
     public NotifyDTO toNotifyNormal(Flow flow) {
         NotifyDTO ret = new NotifyDTO();

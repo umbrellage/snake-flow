@@ -1,5 +1,8 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.client.dto.SupplierDTO;
+import lombok.Data;
+
 import java.util.Map;
 
 /**
@@ -11,4 +14,8 @@ public abstract class BaseAssignRule {
     public abstract String getRuleName();
 
     public abstract Long getAssignUserId(Map<String, Object> params, Flow flow);
+
+    public SupplierDTO getAssignSupplier(Map<String, Object> params){
+        return null;
+    }
 }
