@@ -275,6 +275,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         flowRepository.update(flow);
         History history = History.of(rollback, node.getId(), node.getTenantId());
         historyRepository.add(history);
+        callback(flow.normalNotifyList());
     }
 
 
