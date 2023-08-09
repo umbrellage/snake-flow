@@ -97,6 +97,15 @@ public class Flow extends BaseModel {
         return status == FlowStatusEnum.END;
     }
 
+    public NotifyDTO invalidFlow() {
+        NotifyDTO dto = new NotifyDTO();
+        dto.setFlowId(id);
+        dto.setTenantId(getTenantId());
+        dto.setType(NotifyTypeEnum.INVALID);
+        dto.setCode(getTemplateCode());
+        return dto;
+    }
+
     /**
      * 是否是异常子流程
      *

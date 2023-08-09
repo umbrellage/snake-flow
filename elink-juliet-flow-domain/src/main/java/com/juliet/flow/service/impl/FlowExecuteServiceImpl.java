@@ -239,7 +239,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     public void invalid(InvalidDTO dto) {
+        Flow flow = flowRepository.queryById(Long.valueOf(dto.getFlowId()));
+        NotifyDTO notifyDTO = flow.invalidFlow();
         flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
+        callback(Collections.singletonList(notifyDTO));
     }
 
     @Transactional(rollbackFor = Exception.class)
