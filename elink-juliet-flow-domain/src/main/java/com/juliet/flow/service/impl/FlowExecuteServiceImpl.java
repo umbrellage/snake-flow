@@ -46,6 +46,7 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -215,6 +216,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     @Override
     public List<String> customerStatus(String code, Long tenantId) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code, tenantId);
+        if (flowTemplate == null) {
+            return Lists.newArrayList();
+        }
         return flowTemplate.getNodes().stream()
             .map(Node::getCustomStatus)
             .filter(StringUtils::isNotBlank).distinct()
