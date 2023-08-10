@@ -271,7 +271,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNode(nodeName);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
