@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import com.juliet.flow.client.common.OperateTypeEnum;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -81,6 +82,10 @@ public class NodeVO {
     private Long processedBy;
 
     private String remark;
+    /**
+     * 节点最新的操作
+     */
+    private OperateTypeEnum operateType;
 
     @JsonSerialize(using = DateTime2String.class)
     @JsonDeserialize(using = String2DateTimeDes.class)

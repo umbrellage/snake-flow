@@ -28,6 +28,8 @@ public enum NotifyTypeEnum {
 
     END("流程结束"),
 
+    INVALID("流程作废"),
+
     ;
 
     private String msg;

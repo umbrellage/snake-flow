@@ -17,6 +17,7 @@ public enum FlowStatusEnum {
     IN_PROGRESS(1, "进行中"),
     ABNORMAL(2, "异常中"),
     END(3, "已结束"),
+//    INVALID(4, "已作废")
             ;
 
     private Integer code;

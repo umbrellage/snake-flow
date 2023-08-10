@@ -47,8 +47,10 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
             log.error("send callback msg to mq fail!", e);
         }
         try {
-            AjaxResult<Void> result = callbackClient.callback(list.stream().filter(e -> e.getType() != NotifyTypeEnum.END)
-                .collect(Collectors.toList()));
+            AjaxResult<Void> result = callbackClient.callback(list.stream()
+                .filter(e -> e.getType() != NotifyTypeEnum.END && e.getType() != NotifyTypeEnum.INVALID)
+                .collect(Collectors.toList())
+            );
             log.info("callback result:{}", result);
         } catch (Exception e) {
             log.error("callback error!", e);

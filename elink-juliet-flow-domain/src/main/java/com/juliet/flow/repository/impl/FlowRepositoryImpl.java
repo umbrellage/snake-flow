@@ -55,12 +55,13 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void add(Flow flow) {
+    public Long add(Flow flow) {
         FlowEntityFactory.cleanFlowId(flow);
         FlowEntity entity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.insert(entity);
         flow.setId(entity.getId());
         addNodes(flow.getNodes(), entity.getId(), 0L);
+        return entity.getId();
     }
 
     private void addNodes(List<Node> nodes, Long flowId, Long flowTemplateId) {

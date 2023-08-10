@@ -2,6 +2,7 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -12,6 +13,7 @@ import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
+import com.juliet.flow.constant.FlowConstant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -78,6 +80,15 @@ public class Flow extends BaseModel {
             .collect(Collectors.toList());
     }
 
+    public void reject() {
+        nodes.forEach(node -> {
+            if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
+        });
+        status = FlowStatusEnum.END;
+    }
+
     /**
      * 流程是否已经结束
      *
@@ -85,6 +96,15 @@ public class Flow extends BaseModel {
      */
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END;
+    }
+
+    public NotifyDTO invalidFlow() {
+        NotifyDTO dto = new NotifyDTO();
+        dto.setFlowId(id);
+        dto.setTenantId(getTenantId());
+        dto.setType(NotifyTypeEnum.INVALID);
+        dto.setCode(getTemplateCode());
+        return dto;
     }
 
     /**
@@ -231,7 +251,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNodeThrow(nodeId);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -251,7 +271,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNode(nodeName);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -276,6 +296,22 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
+        return data;
+    }
+
+    public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
+        FlowVO data = flowVO(subFlowList);
+        Map<Long, History> historyMap = historyList.stream()
+            .filter(history -> history.getTargetNodeId() != null)
+            .collect(Collectors.toMap(History::getTargetNodeId, Function.identity(),
+                (x, y) -> x.getCreateTime().isAfter(y.getCreateTime()) ? x : y));
+        data.getNodes().forEach(node -> {
+            History history = historyMap.get(node.getId());
+            if (history != null) {
+                node.setRemark(history.getComment());
+                node.setOperateType(OperateTypeEnum.of(history.getAction()));
+            }
+        });
         return data;
     }
 
@@ -405,6 +441,8 @@ public class Flow extends BaseModel {
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getAccessRule() != null) {
+                        param.put(FlowConstant.INNER_FLOW, this);
+                        param.put(FlowConstant.CURRENT_NODE, node);
                         boolean flag = node.getAccessRule().accessRule(param);
                         // 如果规则不匹配，递归修改后面节点的状态为忽略
                         if (!flag) {
@@ -477,7 +515,7 @@ public class Flow extends BaseModel {
         if (canNotRollback) {
             throw new ServiceException("该流程不支持退回操作");
         }
-        Node node = findNode(dto.getNodeId());
+        Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
             return null;
