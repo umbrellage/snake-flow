@@ -225,6 +225,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(TaskExecute dto) {
         switch (dto.getTaskType()) {
             case ROLLBACK:
@@ -245,7 +246,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         callback(Collections.singletonList(notifyDTO));
     }
 
-    @Transactional(rollbackFor = Exception.class)
     public void reject(TaskExecute dto) {
         RejectDTO reject = (RejectDTO) dto;
         Flow flow = flowRepository.queryById(Long.valueOf(reject.getFlowId()));
