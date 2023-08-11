@@ -14,6 +14,7 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,12 @@ import java.util.stream.Collectors;
  */
 @Service
 public class FlowTemplateServiceImpl implements FlowTemplateService {
+
+
+//    @RabbitListener(queues = "juliet_test_queue")
+//    public void consumer(String message) {
+////        log.info("msg:{}", message);
+//    }
 
     @Autowired
     private FlowRepository flowRepository;
