@@ -177,4 +177,14 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         return supplier;
     }
 
+    public static void main(String[] args) {
+        String date = LocalDateTime.now().toString();
+        LocalDateTime a = LocalDateTime.parse(date);
+        System.out.println(date);
+        Instant instant = Instant.parse(date);
+        LocalDateTime time = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDateTime();
+        //转成上海时区时间。
+//        LocalDateTime time =  LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        System.out.println(date);
+    }
 }

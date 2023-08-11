@@ -217,6 +217,9 @@ public class Flow extends BaseModel {
         if (node == null) {
             throw new ServiceException("找不到节点");
         }
+        if (StringUtils.isBlank(node.getPreName())) {
+            return true;
+        }
         return Arrays.stream(node.getPreName().split(",")).map(this::findNode).allMatch(Node::isProcessed);
     }
 
