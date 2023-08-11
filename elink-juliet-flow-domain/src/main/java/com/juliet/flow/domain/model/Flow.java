@@ -72,9 +72,6 @@ public class Flow extends BaseModel {
             .map(this::findNode)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(nodeList)) {
-            throw new ServiceException("前置节点不存在，流程配置错误，流程id：" + id);
-        }
         return nodeList.stream().map(Node::getProcessedBy).filter(Objects::nonNull)
             .distinct()
             .collect(Collectors.toList());
