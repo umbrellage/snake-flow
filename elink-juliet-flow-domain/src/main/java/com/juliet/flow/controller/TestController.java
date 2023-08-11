@@ -64,15 +64,15 @@ public class TestController {
         return AjaxResult.success();
     }
 
-    @RabbitListener(queues = "juliet_test_queue")
-    public void consumer(String data, Channel channel, Message message) {
-        long tag = message.getMessageProperties().getDeliveryTag();
-        try {
-            channel.basicAck(tag, false);
-            channel.basicReject(tag, true);
-        } catch (IOException e) {
-            log.info("msg:{}", data);
-        }
-    }
+//    @RabbitListener(queues = "juliet_test_queue")
+//    public void consumer(String data, Channel channel, Message message) {
+//        long tag = message.getMessageProperties().getDeliveryTag();
+//        try {
+//            channel.basicAck(tag, false);
+//            channel.basicReject(tag, true);
+//        } catch (IOException e) {
+//            log.info("msg:{}", data);
+//        }
+//    }
 
 }
