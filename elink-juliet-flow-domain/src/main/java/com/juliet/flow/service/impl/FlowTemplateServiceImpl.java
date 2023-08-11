@@ -30,12 +30,6 @@ import java.util.stream.Collectors;
 @Service
 public class FlowTemplateServiceImpl implements FlowTemplateService {
 
-
-//    @RabbitListener(queues = "juliet_test_queue")
-//    public void consumer(String message) {
-////        log.info("msg:{}", message);
-//    }
-
     @Autowired
     private FlowRepository flowRepository;
 

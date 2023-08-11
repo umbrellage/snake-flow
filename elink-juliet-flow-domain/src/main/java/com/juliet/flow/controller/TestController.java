@@ -2,23 +2,18 @@ package com.juliet.flow.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.callback.impl.RabbitMqConfirmCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
-import com.juliet.mq.config.FastJsonMessageConverter;
+import com.rabbitmq.client.Channel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -69,5 +64,15 @@ public class TestController {
         return AjaxResult.success();
     }
 
+    @RabbitListener(queues = "juliet_test_queue")
+    public void consumer(String data, Channel channel, Message message) {
+        long tag = message.getMessageProperties().getDeliveryTag();
+        try {
+            channel.basicAck(tag, false);
+            channel.basicReject(tag, true);
+        } catch (IOException e) {
+            log.info("msg:{}", data);
+        }
+    }
 
 }
