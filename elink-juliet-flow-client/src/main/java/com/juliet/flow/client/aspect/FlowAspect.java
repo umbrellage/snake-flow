@@ -196,7 +196,7 @@ public class FlowAspect {
     private NodeFieldDTO toNodeFieldDTO(List<String> fields, Long julietFlowId, Long julietNodeId, Long userId) {
         NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
         nodeFieldDTO.setFieldCodeList(fields);
-        nodeFieldDTO.setData(FlowContext.getAttachmentMap());
+        nodeFieldDTO.setData(FlowContext.getAttachmentMap() == null ? new HashMap<>() : FlowContext.getAttachmentMap());
         nodeFieldDTO.setNodeId(julietNodeId);
         nodeFieldDTO.setFlowId(julietFlowId);
         nodeFieldDTO.setUserId(userId);

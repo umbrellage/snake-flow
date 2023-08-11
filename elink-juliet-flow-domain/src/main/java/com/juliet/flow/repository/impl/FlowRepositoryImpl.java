@@ -312,7 +312,9 @@ public class FlowRepositoryImpl implements FlowRepository {
             .stream()
             .map(FlowEntity::getId)
             .collect(Collectors.toList());
-        nodeDao.delete(Wrappers.<NodeEntity>lambdaQuery().in(NodeEntity::getFlowId, idList));
+        if (CollectionUtils.isNotEmpty(idList)) {
+            nodeDao.delete(Wrappers.<NodeEntity>lambdaQuery().in(NodeEntity::getFlowId, idList));
+        }
     }
 
     private void deleteNodes(List<Node> nodes) {

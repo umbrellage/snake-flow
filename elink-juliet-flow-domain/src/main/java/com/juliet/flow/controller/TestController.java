@@ -2,20 +2,24 @@ package com.juliet.flow.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.flow.callback.MsgNotifyCallback;
+import com.juliet.flow.callback.impl.RabbitMqConfirmCallback;
 import com.juliet.flow.client.dto.NotifyDTO;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.repository.FlowRepository;
+import com.rabbitmq.client.Channel;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,8 +39,14 @@ public class TestController {
 
     @Autowired
     FlowRepository flowRepository;
+
     @Autowired
-    private List<MsgNotifyCallback> msgNotifyCallbacks;
+    private AmqpTemplate rabbitMqTemplate;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+    @Autowired
+    private RabbitMqConfirmCallback confirmCallback;
 
     @ApiOperation("获取流程列表")
     @PostMapping("/test")
@@ -48,9 +58,21 @@ public class TestController {
     @ApiOperation("回调消息")
     @PostMapping("/send")
     public AjaxResult send() {
-        Flow flow = flowRepository.queryById(1134501098053963776L);
-        flow.modifyNextNodeStatus(1134501098104295424L, Collections.emptyMap());
-        log.info(JSON.toJSONString(flow));
+        NotifyDTO dto = new NotifyDTO();
+        dto.setCode("dd");
+        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
         return AjaxResult.success();
     }
+
+//    @RabbitListener(queues = "juliet_test_queue")
+//    public void consumer(String data, Channel channel, Message message) {
+//        long tag = message.getMessageProperties().getDeliveryTag();
+//        try {
+//            channel.basicAck(tag, false);
+//            channel.basicReject(tag, true);
+//        } catch (IOException e) {
+//            log.info("msg:{}", data);
+//        }
+//    }
+
 }

@@ -160,7 +160,7 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
-        if (CollectionUtils.isNotEmpty(form.getFields())) {
+        if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
             ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
         }
 

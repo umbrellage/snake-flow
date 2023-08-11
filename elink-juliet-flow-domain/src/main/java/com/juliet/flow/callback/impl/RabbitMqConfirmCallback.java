@@ -14,11 +14,10 @@ import org.springframework.stereotype.Component;
 public class RabbitMqConfirmCallback implements RabbitTemplate.ConfirmCallback {
     @Override
     public void confirm(CorrelationData data, boolean ack, String s) {
-        String msgId = data.getId();
         if (ack) {
-            log.info(msgId + ": 消息发送成功");
+            log.info("消息发送成功");
         } else {
-            log.info(msgId + ": 消息发送失败");
+            log.info("消息发送失败");
         }
     }
 }
