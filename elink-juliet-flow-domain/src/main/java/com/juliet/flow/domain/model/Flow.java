@@ -30,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -94,6 +93,19 @@ public class Flow extends BaseModel {
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END;
     }
+
+
+    public List<History> forwardHistory(Long nodeId, Long userId) {
+        Node currentNode = findNode(nodeId);
+        if (currentNode == null) {
+            return Collections.emptyList();
+        }
+        return currentNode.nextNameList().stream()
+            .map(this::findNode)
+            .map(node -> History.of(id, userId, nodeId, node.getId(), getTenantId()))
+            .collect(Collectors.toList());
+    }
+
 
     public NotifyDTO invalidFlow() {
         NotifyDTO dto = new NotifyDTO();

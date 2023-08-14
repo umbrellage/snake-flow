@@ -9,6 +9,7 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.ForwardDTO;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
@@ -515,6 +516,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 if (end) {
                     callback(Collections.singletonList(flow.flowEndNotify()));
                 }
+                List<History> historyList = flow.forwardHistory(nodeId, userId);
+                historyRepository.add(historyList);
                 callback(flow.normalNotifyList());
                 callback(Collections.singletonList(node.toNotifyComplete(flow)));
             }
