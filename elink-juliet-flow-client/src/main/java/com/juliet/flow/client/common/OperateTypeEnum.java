@@ -19,6 +19,11 @@ public enum OperateTypeEnum {
 
     REJECT(2),
 
+    /**
+     * 正常流转
+     */
+    FORWARD(3),
+
     ;
 
 

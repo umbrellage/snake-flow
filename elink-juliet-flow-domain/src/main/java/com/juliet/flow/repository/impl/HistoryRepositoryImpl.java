@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,6 +30,13 @@ public class HistoryRepositoryImpl implements HistoryRepository {
             return;
         }
         historyDao.insert(dto.to());
+    }
+
+    @Override
+    public void add(List<History> dto) {
+        if (CollectionUtils.isNotEmpty(dto)) {
+            dto.forEach(history -> historyDao.insert(history.to()));
+        }
     }
 
     @Override

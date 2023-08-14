@@ -2,6 +2,7 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.OperateTypeEnum;
+import com.juliet.flow.client.dto.ForwardDTO;
 import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.domain.entity.HistoryEntity;
@@ -83,6 +84,17 @@ public class History {
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
         data.setComment(dto.getReason());
+        data.setTenantId(tenantId);
+        return data;
+    }
+
+    public static History of(Long flowId, Long userId, Long sourceNodeId, Long targetNodeId, Long tenantId) {
+        History data = new History();
+        data.setFlowId(flowId);
+        data.setAction(OperateTypeEnum.FORWARD.getCode());
+        data.setSourceNodeId(sourceNodeId);
+        data.setTargetNodeId(targetNodeId);
+        data.setAssignee(userId);
         data.setTenantId(tenantId);
         return data;
     }

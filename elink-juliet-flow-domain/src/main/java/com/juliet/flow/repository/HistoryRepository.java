@@ -13,5 +13,7 @@ public interface HistoryRepository {
 
     void add(History dto);
 
+    void add(List<History> dto);
+
     List<History> queryByFlowId(Long flowId);
 }
