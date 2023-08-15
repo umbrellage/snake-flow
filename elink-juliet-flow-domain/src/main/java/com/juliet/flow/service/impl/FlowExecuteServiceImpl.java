@@ -92,7 +92,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (node.postAuthority(dto.getPostIdList())) {
             return node.toNodeVo(null);
         }
-        throw new ServiceException("该用户没有该节点的处理权限");
+//        throw new ServiceException("该用户没有该节点的处理权限");
+        return null;
     }
 
     @Transactional(rollbackFor = Exception.class)
