@@ -2,6 +2,7 @@ package com.juliet.flow.service.impl;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
 import com.juliet.api.development.domain.entity.SysUser;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.dto.*;
 import com.juliet.flow.common.StatusCode;
@@ -14,6 +15,13 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.TimeZone;
+import org.apache.commons.lang3.time.DateUtils;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -167,5 +175,16 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         supplier.setUpdateBy(updateBy);
         supplier.setTenantId(nodeTenantId);
         return supplier;
+    }
+
+    public static void main(String[] args) {
+        String date = LocalDateTime.now().toString();
+        LocalDateTime a = LocalDateTime.parse(date);
+        System.out.println(date);
+        Instant instant = Instant.parse(date);
+        LocalDateTime time = ZonedDateTime.ofInstant(instant, ZoneId.systemDefault()).toLocalDateTime();
+        //转成上海时区时间。
+//        LocalDateTime time =  LocalDateTime.ofInstant(instant, ZoneId.systemDefault());
+        System.out.println(date);
     }
 }

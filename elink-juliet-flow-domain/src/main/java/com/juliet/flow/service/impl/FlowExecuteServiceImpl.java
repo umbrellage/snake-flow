@@ -9,9 +9,11 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.ForwardDTO;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.TaskExecute;
@@ -106,6 +108,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
         dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        log.info("init flow:{}", JSON.toJSONString(dbFlow));
+        if (dbFlow.isEnd()) {
+            dbFlow.setStatus(FlowStatusEnum.END);
+        }
         flowRepository.update(dbFlow);
         callback(dbFlow.normalNotifyList());
 
@@ -190,7 +196,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
         Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
-            .stream().map(flow -> flow.flowVO(Collections.emptyList())).collect(Collectors.groupingBy(FlowVO::getParentId));
+            .stream().map(flow -> flow.flowVO(Collections.emptyList()))
+            .collect(Collectors.groupingBy(FlowVO::getParentId));
         return mainFlowList.stream()
             .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
@@ -226,11 +233,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void execute(TaskExecute dto) {
         switch (dto.getTaskType()) {
             case ROLLBACK:
                 rollback(dto);
                 break;
+            case REJECT:
+                reject(dto);
             default:
                 break;
         }
@@ -238,7 +248,28 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     public void invalid(InvalidDTO dto) {
-        // TODO: 2023/8/4
+        Flow flow = flowRepository.queryById(Long.valueOf(dto.getFlowId()));
+        NotifyDTO notifyDTO = flow.invalidFlow();
+        flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
+        callback(Collections.singletonList(notifyDTO));
+    }
+
+    public void reject(TaskExecute dto) {
+        RejectDTO reject = (RejectDTO) dto;
+        Flow flow = flowRepository.queryById(Long.valueOf(reject.getFlowId()));
+        if (flow == null) {
+            throw new ServiceException("流程不存在");
+        }
+        List<NotifyDTO> notifyList = flow.getNodes().stream()
+            .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE ||
+                node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .map(node -> node.toNotifyComplete(flow))
+            .collect(Collectors.toList());
+        flow.reject();
+        flowRepository.update(flow);
+        History history = History.of(reject, null, flow.getTenantId());
+        historyRepository.add(history);
+        callback(notifyList);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -252,6 +283,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         flowRepository.update(flow);
         History history = History.of(rollback, node.getId(), node.getTenantId());
         historyRepository.add(history);
+        callback(flow.normalNotifyList());
     }
 
 
@@ -350,7 +382,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity()));
 
-        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList)
+        List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
@@ -451,7 +483,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 // 判断有没有必要创建一条异常流程
                 List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
                 if (CollectionUtils.isNotEmpty(subList)) {
-                    boolean flag = subList.stream().allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
+                    boolean flag = subList.stream()
+                        .allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
                     if (!flag) {
                         throw new ServiceException("有流程将经过当前节点，不可变更");
                     }
@@ -487,6 +520,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 if (end) {
                     callback(Collections.singletonList(flow.flowEndNotify()));
                 }
+                List<History> historyList = flow.forwardHistory(nodeId, userId);
+                historyRepository.add(historyList);
                 callback(flow.normalNotifyList());
                 callback(Collections.singletonList(node.toNotifyComplete(flow)));
             }
@@ -546,9 +581,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         if (flow == null) {
             return null;
         }
+        // TODO: 2023/8/9 目前历史记录只塞了主流程
+        List<History> historyList = historyRepository.queryByFlowId(flowId);
+
         List<FlowVO> flowList = flowRepository.listFlowByParentId(flowId)
             .stream().map(e -> e.flowVO(Collections.emptyList())).collect(Collectors.toList());
-        FlowVO flowVO = flow.flowVO(flowList);
+
+        FlowVO flowVO = flow.flowVO(flowList, historyList);
         flowVO.setHasSubFlow(CollectionUtils.isNotEmpty(flowList));
         flowVO.setSubFlowCount(flowList.size());
         return flowVO;

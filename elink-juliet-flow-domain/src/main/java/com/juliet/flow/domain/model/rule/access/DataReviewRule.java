@@ -24,13 +24,15 @@ public class DataReviewRule extends BaseRule {
 
     @Override
     public boolean accessRule(Map<String, Object> params) {
-        if (!params.containsKey("suppliersettled")) {
+        if (!params.containsKey("supplierSettled")) {
             return false;
         }
         Flow flow = (Flow) params.get(FlowConstant.INNER_FLOW);
         Node node = (Node) params.get(FlowConstant.CURRENT_NODE);
-        Map<String, Object> map = (Map<String, Object>) params.get("suppliersettled");
+        Map<String, Object> map = (Map<String, Object>) params.get("supplierSettled");
         Boolean isLink = (Boolean) map.get("isLink");
+
+
 
         return isLink || node.preNameList().stream()
             .allMatch(name -> flow.findNode(name).getStatus() == NodeStatusEnum.PROCESSED);

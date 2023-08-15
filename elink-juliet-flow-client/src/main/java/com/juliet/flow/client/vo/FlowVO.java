@@ -79,6 +79,16 @@ public class FlowVO {
             .collect(Collectors.toList());
     }
 
+    /**
+     * 只有主流程
+     * @return
+     */
+    public List<NodeVO> currentNode() {
+        return nodes.stream()
+            .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
+            .collect(Collectors.toList());
+    }
+
     public List<Long> processedBy() {
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.add(this);

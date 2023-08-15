@@ -27,15 +27,15 @@ public class SupplierAssignRule extends BaseAssignRule {
 
     @Override
     public SupplierDTO getAssignSupplier(Map<String, Object> params) {
-        if (!params.containsKey("suppliersettled")) {
+        if (!params.containsKey("supplierSettled")) {
             return null;
         }
-        Map<String, Object> map = (Map<String, Object>) params.get("suppliersettled");
+        Map<String, Object> map = (Map<String, Object>) params.get("supplierSettled");
         if (map.get("supplierId") == null || map.get("supplierType") == null) {
             return null;
         }
         SupplierDTO dto = new SupplierDTO();
-        dto.setSupplierId((String) map.get("supplierId"));
+        dto.setSupplierId(String.valueOf(map.get("supplierId")));
         dto.setSupplierType(String.valueOf(map.get("supplierType")));
         return dto;
     }

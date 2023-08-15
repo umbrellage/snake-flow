@@ -239,8 +239,8 @@ public class FlowEntityFactory {
         Date now = new Date();
         entity.setCreateTime(supplier.getCreateTime() == null ? now : supplier.getCreateTime());
         entity.setUpdateTime(supplier.getUpdateTime() == null ? now : supplier.getUpdateTime());
-        entity.setCreateBy(supplier.getCreateBy());
-        entity.setUpdateBy(supplier.getUpdateBy());
+        entity.setCreateBy(supplier.getCreateBy() == null ?0 :supplier.getCreateBy());
+        entity.setUpdateBy(supplier.getUpdateBy() == null ?0 :supplier.getUpdateBy());
         return entity;
     }
 

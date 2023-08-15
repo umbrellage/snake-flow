@@ -2,6 +2,7 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -29,7 +30,6 @@ import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -71,12 +71,18 @@ public class Flow extends BaseModel {
             .map(this::findNode)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-        if (CollectionUtils.isEmpty(nodeList)) {
-            throw new ServiceException("前置节点不存在，流程配置错误，流程id：" + id);
-        }
         return nodeList.stream().map(Node::getProcessedBy).filter(Objects::nonNull)
             .distinct()
             .collect(Collectors.toList());
+    }
+
+    public void reject() {
+        nodes.forEach(node -> {
+            if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
+        });
+        status = FlowStatusEnum.END;
     }
 
     /**
@@ -86,6 +92,28 @@ public class Flow extends BaseModel {
      */
     public boolean isFlowEnd() {
         return status == FlowStatusEnum.END;
+    }
+
+
+    public List<History> forwardHistory(Long nodeId, Long userId) {
+        Node currentNode = findNode(nodeId);
+        if (currentNode == null) {
+            return Collections.emptyList();
+        }
+        return currentNode.nextNameList().stream()
+            .map(this::findNode)
+            .map(node -> History.of(id, userId, nodeId, node.getId(), getTenantId()))
+            .collect(Collectors.toList());
+    }
+
+
+    public NotifyDTO invalidFlow() {
+        NotifyDTO dto = new NotifyDTO();
+        dto.setFlowId(id);
+        dto.setTenantId(getTenantId());
+        dto.setType(NotifyTypeEnum.INVALID);
+        dto.setCode(getTemplateCode());
+        return dto;
     }
 
     /**
@@ -198,6 +226,9 @@ public class Flow extends BaseModel {
         if (node == null) {
             throw new ServiceException("找不到节点");
         }
+        if (StringUtils.isBlank(node.getPreName())) {
+            return true;
+        }
         return Arrays.stream(node.getPreName().split(",")).map(this::findNode).allMatch(Node::isProcessed);
     }
 
@@ -232,7 +263,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNodeThrow(nodeId);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -252,7 +283,7 @@ public class Flow extends BaseModel {
         Node currentNode = findNode(nodeName);
         List<String> preNameList = currentNode.preNameList();
         boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -277,6 +308,22 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
+        return data;
+    }
+
+    public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
+        FlowVO data = flowVO(subFlowList);
+        Map<Long, History> historyMap = historyList.stream()
+            .filter(history -> history.getTargetNodeId() != null)
+            .collect(Collectors.toMap(History::getTargetNodeId, Function.identity(),
+                (x, y) -> x.getCreateTime().isAfter(y.getCreateTime()) ? x : y));
+        data.getNodes().forEach(node -> {
+            History history = historyMap.get(node.getId());
+            if (history != null) {
+                node.setRemark(history.getComment());
+                node.setOperateType(OperateTypeEnum.of(history.getAction()));
+            }
+        });
         return data;
     }
 
