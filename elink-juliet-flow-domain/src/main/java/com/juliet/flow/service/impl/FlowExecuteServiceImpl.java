@@ -113,13 +113,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         flowRepository.update(dbFlow);
         callback(dbFlow.normalNotifyList());
-
-//        Node node = flow.startNode();
-//        flow.modifyNextNodeStatus(node.getId(), dto.getData());
-//        flow.validate();
-//        flowRepository.add(flow);
-//        Flow dbFlow = flowRepository.queryById(flow.getId());
-//        callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
 
@@ -397,7 +390,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             return;
         }
         Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
-//        callback(Collections.singletonList(currentFlowNode.toNotifyComplete(flow)));
         // 异常子流程
         List<Flow> subFlowList = new ArrayList<>();
         // 主流程
