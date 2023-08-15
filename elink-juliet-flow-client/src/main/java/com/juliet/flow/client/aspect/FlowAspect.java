@@ -207,7 +207,7 @@ public class FlowAspect {
         AjaxResult<Long> result = function.apply(dto);
         if (!isSuccess(result)) {
             log.error("juliet flow init error! julietFlowCode:{}, response:{}", dto.getTemplateCode(), result);
-            throw new RuntimeException("juliet flow init error!");
+            throw new RuntimeException(result.getMsg());
         }
         Long julietFlowId = result.getData();
         if (julietFlowId == null) {
