@@ -27,8 +27,6 @@ public class HistoryEntity extends BaseEntity {
 
     private Long targetNodeId;
 
-    private Long triggerNode;
-
     private Long assignee;
 
     private String comment;

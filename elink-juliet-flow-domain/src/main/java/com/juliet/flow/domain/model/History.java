@@ -31,8 +31,6 @@ public class History {
 
     private Long targetNodeId;
 
-    private Long triggerNode;
-
     private Long assignee;
 
     private String comment;
@@ -50,7 +48,6 @@ public class History {
         data.setAction(OperateTypeEnum.of(entity.getAction()));
         data.setSourceNodeId(entity.getSourceNodeId());
         data.setTargetNodeId(entity.getTargetNodeId());
-        data.setTriggerNode(entity.getTriggerNode());
         data.setAssignee(entity.getAssignee());
         data.setComment(entity.getComment());
         data.setTenantId(entity.getTenantId());
@@ -74,7 +71,6 @@ public class History {
         data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
-        data.setTriggerNode(Long.valueOf(dto.getNodeId()));
         data.setComment(dto.getReason());
         data.setTenantId(flow.getTenantId());
         data.setMainFlowId(flow.getParentId());
@@ -86,7 +82,6 @@ public class History {
         data.setFlowId(Long.valueOf(dto.getFlowId()));
         data.setAction(OperateTypeEnum.REJECT);
         data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
-        data.setTriggerNode(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
         data.setComment(dto.getReason());
@@ -102,7 +97,6 @@ public class History {
         data.setAction(OperateTypeEnum.FORWARD);
         data.setSourceNodeId(sourceNodeId);
         data.setTargetNodeId(targetNodeId);
-        data.setTriggerNode(sourceNodeId);
         data.setAssignee(userId);
         data.setTenantId(flow.getTenantId());
         return data;
@@ -114,7 +108,6 @@ public class History {
         data.setMainFlowId(flow.getParentId());
         data.setAction(OperateTypeEnum.ERROR_CLOSE);
         data.setTargetNodeId(targetNodeId);
-        data.setTriggerNode(triggerNodeId);
         data.setTenantId(flow.getTenantId());
         return data;
     }
