@@ -26,11 +26,13 @@ public class History {
 
     private Long mainFlowId;
 
-    private Integer action;
+    private OperateTypeEnum action;
 
     private Long sourceNodeId;
 
     private Long targetNodeId;
+
+    private Long triggerNode;
 
     private Long assignee;
 
@@ -46,9 +48,10 @@ public class History {
         data.setId(entity.getId());
         data.setFlowId(entity.getFlowId());
         data.setMainFlowId(entity.getMainFlowId());
-        data.setAction(entity.getAction());
+        data.setAction(OperateTypeEnum.of(entity.getAction()));
         data.setSourceNodeId(entity.getSourceNodeId());
         data.setTargetNodeId(entity.getTargetNodeId());
+        data.setTriggerNode(entity.getTriggerNode());
         data.setAssignee(entity.getAssignee());
         data.setComment(entity.getComment());
         data.setTenantId(entity.getTenantId());
@@ -64,13 +67,15 @@ public class History {
     }
 
 
+
     public static History of(RollbackDTO dto, Long targetNodeId, Long tenantId) {
         History data = new History();
         data.setFlowId(Long.valueOf(dto.getFlowId()));
-        data.setAction(OperateTypeEnum.ROLLBACK.getCode());
+        data.setAction(OperateTypeEnum.ROLLBACK);
         data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
+        data.setTriggerNode(Long.valueOf(dto.getNodeId()));
         data.setComment(dto.getReason());
         data.setTenantId(tenantId);
         return data;
@@ -79,8 +84,9 @@ public class History {
     public static History of(RejectDTO dto, Long targetNodeId, Long tenantId) {
         History data = new History();
         data.setFlowId(Long.valueOf(dto.getFlowId()));
-        data.setAction(OperateTypeEnum.REJECT.getCode());
+        data.setAction(OperateTypeEnum.REJECT);
         data.setSourceNodeId(Long.valueOf(dto.getNodeId()));
+        data.setTriggerNode(Long.valueOf(dto.getNodeId()));
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
         data.setComment(dto.getReason());
@@ -91,11 +97,23 @@ public class History {
     public static History of(Long flowId, Long userId, Long sourceNodeId, Long targetNodeId, Long tenantId) {
         History data = new History();
         data.setFlowId(flowId);
-        data.setAction(OperateTypeEnum.FORWARD.getCode());
+        data.setAction(OperateTypeEnum.FORWARD);
         data.setSourceNodeId(sourceNodeId);
         data.setTargetNodeId(targetNodeId);
+        data.setTriggerNode(sourceNodeId);
         data.setAssignee(userId);
         data.setTenantId(tenantId);
+        return data;
+    }
+
+    public static History errorClose(Flow flow, Long targetNodeId, Long triggerNodeId) {
+        History data = new History();
+        data.setFlowId(flow.getId());
+        data.setMainFlowId(flow.getParentId());
+        data.setAction(OperateTypeEnum.ERROR_CLOSE);
+        data.setTargetNodeId(targetNodeId);
+        data.setTriggerNode(triggerNodeId);
+        data.setTenantId(flow.getTenantId());
         return data;
     }
 

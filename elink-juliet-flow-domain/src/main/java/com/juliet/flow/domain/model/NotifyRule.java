@@ -8,10 +8,10 @@ import java.util.List;
  * @author Geweilang
  * @date 2023/8/21
  */
-public interface ActiveRule {
+public interface NotifyRule {
 
-    String activeRuleName();
+    String notifyRuleName();
 
-    List<Long> activeNodeIds();
+    List<Long> notifyNodeIds();
 
 }

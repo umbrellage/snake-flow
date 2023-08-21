@@ -16,8 +16,6 @@ import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -359,7 +357,7 @@ public class Flow extends BaseModel {
             History history = historyMap.get(node.getId());
             if (history != null) {
                 node.setRemark(history.getComment());
-                node.setOperateType(OperateTypeEnum.of(history.getAction()));
+                node.setOperateType(history.getAction());
             }
         });
         return data;
@@ -522,7 +520,7 @@ public class Flow extends BaseModel {
         nodes.stream()
             .filter(node -> node.getActiveRule() != null)
             .forEach(node -> {
-                List<Long> nodeIdList = node.getActiveRule().activeNodeIds();
+                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds();
                 nodeIdList.forEach(nodeId -> {
                     Node activeNode = findNode(nodeId);
                     if (activeNode == null) {
@@ -547,12 +545,13 @@ public class Flow extends BaseModel {
     /**
      * 校准流程节点,并且返回需要被通知的待办
      *
-     * @param flow 标准流程，按照这个流程来校准
+     * @param standardFlow 标准流程，按照这个流程来校准
      * @return 需要被通知的消息待办
      */
-    public List<NotifyDTO> calibrateFlow(Flow flow) {
+    @Deprecated
+    public List<NotifyDTO> calibrateFlow(Flow standardFlow) {
         List<NotifyDTO> notifyNodeList = new ArrayList<>();
-        Map<String, Node> nodeMap = flow.getNodes().stream()
+        Map<String, Node> nodeMap = standardFlow.getNodes().stream()
             .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
@@ -562,6 +561,34 @@ public class Flow extends BaseModel {
                     notifyNodeList.add(cc);
                     NotifyDTO delete = node.toNotifyDelete(this);
                     notifyNodeList.add(delete);
+                }
+                node.setStatus(NodeStatusEnum.IGNORE);
+            }
+            if (standardNode.getStatus() != NodeStatusEnum.IGNORE) {
+                if (node.getStatus() == NodeStatusEnum.IGNORE) {
+                    node.setStatus(NodeStatusEnum.PROCESSED);
+                }
+            }
+        });
+
+        return notifyNodeList;
+    }
+
+    /**
+     * 校准流程节点,并且返回需要被通知的节点
+     *
+     * @param standardFlow 标准流程，按照这个流程来校准
+     * @return 需要被通知的节点
+     */
+    public List<Node> calibrateFlowV2(Flow standardFlow) {
+        List<Node> notifyNodeList = new ArrayList<>();
+        Map<String, Node> nodeMap = standardFlow.getNodes().stream()
+            .collect(Collectors.toMap(Node::getName, Function.identity()));
+        nodes.forEach(node -> {
+            Node standardNode = nodeMap.get(node.getName());
+            if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
+                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                    notifyNodeList.add(node);
                 }
                 node.setStatus(NodeStatusEnum.IGNORE);
             }

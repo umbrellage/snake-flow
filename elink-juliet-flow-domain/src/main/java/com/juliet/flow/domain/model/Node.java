@@ -71,7 +71,7 @@ public class Node extends BaseModel {
      */
     private BaseRule submitRule;
 
-    private ActiveRule activeRule;
+    private NotifyRule activeRule;
 
     /**
      * 主管分配

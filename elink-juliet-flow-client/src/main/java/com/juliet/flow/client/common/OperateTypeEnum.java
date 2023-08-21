@@ -24,6 +24,8 @@ public enum OperateTypeEnum {
      */
     FORWARD(3),
 
+    ERROR_CLOSE(4),
+
     ;
 
 

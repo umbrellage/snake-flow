@@ -457,6 +457,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
+        List<History> historyList = new ArrayList<>();
         calibrateFlowList.add(flow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
@@ -482,7 +483,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 subFlow.modifyNodeStatus(node);
                 Node subNode = subFlow.findNode(node.getName());
                 subFlow.modifyNextNodeStatus(subNode.getId(), data);
-                syncFlow(calibrateFlowList, subFlow);
+                List<History> closeHistory = syncFlow(calibrateFlowList, subFlow, subNode);
+                List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
+                historyList.addAll(closeHistory);
+                historyList.addAll(forwardHistory);
+                historyRepository.add(historyList);
                 flowRepository.add(subFlow);
                 // 发送消息提醒
                 List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
@@ -495,7 +500,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
                 flow.modifyNextNodeStatus(nodeId, data);
-                syncFlow(calibrateFlowList, flow);
+                List<History> syncHistory = syncFlow(calibrateFlowList, flow, node);
                 if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                     .allMatch(Flow::isEnd))) {
                     end = true;
@@ -509,7 +514,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 if (end) {
                     callback(Collections.singletonList(flow.flowEndNotify()));
                 }
-                List<History> historyList = flow.forwardHistory(nodeId, userId);
+                List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
+                historyList.addAll(syncHistory);
+                historyList.addAll(forwardHistory);
                 historyRepository.add(historyList);
                 callback(flow.normalNotifyList());
                 callback(Collections.singletonList(node.toNotifyComplete(flow)));
@@ -528,7 +535,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
                 throw new ServiceException("该节点未被认领");
             }
             errorFlow.modifyNextNodeStatus(nodeId, data);
-            syncFlow(calibrateFlowList, errorFlow);
+            List<History> syncHistory = syncFlow(calibrateFlowList, errorFlow, errorNode);
             if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
                 flow.setStatus(FlowStatusEnum.END);
                 exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
@@ -540,6 +547,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             } else {
                 flowRepository.update(errorFlow);
             }
+            List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
+            historyList.addAll(syncHistory);
+            historyList.addAll(forwardHistory);
+            historyRepository.add(historyList);
 
             if (end) {
                 callback(Collections.singletonList(flow.flowEndNotify()));
@@ -550,12 +561,25 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
     }
 
-    public void syncFlow(List<Flow> calibrateFlowList, Flow standardFlow) {
-        List<NotifyDTO> notifyDTOList = calibrateFlowList.stream()
-            .map(flow -> flow.calibrateFlow(standardFlow))
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+    public List<History> syncFlow(List<Flow> calibrateFlowList, Flow standardFlow, Node triggerNode) {
+        List<NotifyDTO> notifyDTOList = new ArrayList<>();
+        List<History> historyList = new ArrayList<>();
+
+        for (Flow flow : calibrateFlowList) {
+            List<Node> nodeList = flow.calibrateFlowV2(standardFlow);
+            for (Node node : nodeList) {
+                // 需要通知的节点转成待办
+                NotifyDTO cc = node.toNotifyCC(flow, "已不会流经该节点，您不需要再处理该节点, 已将您的待办删除");
+                notifyDTOList.add(cc);
+                NotifyDTO delete = node.toNotifyDelete(flow);
+                notifyDTOList.add(delete);
+                // 需要通知的节点，记录流程流转历史
+                History history = History.errorClose(flow, node.getId(), triggerNode.getId());
+                historyList.add(history);
+            }
+        }
         callback(notifyDTOList);
+        return historyList;
     }
 
     private void callback(List<NotifyDTO> list) {

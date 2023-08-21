@@ -1,6 +1,6 @@
 package com.juliet.flow.domain.model.rule;
 
-import com.juliet.flow.domain.model.ActiveRule;
+import com.juliet.flow.domain.model.NotifyRule;
 import com.juliet.flow.domain.model.BaseAssignRule;
 import com.juliet.flow.domain.model.BaseRule;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +22,7 @@ public class RuleFactory {
 
     private static List<BaseRule> accessRules;
 
-    private static List<ActiveRule> activeRules;
+    private static List<NotifyRule> activeRules;
 
     @Autowired
     private void setAssignRules(List<BaseAssignRule> rules) {
@@ -35,11 +35,11 @@ public class RuleFactory {
     }
 
     @Autowired
-    private void setActiveRule(List<ActiveRule> rules) {
+    private void setActiveRule(List<NotifyRule> rules) {
         RuleFactory.activeRules = rules;
     }
 
-    public static ActiveRule activeRule(String name) {
+    public static NotifyRule activeRule(String name) {
         if (name == null) {
             log.error("activeRule, name is null!");
             return null;
@@ -48,8 +48,8 @@ public class RuleFactory {
             log.warn("can not find system active rule!");
             return null;
         }
-        for (ActiveRule rule : activeRules) {
-            if (name.equals(rule.activeRuleName())) {
+        for (NotifyRule rule : activeRules) {
+            if (name.equals(rule.notifyRuleName())) {
                 return rule;
             }
         }
