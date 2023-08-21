@@ -23,6 +23,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.common.enums.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -373,6 +374,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
+            .filter(node -> node.getTodoNotify() == TodoNotifyEnum.NOTIFY)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
 
@@ -404,16 +406,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             mainFlow = flow;
         }
         assert mainFlow != null;
-        if (mainFlow.isFlowEnd()) {
-            throw new ServiceException("流程已结束");
-        }
+//        if (mainFlow.isFlowEnd()) {
+//            throw new ServiceException("流程已结束");
+//        }
         subFlowList.add(mainFlow);
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.stream()
                 .filter(subFlow -> {
                     Node node = subFlow.findNode(currentFlowNode.getName());
-                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName())
-                        && node.getStatus() != NodeStatusEnum.IGNORE;
+                    return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                 })
                 .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
         }

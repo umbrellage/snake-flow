@@ -11,6 +11,7 @@ import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.enums.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;
@@ -19,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
@@ -134,7 +136,9 @@ public class Flow extends BaseModel {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
         return nodes.stream().allMatch(
-            node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
+            node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+                node.getStatus() == NodeStatusEnum.IGNORE ||
+                node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
     }
 
 
@@ -222,14 +226,52 @@ public class Flow extends BaseModel {
      * @return
      */
     public boolean ifPreNodeIsHandle(String name) {
-        Node node = findNode(name);
-        if (node == null) {
+        Node currentNode = findNode(name);
+        if (currentNode == null) {
             throw new ServiceException("找不到节点");
         }
-        if (StringUtils.isBlank(node.getPreName())) {
+        if (StringUtils.isBlank(currentNode.getPreName())) {
             return true;
         }
-        return Arrays.stream(node.getPreName().split(",")).map(this::findNode).allMatch(Node::isProcessed);
+
+        /*
+         * 判断当前节点的所有前置节点
+         */
+        return recursionGetPreNode(name).stream()
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+                node.getStatus() == NodeStatusEnum.IGNORE ||
+                node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
+        /*
+         * 只判断当前节点的前一级节点
+         */
+//        return Arrays.stream(currentNode.getPreName().split(","))
+//            .map(this::findNode)
+//            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+//            node.getStatus() == NodeStatusEnum.IGNORE ||
+//            node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
+    }
+
+    public List<Node> recursionGetPreNode(String name) {
+        List<Node> nodeList = new ArrayList<>();
+        Node node = findNode(name);
+        LinkedList<Node> preNodeList = new LinkedList<>();
+        preNodeList.add(node);
+        while (CollectionUtils.isNotEmpty(preNodeList)) {
+            Node currentNode = preNodeList.pollLast();
+            assert currentNode != null;
+            List<Node> nodes = getPreNode(currentNode);
+            if (CollectionUtils.isNotEmpty(nodes)) {
+                nodeList.addAll(nodes);
+                preNodeList.addAll(nodes);
+            }
+        }
+        return nodeList;
+    }
+
+    public List<Node> getPreNode(Node node) {
+        return node.preNameList().stream()
+            .map(this::findNode)
+            .collect(Collectors.toList());
     }
 
 
@@ -261,9 +303,7 @@ public class Flow extends BaseModel {
             return;
         }
         Node currentNode = findNodeThrow(nodeId);
-        List<String> preNameList = currentNode.preNameList();
-        boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
+        boolean preHandled = ifPreNodeIsHandle(currentNode.getName());
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -281,9 +321,7 @@ public class Flow extends BaseModel {
             return;
         }
         Node currentNode = findNode(nodeName);
-        List<String> preNameList = currentNode.preNameList();
-        boolean preHandled = nodes.stream().filter(node -> preNameList.contains(node.getName()))
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED || node.getStatus() == NodeStatusEnum.IGNORE);
+        boolean preHandled = ifPreNodeIsHandle(nodeName);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
@@ -443,13 +481,11 @@ public class Flow extends BaseModel {
                 node.setUpdateTime(new Date());
             }
         });
+        // 修改节点消息通知状态
+        modifyNodeTodoStatus();
         nodes.forEach(node -> {
             if (nextNameList.contains(node.getName())) {
-
-                List<String> preNameList = node.preNameList();
-                boolean preHandled = nodes.stream().filter(handledNode -> preNameList.contains(handledNode.getName()))
-                    .allMatch(handledNode -> handledNode.getStatus() == NodeStatusEnum.PROCESSED
-                        || handledNode.getStatus() == NodeStatusEnum.IGNORE);
+                boolean preHandled = ifPreNodeIsHandle(node.getName());
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getAccessRule() != null) {
@@ -482,6 +518,21 @@ public class Flow extends BaseModel {
         });
     }
 
+    public void modifyNodeTodoStatus() {
+        nodes.stream()
+            .filter(node -> node.getActiveRule() != null)
+            .forEach(node -> {
+                List<Long> nodeIdList = node.getActiveRule().activeNodeIds();
+                nodeIdList.forEach(nodeId -> {
+                    Node activeNode = findNode(nodeId);
+                    if (activeNode == null) {
+                        throw new ServiceException("node active rule configuration error, nodeId:" + nodeId);
+                    }
+                    activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
+                });
+            });
+    }
+
     /**
      * 判断该节点在当前流程中与该节点的相同的节点是否已完成
      *
@@ -505,7 +556,7 @@ public class Flow extends BaseModel {
             .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
-            if (standardNode.getStatus() == NodeStatusEnum.IGNORE && node.getStatus() != NodeStatusEnum.IGNORE) {
+            if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
                 if (node.getStatus() == NodeStatusEnum.ACTIVE) {
                     NotifyDTO cc = node.toNotifyCC(this, "已不会流经该节点，您不需要再处理该节点, 已将您的待办删除");
                     notifyNodeList.add(cc);
@@ -514,8 +565,10 @@ public class Flow extends BaseModel {
                 }
                 node.setStatus(NodeStatusEnum.IGNORE);
             }
-            if (standardNode.getStatus() != NodeStatusEnum.IGNORE && node.getStatus() == NodeStatusEnum.IGNORE) {
-                node.setStatus(NodeStatusEnum.PROCESSED);
+            if (standardNode.getStatus() != NodeStatusEnum.IGNORE) {
+                if (node.getStatus() == NodeStatusEnum.IGNORE) {
+                    node.setStatus(NodeStatusEnum.PROCESSED);
+                }
             }
         });
 

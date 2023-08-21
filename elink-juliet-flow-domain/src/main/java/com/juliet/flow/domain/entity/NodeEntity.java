@@ -82,6 +82,10 @@ public class NodeEntity extends BaseEntity {
 
     private Long processedBy;
 
+    private Integer todoNotify;
+
+    private String modifyOtherTodoName;
+
     /**
      * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法, 并考虑历史数据
      * @see Node#formatOf

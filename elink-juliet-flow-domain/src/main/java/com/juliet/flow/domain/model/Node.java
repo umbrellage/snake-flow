@@ -10,6 +10,7 @@ import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.enums.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
 import java.time.LocalDateTime;
@@ -70,6 +71,8 @@ public class Node extends BaseModel {
      */
     private BaseRule submitRule;
 
+    private ActiveRule activeRule;
+
     /**
      * 主管分配
      */
@@ -100,6 +103,14 @@ public class Node extends BaseModel {
      */
     private Long processedBy;
     private LocalDateTime processedTime;
+    /**
+     * 是否发送消息通知
+     */
+    private TodoNotifyEnum todoNotify;
+    /**
+     * 修改其他节点待办配置
+     */
+    private String modifyOtherTodoName;
 
 
     public boolean ifLeaderAdjust(Long userId) {
@@ -302,7 +313,7 @@ public class Node extends BaseModel {
      * @return
      */
     public boolean isExecutable() {
-        return status == NodeStatusEnum.PROCESSED || status == NodeStatusEnum.ACTIVE;
+        return status == NodeStatusEnum.PROCESSED || status == NodeStatusEnum.ACTIVE || todoNotify == TodoNotifyEnum.NO_NOTIFY;
     }
 
     /**
@@ -329,7 +340,7 @@ public class Node extends BaseModel {
      * @return
      */
     public boolean isTodoNode() {
-        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
+        return (status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED) && todoNotify == TodoNotifyEnum.NOTIFY;
     }
 
 
