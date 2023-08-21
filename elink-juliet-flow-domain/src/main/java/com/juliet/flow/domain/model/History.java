@@ -2,7 +2,6 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.OperateTypeEnum;
-import com.juliet.flow.client.dto.ForwardDTO;
 import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.domain.entity.HistoryEntity;
@@ -68,7 +67,7 @@ public class History {
 
 
 
-    public static History of(RollbackDTO dto, Long targetNodeId, Long tenantId) {
+    public static History of(RollbackDTO dto, Long targetNodeId, Flow flow) {
         History data = new History();
         data.setFlowId(Long.valueOf(dto.getFlowId()));
         data.setAction(OperateTypeEnum.ROLLBACK);
@@ -77,11 +76,12 @@ public class History {
         data.setAssignee(dto.getUserId());
         data.setTriggerNode(Long.valueOf(dto.getNodeId()));
         data.setComment(dto.getReason());
-        data.setTenantId(tenantId);
+        data.setTenantId(flow.getTenantId());
+        data.setMainFlowId(flow.getParentId());
         return data;
     }
 
-    public static History of(RejectDTO dto, Long targetNodeId, Long tenantId) {
+    public static History of(RejectDTO dto, Long targetNodeId, Flow flow) {
         History data = new History();
         data.setFlowId(Long.valueOf(dto.getFlowId()));
         data.setAction(OperateTypeEnum.REJECT);
@@ -90,19 +90,21 @@ public class History {
         data.setTargetNodeId(targetNodeId);
         data.setAssignee(dto.getUserId());
         data.setComment(dto.getReason());
-        data.setTenantId(tenantId);
+        data.setTenantId(flow.getTenantId());
+        data.setMainFlowId(flow.getParentId());
         return data;
     }
 
-    public static History of(Long flowId, Long userId, Long sourceNodeId, Long targetNodeId, Long tenantId) {
+    public static History of(Flow flow, Long userId, Long sourceNodeId, Long targetNodeId) {
         History data = new History();
-        data.setFlowId(flowId);
+        data.setFlowId(flow.getId());
+        data.setMainFlowId(flow.getParentId());
         data.setAction(OperateTypeEnum.FORWARD);
         data.setSourceNodeId(sourceNodeId);
         data.setTargetNodeId(targetNodeId);
         data.setTriggerNode(sourceNodeId);
         data.setAssignee(userId);
-        data.setTenantId(tenantId);
+        data.setTenantId(flow.getTenantId());
         return data;
     }
 

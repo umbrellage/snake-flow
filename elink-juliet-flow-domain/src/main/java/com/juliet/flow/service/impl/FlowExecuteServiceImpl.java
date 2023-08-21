@@ -257,7 +257,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
             .collect(Collectors.toList());
         flow.reject();
         flowRepository.update(flow);
-        History history = History.of(reject, null, flow.getTenantId());
+        History history = History.of(reject, null, flow);
         historyRepository.add(history);
         callback(notifyList);
     }
@@ -271,7 +271,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
         }
         Node node = flow.rollback(rollback);
         flowRepository.update(flow);
-        History history = History.of(rollback, node.getId(), node.getTenantId());
+        History history = History.of(rollback, node.getId(), flow);
         historyRepository.add(history);
         callback(flow.normalNotifyList());
     }
@@ -346,6 +346,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
     @Override
     public List<NodeVO> todoNodeList(UserDTO dto) {
+        return todoNodeList(dto, TodoNotifyEnum.NOTIFY);
+    }
+
+    @Override
+    public List<NodeVO> canDoNodeList(UserDTO dto) {
+        return todoNodeList(dto, TodoNotifyEnum.NO_NOTIFY);
+    }
+
+    public List<NodeVO> todoNodeList(UserDTO dto, TodoNotifyEnum notify) {
         List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
         List<Node> supervisorIdNodeList = flowRepository.listNode(NodeQuery.findBySupervisorId(dto.getUserId()));
         List<Node> postIdNodeList = new ArrayList<>();
@@ -374,7 +383,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService {
 
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
-            .filter(node -> node.getTodoNotify() == TodoNotifyEnum.NOTIFY)
+            .filter(node -> node.getTodoNotify() == notify)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
 

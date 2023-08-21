@@ -102,7 +102,7 @@ public class Flow extends BaseModel {
         }
         return currentNode.nextNameList().stream()
             .map(this::findNode)
-            .map(node -> History.of(id, userId, nodeId, node.getId(), getTenantId()))
+            .map(node -> History.of(this, userId, nodeId, node.getId()))
             .collect(Collectors.toList());
     }
 

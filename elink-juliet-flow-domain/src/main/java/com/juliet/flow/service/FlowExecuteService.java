@@ -36,6 +36,8 @@ public interface FlowExecuteService {
 
     List<NodeVO> todoNodeList(UserDTO dto);
 
+    List<NodeVO> canDoNodeList(UserDTO dto);
+
     void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data);
 
     FlowVO flow(Long flowId);

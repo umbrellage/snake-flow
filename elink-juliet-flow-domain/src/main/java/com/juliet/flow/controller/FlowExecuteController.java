@@ -133,6 +133,13 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(nodeVOList);
     }
 
+    @ApiOperation("获取所有的可办")
+    @Override
+    public AjaxResult<List<NodeVO>> canDoNodeList(UserDTO dto) {
+        List<NodeVO> nodeVOList = flowExecuteService.canDoNodeList(dto);
+        return AjaxResult.success(nodeVOList);
+    }
+
     @ApiOperation("获取流程")
     @Override
     public AjaxResult<FlowVO> flow(@RequestBody FlowIdDTO dto) {
