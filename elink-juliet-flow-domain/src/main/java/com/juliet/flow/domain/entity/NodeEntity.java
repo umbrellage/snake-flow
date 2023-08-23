@@ -82,6 +82,7 @@ public class NodeEntity extends BaseEntity {
 
     private Long processedBy;
 
+    @TableField(value = "todo_notify")
     private Integer todoNotify;
 
     private String modifyOtherTodoName;

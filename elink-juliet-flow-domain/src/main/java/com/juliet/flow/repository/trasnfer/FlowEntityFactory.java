@@ -6,6 +6,7 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.enums.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -289,6 +290,8 @@ public class FlowEntityFactory {
         nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
         nodeEntity.setUpdateTime(node.getUpdateTime() == null ? now : node.getUpdateTime());
         nodeEntity.setModifyOtherTodoName(node.getModifyOtherTodoName());
+        nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
+
         return nodeEntity;
     }
 
@@ -346,6 +349,8 @@ public class FlowEntityFactory {
         node.setCreateTime(nodeEntity.getCreateTime());
         node.setUpdateTime(nodeEntity.getUpdateTime());
         node.setActiveRule(RuleFactory.activeRule(nodeEntity.getModifyOtherTodoName()));
+        node.setTodoNotify(TodoNotifyEnum.of(nodeEntity.getTodoNotify()));
+        node.setModifyOtherTodoName(nodeEntity.getModifyOtherTodoName());
         return node;
     }
 
