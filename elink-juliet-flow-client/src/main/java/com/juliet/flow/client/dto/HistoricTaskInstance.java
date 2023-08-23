@@ -1,6 +1,9 @@
 package com.juliet.flow.client.dto;
 
+import com.juliet.common.core.utils.DateUtils;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.OperateTypeEnum;
+import java.time.LocalDateTime;
 import lombok.Data;
 
 /**
@@ -17,11 +20,20 @@ public class HistoricTaskInstance implements TaskInfo, HistoricData{
     private Long mainFlowId;
     private Long executeNodeId;
     private OperateTypeEnum operateType;
+    private LocalDateTime createTime;
 
 
     @Override
     public Long historyId() {
         return historyId;
+    }
+
+    @Override
+    public String createTime() {
+        if (createTime == null) {
+            return null;
+        }
+        return JulietTimeMemo.format(createTime, DateUtils.YYYY_MM_DD_HH_MM_SS);
     }
 
     @Override

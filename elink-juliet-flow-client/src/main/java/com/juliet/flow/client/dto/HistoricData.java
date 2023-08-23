@@ -9,4 +9,6 @@ package com.juliet.flow.client.dto;
 public interface HistoricData {
 
     Long historyId();
+
+    String createTime();
 }
