@@ -14,4 +14,6 @@ public abstract class NotifyRule {
 
     public abstract List<Long> notifyNodeIds();
 
+    public abstract boolean activeSelf();
+
 }
