@@ -121,6 +121,33 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public HistoricTaskInstance startFlowV2(BpmDTO dto) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
+        if (flowTemplate == null) {
+            throw new ServiceException("流程模版不存在");
+        }
+        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
+
+        Long flowId = flowRepository.add(flow);
+        Flow dbFlow = flowRepository.queryById(flowId);
+        Node node = dbFlow.startNode();
+        dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        log.info("init flow:{}", JSON.toJSONString(dbFlow));
+        if (dbFlow.isEnd()) {
+            dbFlow.setStatus(FlowStatusEnum.END);
+        }
+        List<History> forwardHistory = flow.forwardHistory(node.getId(), dto.getUserId());
+        historyRepository.add(forwardHistory);
+        flowRepository.update(dbFlow);
+        callback(dbFlow.normalNotifyList());
+
+        return forwardHistory.stream()
+            .map(History::toHistoricTask)
+            .findAny()
+            .orElse(null);
+    }
+
+    @Override
     public Long startOnlyFlow(BpmDTO dto) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
         if (flowTemplate == null) {

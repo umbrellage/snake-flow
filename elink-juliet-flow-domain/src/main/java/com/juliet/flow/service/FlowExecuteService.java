@@ -25,6 +25,8 @@ public interface FlowExecuteService {
 
     Long startFlow(BpmDTO dto);
 
+    HistoricTaskInstance startFlowV2(BpmDTO dto);
+
     Long startOnlyFlow(BpmDTO dto);
 
     boolean flowEnd(Long flowId);
