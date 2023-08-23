@@ -9,6 +9,7 @@ import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.enums.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
 import com.juliet.flow.domain.model.*;
@@ -109,6 +110,10 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setSelfAndSupervisorAssignment(nodeDTO.getSelfAndSupervisorAssignment());
         node.setAssignRule(RuleFactory.getAssignRule(nodeDTO.getAssignRuleName()));
         node.setTenantId(StringUtil.isBlank(nodeDTO.getTenantId()) ? flowTenantId : Long.valueOf(nodeDTO.getTenantId()));
+        if (nodeDTO.getTodoNotify() == null) {
+            nodeDTO.setTodoNotify(TodoNotifyEnum.NO_NOTIFY.getCode());
+        }
+        node.setTodoNotify(TodoNotifyEnum.of(nodeDTO.getTodoNotify()));
         node.setCreateBy(createBy);
         node.setUpdateBy(updateBy);
         if (nodeDTO.getForm() != null) {
