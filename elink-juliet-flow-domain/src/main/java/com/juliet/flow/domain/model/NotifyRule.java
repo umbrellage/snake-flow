@@ -8,10 +8,10 @@ import java.util.List;
  * @author Geweilang
  * @date 2023/8/21
  */
-public interface NotifyRule {
+public abstract class NotifyRule {
 
-    String notifyRuleName();
+    public abstract String notifyRuleName();
 
-    List<Long> notifyNodeIds();
+    public abstract List<Long> notifyNodeIds();
 
 }
