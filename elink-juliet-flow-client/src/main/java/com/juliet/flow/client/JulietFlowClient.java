@@ -5,6 +5,7 @@ import com.juliet.flow.client.dto.*;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.client.vo.NodeVO;
+import io.swagger.annotations.ApiOperation;
 import java.util.List;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -164,5 +165,9 @@ public interface JulietFlowClient {
      */
     @PostMapping("/bpm/reject")
     AjaxResult<Void> reject(@RequestBody RejectDTO dto);
+
+    @ApiOperation("作废")
+    @PostMapping("/bpm/invalid")
+    AjaxResult<Void> invalid(@RequestBody InvalidDTO dto);
 
 }
