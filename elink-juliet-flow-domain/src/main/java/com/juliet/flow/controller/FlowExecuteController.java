@@ -6,6 +6,7 @@ import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -65,6 +66,12 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<List<HistoricTaskInstance>> forwardV2(NodeFieldDTO dto) {
+        List<HistoricTaskInstance> instanceList = flowExecuteService.forward(dto);
+        return AjaxResult.success(instanceList);
+    }
+
+    @Override
     public AjaxResult<List<String>> customerStatus(FlowOpenDTO dto) {
         return AjaxResult.success(flowExecuteService.customerStatus(dto.getCode(), dto.getTenantId()));
     }
@@ -121,7 +128,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("执行一个节点任务")
     @Override
-    public AjaxResult<Void> task(TaskDTO dto) {
+    public AjaxResult<List<HistoricTaskInstance>> task(TaskDTO dto) {
         flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId(), Collections.emptyMap());
         return AjaxResult.success();
     }

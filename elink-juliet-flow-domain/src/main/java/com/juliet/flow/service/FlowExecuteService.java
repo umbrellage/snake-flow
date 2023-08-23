@@ -4,6 +4,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
+import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -28,7 +29,7 @@ public interface FlowExecuteService {
 
     boolean flowEnd(Long flowId);
 
-    void forward(NodeFieldDTO dto);
+    List<HistoricTaskInstance> forward(NodeFieldDTO dto);
 
     List<NodeVO> currentNodeList(Long flowId);
 
@@ -38,7 +39,7 @@ public interface FlowExecuteService {
 
     List<NodeVO> canDoNodeList(UserDTO dto);
 
-    void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data);
+    List<HistoricTaskInstance> task(Long flowId, Long nodeId, Long userId, Map<String, Object> data);
 
     FlowVO flow(Long flowId);
 

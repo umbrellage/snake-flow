@@ -10,6 +10,7 @@ import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.ForwardDTO;
+import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
@@ -395,12 +396,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void forward(NodeFieldDTO dto) {
+    public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
+        List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
         // 需要被执行的节点列表
         List<Node> executableNode = new ArrayList<>();
         Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
-            return;
+            return historicTaskInstanceList;
         }
         Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
         // 异常子流程
@@ -437,8 +439,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .values());
 
         for (Node node : nodeList) {
-            task(mainFlow.getId(), node.getId(), node.getProcessedBy(), dto.getData());
+            List<HistoricTaskInstance> taskInstances = task(mainFlow.getId(), node.getId(), node.getProcessedBy(), dto.getData());
+            historicTaskInstanceList.addAll(taskInstances);
         }
+
+        return historicTaskInstanceList.stream()
+            .distinct()
+            .collect(Collectors.toList());
     }
 
     /**
@@ -459,7 +466,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
      */
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized void task(Long flowId, Long nodeId, Long userId, Map<String, Object> data) {
+    public synchronized List<HistoricTaskInstance> task(Long flowId, Long nodeId, Long userId, Map<String, Object> data) {
         Flow flow = flowRepository.queryById(flowId);
         if (flow == null || flow.hasParentFlow()) {
             log.error("流程存在异常{}", JSON.toJSONString(flow));
@@ -471,11 +478,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         calibrateFlowList.add(flow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = flow.findNode(nodeId);
-        boolean end = false;
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
-                return;
+                return Collections.emptyList();
             }
             // 当节点是异常节点时
             if (node.isProcessed()) {
@@ -503,8 +509,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //                    .collect(Collectors.toList());
 //                callback(notifyDTOList);
 //                return;
-
-
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+                return createSubFlowTask(forwardDTO);
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
@@ -528,8 +534,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //                historyRepository.add(forwardHistory);
 //                callback(flow.normalNotifyList());
 //                callback(Collections.singletonList(node.toNotifyComplete(flow)));
-
-
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+                return forwardMainFlowTask(forwardDTO);
             }
         }
         if (node == null) {
@@ -566,14 +572,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //            // 异步发送消息提醒
 //            callback(errorFlow.normalNotifyList());
 //            callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
-
-
+            TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+            return forwardSubFlowTask(forwardDTO);
         }
+        return Collections.emptyList();
     }
 
 
     @Override
-    public void createSubFlowTask(TaskForwardDTO dto) {
+    public List<HistoricTaskInstance> createSubFlowTask(TaskForwardDTO dto) {
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         // 查询异常流程
@@ -603,10 +610,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .flatMap(Collection::stream)
             .collect(Collectors.toList());
         callback(notifyDTOList);
+
+        return forwardHistory.stream()
+            .map(History::toHistoricTask)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public void forwardMainFlowTask(TaskForwardDTO dto) {
+    public List<HistoricTaskInstance> forwardMainFlowTask(TaskForwardDTO dto) {
         boolean end = false;
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(dto.getMainFlow().getId());
@@ -633,10 +644,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         historyRepository.add(forwardHistory);
         callback(flow.normalNotifyList());
         callback(Collections.singletonList(node.toNotifyComplete(flow)));
+
+        return forwardHistory.stream()
+            .map(History::toHistoricTask)
+            .collect(Collectors.toList());
     }
 
     @Override
-    public void forwardSubFlowTask(TaskForwardDTO dto) {
+    public List<HistoricTaskInstance> forwardSubFlowTask(TaskForwardDTO dto) {
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         boolean end = false;
@@ -649,7 +664,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .filter(exFlow -> exFlow.findNode(node.getId()) != null)
             .findAny().orElse(null);
         if (errorFlow == null) {
-            return;
+            return Collections.emptyList();
         }
         Node errorNode = errorFlow.findNode(node.getId());
         if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
@@ -677,6 +692,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         // 异步发送消息提醒
         callback(errorFlow.normalNotifyList());
         callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
+
+        return forwardHistory.stream()
+            .map(History::toHistoricTask)
+            .collect(Collectors.toList());
     }
 
 

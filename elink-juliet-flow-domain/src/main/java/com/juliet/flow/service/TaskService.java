@@ -1,6 +1,8 @@
 package com.juliet.flow.service;
 
+import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.domain.dto.TaskForwardDTO;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -12,9 +14,9 @@ import org.springframework.stereotype.Service;
 public interface TaskService {
 
 
-    void createSubFlowTask(TaskForwardDTO dto);
+    List<HistoricTaskInstance> createSubFlowTask(TaskForwardDTO dto);
 
-    void forwardMainFlowTask(TaskForwardDTO dto);
+    List<HistoricTaskInstance> forwardMainFlowTask(TaskForwardDTO dto);
 
-    void forwardSubFlowTask(TaskForwardDTO dto);
+    List<HistoricTaskInstance> forwardSubFlowTask(TaskForwardDTO dto);
 }

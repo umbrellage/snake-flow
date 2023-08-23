@@ -29,13 +29,19 @@ public class HistoryRepositoryImpl implements HistoryRepository {
         if (dto == null) {
             return;
         }
-        historyDao.insert(dto.to());
+        HistoryEntity entity = dto.to();
+        historyDao.insert(entity);
+        dto.setId(entity.getId());
     }
 
     @Override
     public void add(List<History> dto) {
         if (CollectionUtils.isNotEmpty(dto)) {
-            dto.forEach(history -> historyDao.insert(history.to()));
+            dto.forEach(history -> {
+                HistoryEntity entity = history.to();
+                historyDao.insert(entity);
+                history.setId(entity.getId());
+            });
         }
     }
 
