@@ -96,6 +96,11 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<HistoricTaskInstance> initBmpV2(BpmDTO dto) {
+        return AjaxResult.success(flowExecuteService.startFlowV2(dto));
+    }
+
+    @Override
     public AjaxResult<Long> initBmpOnlyFlow(BpmDTO dto) {
         return AjaxResult.success(flowExecuteService.startOnlyFlow(dto));
     }

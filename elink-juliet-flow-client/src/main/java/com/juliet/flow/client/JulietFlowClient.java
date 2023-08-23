@@ -61,6 +61,14 @@ public interface JulietFlowClient {
      * @param dto templateId 必填
      * @return 流程实例id
      */
+    @PostMapping("/init/bpmV2")
+    AjaxResult<HistoricTaskInstance> initBmpV2(@RequestBody BpmDTO dto);
+
+    /**
+     * 发起一个新的流程
+     * @param dto templateId 必填
+     * @return 流程实例id
+     */
     @PostMapping("/init/bpm/onlyFlow")
     AjaxResult<Long> initBmpOnlyFlow(@RequestBody BpmDTO dto);
 

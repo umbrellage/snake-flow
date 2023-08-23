@@ -120,6 +120,7 @@ public class History {
         data.setHistoryId(id);
         data.setOperateType(action);
         data.setExecuteNodeId(sourceNodeId);
+        data.setCreateTime(createTime);
         return data;
     }
 

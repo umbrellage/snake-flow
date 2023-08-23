@@ -50,6 +50,10 @@ public class GraphNodeVO {
         private String currentProcessUserId;
 
         private String currentProcessUserName;
+
+        private Long processBy;
+
+        private String operateTime;
     }
 
     @Data
