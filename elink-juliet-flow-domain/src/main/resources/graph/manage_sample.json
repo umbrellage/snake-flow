@@ -1,7 +1,7 @@
 {
   "nodes": [
     {
-      "id": "a",
+      "id": "b",
       "type": "flowNode",
       "x": 130,
       "y": 530,
@@ -27,7 +27,7 @@
       }
     },
     {
-      "id": "b",
+      "id": "c",
       "type": "flowNode",
       "x": 290,
       "y": 530,
@@ -53,7 +53,7 @@
       }
     },
     {
-      "id": "c",
+      "id": "d",
       "type": "flowNode",
       "x": 460,
       "y": 530,
@@ -79,7 +79,7 @@
       }
     },
     {
-      "id": "d",
+      "id": "end",
       "type": "flowNode",
       "x": 630,
       "y": 530,
@@ -109,8 +109,8 @@
     {
       "id": "76f3b830-38a5-4472-a914-96480f5ed839",
       "type": "polyline",
-      "sourceNodeId": "a",
-      "targetNodeId": "b",
+      "sourceNodeId": "b",
+      "targetNodeId": "c",
       "startPoint": {
         "x": 180,
         "y": 530
@@ -134,8 +134,8 @@
     {
       "id": "8b0b730a-499e-469c-b646-19a078c8951a",
       "type": "polyline",
-      "sourceNodeId": "b",
-      "targetNodeId": "c",
+      "sourceNodeId": "c",
+      "targetNodeId": "d",
       "startPoint": {
         "x": 340,
         "y": 530
@@ -159,8 +159,8 @@
     {
       "id": "997bbf2e-5bb1-4176-86bb-d991ba768373",
       "type": "polyline",
-      "sourceNodeId": "c",
-      "targetNodeId": "d",
+      "sourceNodeId": "d",
+      "targetNodeId": "end",
       "startPoint": {
         "x": 510,
         "y": 530
