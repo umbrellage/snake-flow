@@ -2,6 +2,8 @@ package com.juliet.flow.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.utils.DateUtils;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -10,7 +12,11 @@ import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowManagerService;
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
@@ -62,12 +68,21 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     @Override
     public GraphVO getGraph(Long id, Long userId) {
         Flow flow = flowRepository.queryById(id);
+        Map<Long, Node> nodeMap = flow.getNodes().stream()
+            .collect(Collectors.toMap(Node::getId, Function.identity()));
         GraphVO graphVO = getGraph(id);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
             graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
+            Long nodeId = Long.valueOf(graphNodeVO.getProperties().getNodeId());
+            LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
+            Long processBy = nodeMap.get(nodeId).getProcessedBy();
+            graphNodeVO.getProperties().setProcessBy(processBy);
+            if (time != null) {
+                graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
+            }
         }
         return graphVO;
     }
