@@ -89,7 +89,20 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Override
     public GraphVO getTemplateGraph(Long templateId) {
-        return null;
+        FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
+        if (flowTemplate == null) {
+            throw new ServiceException("没有找到流程模板，流程模板id:" + templateId);
+        }
+        GraphVO vo = null;
+        String json = null;
+        String jsonFilePath = findJsonFile(flowTemplate);
+        try {
+            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
+        } catch (IOException e) {
+            log.error("read {} fail!", jsonFilePath, e);
+        }
+        vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
+        return vo;
     }
 
     private void fillFlowInfo(Flow flow, GraphVO vo) {

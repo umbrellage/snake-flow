@@ -171,6 +171,11 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<GraphVO> templateGraph(Long id) {
+        return AjaxResult.success(flowManagerService.getTemplateGraph(id));
+    }
+
+    @Override
     public AjaxResult<Void> reject(RejectDTO dto) {
         flowExecuteService.execute(dto);
         return AjaxResult.success();
