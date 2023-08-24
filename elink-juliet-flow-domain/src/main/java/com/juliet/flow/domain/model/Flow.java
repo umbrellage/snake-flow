@@ -482,11 +482,11 @@ public class Flow extends BaseModel {
             }
         });
         // 修改节点消息通知状态
-        modifyNodeTodoStatus();
+        modifyNodeTodoStatusAndActiveSelf(this);
         nextNameList.stream()
             .map(this::findNode)
             .forEach(node -> {
-                boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf());
+                boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf(this));
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getAccessRule() != null) {
@@ -551,11 +551,11 @@ public class Flow extends BaseModel {
 //        });
     }
 
-    public void modifyNodeTodoStatus() {
+    public void modifyNodeTodoStatusAndActiveSelf(Flow flow) {
         nodes.stream()
             .filter(node -> node.getActiveRule() != null)
             .forEach(node -> {
-                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds();
+                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds(flow);
                 nodeIdList.forEach(nodeId -> {
                     Node activeNode = findNode(nodeId);
                     if (activeNode == null) {
@@ -563,6 +563,11 @@ public class Flow extends BaseModel {
                     }
                     activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
                 });
+
+                boolean active = node.getActiveRule().activeSelf(flow);
+                if (active) {
+                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                }
             });
     }
 

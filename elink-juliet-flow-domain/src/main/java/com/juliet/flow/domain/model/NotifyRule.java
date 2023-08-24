@@ -12,8 +12,8 @@ public abstract class NotifyRule {
 
     public abstract String notifyRuleName();
 
-    public abstract List<Long> notifyNodeIds();
+    public abstract List<Long> notifyNodeIds(Flow flow);
 
-    public abstract boolean activeSelf();
+    public abstract boolean activeSelf(Flow flow);
 
 }
