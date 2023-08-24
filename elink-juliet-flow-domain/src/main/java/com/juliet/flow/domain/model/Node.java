@@ -434,6 +434,7 @@ public class Node extends BaseModel {
         node.setCreateTime(new Date());
         node.setUpdateTime(new Date());
         node.setTenantId(this.getTenantId());
+        node.setTodoNotify(todoNotify);
         return node;
     }
 
