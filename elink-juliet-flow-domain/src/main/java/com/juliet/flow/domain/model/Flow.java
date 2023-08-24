@@ -341,6 +341,8 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }
+        data.setHasSubFlow(CollectionUtils.isNotEmpty(subFlowList));
+        data.setSubFlowCount(subFlowList == null ? 0 : subFlowList.size());
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
