@@ -114,6 +114,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
             nodeDTO.setTodoNotify(TodoNotifyEnum.NOTIFY.getCode());
         }
         node.setTodoNotify(TodoNotifyEnum.of(nodeDTO.getTodoNotify()));
+        node.setModifyOtherTodoName(nodeDTO.getModifyOtherTodoName() == null ? "" : nodeDTO.getModifyOtherTodoName());
         node.setCreateBy(createBy);
         node.setUpdateBy(updateBy);
         if (nodeDTO.getForm() != null) {
