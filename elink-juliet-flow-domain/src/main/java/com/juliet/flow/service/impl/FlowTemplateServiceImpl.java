@@ -111,7 +111,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setAssignRule(RuleFactory.getAssignRule(nodeDTO.getAssignRuleName()));
         node.setTenantId(StringUtil.isBlank(nodeDTO.getTenantId()) ? flowTenantId : Long.valueOf(nodeDTO.getTenantId()));
         if (nodeDTO.getTodoNotify() == null) {
-            nodeDTO.setTodoNotify(TodoNotifyEnum.NO_NOTIFY.getCode());
+            nodeDTO.setTodoNotify(TodoNotifyEnum.NOTIFY.getCode());
         }
         node.setTodoNotify(TodoNotifyEnum.of(nodeDTO.getTodoNotify()));
         node.setCreateBy(createBy);
