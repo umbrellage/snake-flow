@@ -16,6 +16,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -232,21 +233,20 @@ public class Flow extends BaseModel {
             return true;
         }
 
-        /*
-         * 判断当前节点的所有前置节点
-         */
-        return recursionGetPreNode(name).stream()
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
-                node.getStatus() == NodeStatusEnum.IGNORE ||
-                node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
+//        /*
+//         * 判断当前节点的所有前置节点
+//         */
+//        return recursionGetPreNode(name).stream()
+//            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+//                node.getStatus() == NodeStatusEnum.IGNORE ||
+//                node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
         /*
          * 只判断当前节点的前一级节点
          */
-//        return Arrays.stream(currentNode.getPreName().split(","))
-//            .map(this::findNode)
-//            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
-//            node.getStatus() == NodeStatusEnum.IGNORE ||
-//            node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
+        return Arrays.stream(currentNode.getPreName().split(","))
+            .map(this::findNode)
+            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+            node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
     public List<Node> recursionGetPreNode(String name) {
@@ -484,7 +484,7 @@ public class Flow extends BaseModel {
         nextNameList.stream()
             .map(this::findNode)
             .forEach(node -> {
-                boolean preHandled = ifPreNodeIsHandle(node.getName());
+                boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf());
                 // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
                 if (preHandled) {
                     if (node.getAccessRule() != null) {
