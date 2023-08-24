@@ -3,7 +3,12 @@ package com.juliet.flow.client;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
+
+import java.util.List;
 import java.util.function.Function;
+
+import com.juliet.flow.client.dto.HistoricTaskInstance;
+import com.juliet.flow.client.dto.NodeFieldDTO;
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +28,18 @@ public class FlowContext {
 
     private static TransmittableThreadLocal<BpmDTO> BPM_DTO_CACHE = new TransmittableThreadLocal<>();
 
+    private static TransmittableThreadLocal<NodeFieldDTO> NODE_FIELD_DTO_CACHE = new TransmittableThreadLocal<>();
+
     private static JulietFlowClient julietFlowClient;
 
     public static void setClient(JulietFlowClient client, BpmDTO bpmDTO) {
         julietFlowClient = client;
         BPM_DTO_CACHE.set(bpmDTO);
+    }
+
+    public static void setClient(JulietFlowClient client, NodeFieldDTO nodeFieldDTO) {
+        julietFlowClient = client;
+        NODE_FIELD_DTO_CACHE.set(nodeFieldDTO);
     }
     public static void putAttachment(String key, Object value) {
         Map<String, Object> local = LOCAL_CACHE.get();
@@ -64,6 +76,21 @@ public class FlowContext {
                 throw new RuntimeException("juliet flow init error!");
             }
             return initResult.getData();
+        } finally {
+            clean();
+        }
+    }
+
+    public static List<HistoricTaskInstance> forward() {
+        try {
+            NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+            nodeFieldDTO.setData(LOCAL_CACHE.get());
+            AjaxResult<List<HistoricTaskInstance>> result = julietFlowClient.forwardV2(nodeFieldDTO);
+            if (result == null || result.getCode() == null || result.getCode() != 200) {
+                log.error("juliet flow forward error! response:{}", result);
+                throw new RuntimeException("juliet flow forward error!");
+            }
+            return result.getData();
         } finally {
             clean();
         }

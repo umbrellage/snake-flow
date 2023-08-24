@@ -147,6 +147,13 @@ public class FlowAspect {
                 throw new ServiceException("当前用户没有操作权限");
             }
             log.info("juliet flow pre forward!");
+            NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
+            nodeFieldDTO.setFieldCodeList(fields);
+            nodeFieldDTO.setUserId(userId);
+            nodeFieldDTO.setFlowId(julietFlowId);
+            nodeFieldDTO.setNodeId(julietNodeId);
+
+            FlowContext.setClient(julietFlowClient, nodeFieldDTO);
         }
 
         request.setAttribute(PARAM_NAME_JULIET_FLOW_ID, julietFlowId);
@@ -162,23 +169,25 @@ public class FlowAspect {
             log.error("business forward exception!", e);
             throw e;
         } finally {
-            if (businessForwardSuccess) {
-                log.info("juliet flow forward by flow id:{}", julietFlowId);
-                // 业务处理成功，流程往后走
-                if (!bpmInit) {
-                    NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId, julietNodeId, userId);
-                    AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
-                    if (!isSuccess(forwardResult)) {
-                        log.error("business forward success but flow error! flow id:{}, request:{}, response:{}",
-                            julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
+            if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
+                if (businessForwardSuccess) {
+                    log.info("juliet flow forward by flow id:{}", julietFlowId);
+                    // 业务处理成功，流程往后走
+                    if (!bpmInit) {
+                        NodeFieldDTO nodeFieldDTO = toNodeFieldDTO(fields, julietFlowId, julietNodeId, userId);
+                        AjaxResult forwardResult = julietFlowClient.forward(nodeFieldDTO);
+                        if (!isSuccess(forwardResult)) {
+                            log.error("business forward success but flow error! flow id:{}, request:{}, response:{}",
+                                    julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
+                        }
+                        log.info("juliet flow forward success!");
                     }
-                    log.info("juliet flow forward success!");
-                }
-            } else {
-                log.error("business forward error, flow abort! flow id:{}", julietFlowId);
-                if (bpmInit) {
-                    // 初始化流程的情况下，业务处理失败，流程结束
-                    // TODO 关闭流程
+                } else {
+                    log.error("business forward error, flow abort! flow id:{}", julietFlowId);
+                    if (bpmInit) {
+                        // 初始化流程的情况下，业务处理失败，流程结束
+                        // TODO 关闭流程
+                    }
                 }
             }
             FlowContext.clean();
