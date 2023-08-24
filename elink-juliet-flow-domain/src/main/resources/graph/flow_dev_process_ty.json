@@ -9,6 +9,7 @@
         "text": "创建设计稿",
         "name": "b",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
@@ -30,6 +31,7 @@
         "text": "分配版师",
         "name": "c",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
@@ -51,6 +53,7 @@
         "text": "面料信息确认",
         "name": "d",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
@@ -72,6 +75,7 @@
         "text": "辅料信息确认",
         "name": "e",
         "region": "",
+        "required": false,
         "type": "",
         "a": {
           "a1": "",
@@ -93,6 +97,7 @@
         "text": "头样估价",
         "name": "f",
         "region": "",
+        "required": false,
         "type": "",
         "a": {
           "a1": "",
@@ -114,6 +119,7 @@
         "text": "特殊工艺供应商",
         "name": "g",
         "region": "",
+        "required": false,
         "type": "",
         "a": {
           "a1": "",
@@ -135,6 +141,7 @@
         "text": "面料核用量",
         "name": "j",
         "region": "",
+        "required": false,
         "type": "",
         "a": {
           "a1": "",
@@ -156,6 +163,7 @@
         "text": "辅料核用量",
         "name": "k",
         "region": "",
+        "required": false,
         "type": "",
         "a": {
           "a1": "",
@@ -177,6 +185,7 @@
         "text": "设计师确认",
         "name": "l",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
@@ -198,6 +207,7 @@
         "text": "样衣生产",
         "name": "o1",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
@@ -217,6 +227,7 @@
       "y": 370,
       "properties": {
         "text": "审样流程",
+        "required": true,
         "name": "o2",
         "region": "",
         "type": "",
@@ -240,6 +251,7 @@
         "text": "结束",
         "name": "end",
         "region": "",
+        "required": true,
         "type": "",
         "a": {
           "a1": "",
