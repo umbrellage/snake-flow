@@ -52,7 +52,7 @@ public class FlowVO {
     private List<Long> theLastProcessedBy;
 
     private List<FlowVO> subFlowList;
-
+    
     public boolean end() {
         return status == 3;
     }
