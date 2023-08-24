@@ -463,6 +463,38 @@ public class Flow extends BaseModel {
             .collect(Collectors.toList());
     }
 
+    public void activeNode(Node node, Map<String, Object> param) {
+        boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf(this));
+        // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
+        if (preHandled) {
+            if (node.getAccessRule() != null) {
+                param.put(FlowConstant.INNER_FLOW, this);
+                param.put(FlowConstant.CURRENT_NODE, node);
+                boolean flag = node.getAccessRule().accessRule(param);
+                // 如果规则不匹配，递归修改后面节点的状态为忽略
+                if (!flag) {
+                    ignoreEqualAfterNode(node);
+                }
+            }
+            if (node.getType() == NodeTypeEnum.END) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+                return;
+            }
+            if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                node.regularDistribution(param, this);
+                if (node.nodeTodo()) {
+                    node.setStatus(NodeStatusEnum.ACTIVE);
+                } else {
+                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                }
+                return;
+            }
+            if (node.getStatus() == NodeStatusEnum.PROCESSED) {
+                node.setStatus(NodeStatusEnum.ACTIVE);
+            }
+        }
+    }
+
     /**
      * 完成某一节点的处理，并且修改下一节点的状态从待激活到待认领，如果处理人不为null则修改为已认领
      *
@@ -482,40 +514,10 @@ public class Flow extends BaseModel {
             }
         });
         // 修改节点消息通知状态
-        modifyNodeTodoStatus();
+        modifyNodeTodoStatusAndActiveSelf(this, param);
         nextNameList.stream()
             .map(this::findNode)
-            .forEach(node -> {
-                boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf());
-                // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
-                if (preHandled) {
-                    if (node.getAccessRule() != null) {
-                        param.put(FlowConstant.INNER_FLOW, this);
-                        param.put(FlowConstant.CURRENT_NODE, node);
-                        boolean flag = node.getAccessRule().accessRule(param);
-                        // 如果规则不匹配，递归修改后面节点的状态为忽略
-                        if (!flag) {
-                            ignoreEqualAfterNode(node);
-                        }
-                    }
-                    if (node.getType() == NodeTypeEnum.END) {
-                        node.setStatus(NodeStatusEnum.PROCESSED);
-                        return;
-                    }
-                    if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                        node.regularDistribution(param, this);
-                        if (node.nodeTodo()) {
-                            node.setStatus(NodeStatusEnum.ACTIVE);
-                        } else {
-                            node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
-                        }
-                        return;
-                    }
-                    if (node.getStatus() == NodeStatusEnum.PROCESSED) {
-                        node.setStatus(NodeStatusEnum.ACTIVE);
-                    }
-                }
-            });
+            .forEach(node -> activeNode(node, param));
 //        nodes.forEach(node -> {
 //            if (nextNameList.contains(node.getName())) {
 //                boolean preHandled = ifPreNodeIsHandle(node.getName());
@@ -551,11 +553,11 @@ public class Flow extends BaseModel {
 //        });
     }
 
-    public void modifyNodeTodoStatus() {
+    public void modifyNodeTodoStatusAndActiveSelf(Flow flow, Map<String, Object> param) {
         nodes.stream()
             .filter(node -> node.getActiveRule() != null)
             .forEach(node -> {
-                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds();
+                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds(flow);
                 nodeIdList.forEach(nodeId -> {
                     Node activeNode = findNode(nodeId);
                     if (activeNode == null) {
@@ -563,6 +565,12 @@ public class Flow extends BaseModel {
                     }
                     activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
                 });
+
+                boolean active = node.getActiveRule().activeSelf(flow);
+                if (active) {
+                    activeNode(node, param);
+                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                }
             });
     }
 
