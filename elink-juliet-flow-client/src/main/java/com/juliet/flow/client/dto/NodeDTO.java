@@ -89,6 +89,8 @@ public class NodeDTO {
      */
     private Integer todoNotify;
 
+    private String modifyOtherTodoName;
+
     private String tenantId;
 
 }

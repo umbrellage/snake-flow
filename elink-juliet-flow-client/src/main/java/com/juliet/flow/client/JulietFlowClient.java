@@ -131,7 +131,7 @@ public interface JulietFlowClient {
      * @return
      */
     @PostMapping("/bpm/canDo")
-    AjaxResult<List<NodeVO>> canDoNodeList(UserDTO dto);
+    AjaxResult<List<NodeVO>> canDoNodeList(@RequestBody UserDTO dto);
 
     /**
      * 获取流程信息
