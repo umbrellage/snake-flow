@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model.rule.notify;
 
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
@@ -30,11 +31,11 @@ public class DefaultNotifyRule extends NotifyRule {
             .filter(node -> StringUtils.equalsAny(node.getName(), "c", "d"))
             .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
         if (handled) {
-            List<Long> idList = flow.getNodes().stream()
+            return flow.getNodes().stream()
                 .filter(node -> StringUtils.equals(node.getName(), "g"))
+                .filter(node -> node.getStatus() != NodeStatusEnum.IGNORE)
                 .map(Node::getId)
                 .collect(Collectors.toList());
-            return idList;
         }
         return Collections.emptyList();
     }
@@ -42,6 +43,15 @@ public class DefaultNotifyRule extends NotifyRule {
     @Override
     public boolean activeSelf(Flow flow) {
 
+        Node specialProcessNode = flow.getNodes().stream()
+            .filter(node -> StringUtils.equals(node.getName(), "g"))
+            .findAny()
+            .orElseThrow(() -> new ServiceException("不存在特殊工艺节点"));
+        if (specialProcessNode.getStatus() == NodeStatusEnum.IGNORE) {
+            return flow.getNodes().stream()
+                .filter(node -> StringUtils.equalsAny(node.getName(), "c", "d"))
+                .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
+        }
         return flow.getNodes().stream()
             .filter(node -> StringUtils.equalsAny(node.getName(), "c", "d", "g"))
             .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
