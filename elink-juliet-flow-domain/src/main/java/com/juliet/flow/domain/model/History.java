@@ -116,7 +116,11 @@ public class History {
     public HistoricTaskInstance toHistoricTask() {
         HistoricTaskInstance data = new HistoricTaskInstance();
         data.setFlowId(flowId);
-        data.setMainFlowId(mainFlowId);
+        if (mainFlowId == null || mainFlowId == 0) {
+            data.setMainFlowId(flowId);
+        }else {
+            data.setMainFlowId(mainFlowId);
+        }
         data.setHistoryId(id);
         data.setOperateType(action);
         data.setExecuteNodeId(sourceNodeId);
