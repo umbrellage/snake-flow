@@ -53,8 +53,6 @@ public class FlowVO {
 
     private List<FlowVO> subFlowList;
 
-//    private Map<String, OperateTypeEnum> operateTypeMap;
-
     public boolean end() {
         return status == 3;
     }
