@@ -156,7 +156,8 @@ public interface JulietFlowClient {
 
 
     @GetMapping("/template/graph")
-    AjaxResult<GraphVO> templateGraph(@RequestParam(value = "id", required = true) Long id);
+    AjaxResult<GraphVO> templateGraph(@RequestParam(value = "id", required = false) Long id,
+                                      @RequestParam(value = "id", required = false, defaultValue = "flow_dev_process_ty") String code);
 
     /**
      * 拒绝

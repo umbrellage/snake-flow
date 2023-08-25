@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
+import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -88,8 +89,13 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     @Override
-    public GraphVO getTemplateGraph(Long templateId) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
+    public GraphVO getTemplateGraph(Long templateId, String templateCode) {
+        FlowTemplate flowTemplate = null;
+        if (templateId != null) {
+            flowTemplate = flowRepository.queryTemplateById(templateId);
+        } else if (templateCode != null) {
+            flowTemplate = flowRepository.queryTemplateByCode(templateCode, SecurityUtils.getLoginUser().getSysUser().getTenantId());
+        }
         if (flowTemplate == null) {
             throw new ServiceException("没有找到流程模板，流程模板id:" + templateId);
         }
