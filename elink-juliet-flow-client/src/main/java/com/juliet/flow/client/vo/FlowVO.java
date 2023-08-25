@@ -1,11 +1,15 @@
 package com.juliet.flow.client.vo;
 
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.OperateTypeEnum;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
+import javax.xml.soap.Node;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
@@ -41,9 +45,7 @@ public class FlowVO {
     private Integer subFlowCount;
 
     /**
-     * IN_PROGRESS(1, "进行中"),
-     * ABNORMAL(2, "异常中"),
-     * END(3, "已结束"),
+     * IN_PROGRESS(1, "进行中"), ABNORMAL(2, "异常中"), END(3, "已结束"),
      */
     private Integer status;
     /**
@@ -52,6 +54,61 @@ public class FlowVO {
     private List<Long> theLastProcessedBy;
 
     private List<FlowVO> subFlowList;
+
+    /**
+     * @param userId
+     * @param postId
+     * @return 1. 可办
+     */
+    public UserExecutor canChange(Long userId, Long postId) {
+        UserExecutor executor = new UserExecutor();
+        List<NodeVO> userDoneNodeList = new ArrayList<>();
+        nodes.forEach(nodeVO -> {
+            // 可编辑：
+            // 1. 当前用户所属节点已经激活为可编辑
+            if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 3)) {
+                executor.setCanEdit(true);
+            }
+            // 2. 属于该岗位下，节点未被认领
+            boolean samePostId = nodeVO.getBindPosts().stream()
+                .anyMatch(post -> post.getPostId().equals(String.valueOf(postId)));
+            if (samePostId && nodeVO.getStatus() == 2) {
+                executor.setCanEdit(true);
+            }
+            // 未来可办
+            // 1. 节点操作人为该用户，但未被激活
+            if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 1)) {
+                executor.setWillEdit(true);
+            }
+            // 2. 用户属于该节点的岗位下，但未激活
+            if (samePostId && nodeVO.getStatus() == 1) {
+                executor.setWillEdit(true);
+            }
+            if (nodeVO.getStatus() == 4 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
+                userDoneNodeList.add(nodeVO);
+            }
+        });
+        // 说明该流程为异常流程，不允许变更
+        if (parentId != 0) {
+            return executor;
+        }
+
+        boolean canChange = userDoneNodeList.stream()
+            .anyMatch(nodeVO -> subFlowList.stream()
+                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getId()))
+            );
+        executor.setCanChange(canChange);
+        return executor;
+    }
+
+    public Boolean nodeIsHandled(Long nodeId) {
+        NodeVO node = nodes.stream()
+            .filter(nodeVO -> Objects.equals(nodeVO.getId(), nodeId))
+            .findAny()
+            .orElseThrow(() -> new ServiceException("找不到节点"));
+        return node.getStatus() == 4;
+    }
+
 
     public boolean end() {
         return status == 3;
@@ -71,7 +128,7 @@ public class FlowVO {
                 .collect(Collectors.toList());
         }
         return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 3|| nodeVO.getStatus() == 2)
+            .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
             .map(NodeVO::getCustomStatus)
             .distinct()
             .collect(Collectors.toList());
@@ -79,6 +136,7 @@ public class FlowVO {
 
     /**
      * 只有主流程
+     *
      * @return
      */
     public List<NodeVO> currentNode() {
