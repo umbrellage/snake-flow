@@ -60,7 +60,7 @@ public class FlowVO {
      * @param postId
      * @return 1. 可办
      */
-    public UserExecutor canChange(Long userId, Long postId) {
+    public UserExecutor userExecutorInfo(Long userId, Long postId) {
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         nodes.forEach(nodeVO -> {
