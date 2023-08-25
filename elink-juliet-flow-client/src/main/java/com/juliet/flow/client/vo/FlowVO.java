@@ -13,6 +13,7 @@ import javax.xml.soap.Node;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * FlowVO
@@ -95,22 +96,27 @@ public class FlowVO {
                 userDoneNodeList.add(nodeVO);
             }
         });
-        // 说明该流程为异常流程，不允许变更
-        if (parentId != 0) {
+        // 说明该流程为异常流程或者不存在变更的节点，则不允许变更
+        if (parentId != 0 || CollectionUtils.isEmpty(userDoneNodeList)) {
+            return executor;
+        }
+
+        if (CollectionUtils.isEmpty(subFlowList)) {
+            executor.setCanChange(true);
             return executor;
         }
 
         boolean canChange = userDoneNodeList.stream()
             .anyMatch(nodeVO -> subFlowList.stream()
-                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getId()))
+                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
             );
         executor.setCanChange(canChange);
         return executor;
     }
 
-    public Boolean nodeIsHandled(Long nodeId) {
+    public Boolean nodeIsHandled(String nodeName) {
         NodeVO node = nodes.stream()
-            .filter(nodeVO -> Objects.equals(nodeVO.getId(), nodeId))
+            .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
             .findAny()
             .orElseThrow(() -> new ServiceException("找不到节点"));
         return node.getStatus() == 4;
