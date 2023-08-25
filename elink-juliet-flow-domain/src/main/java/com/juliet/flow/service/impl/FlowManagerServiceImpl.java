@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
+import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -75,21 +76,28 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
-            graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
-            Long nodeId = Long.valueOf(graphNodeVO.getProperties().getNodeId());
-            LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
-            Long processBy = nodeMap.get(nodeId).getProcessedBy();
-            graphNodeVO.getProperties().setProcessBy(processBy);
-            if (time != null) {
-                graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
+            Long nodeId = getNodeIdByName(graphNodeVO, flow);
+            if (nodeId != null) {
+                graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
+                LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
+                Long processBy = nodeMap.get(nodeId).getProcessedBy();
+                graphNodeVO.getProperties().setProcessBy(processBy);
+                if (time != null) {
+                    graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
+                }
             }
         }
         return graphVO;
     }
 
     @Override
-    public GraphVO getTemplateGraph(Long templateId) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateById(templateId);
+    public GraphVO getTemplateGraph(Long templateId, String templateCode) {
+        FlowTemplate flowTemplate = null;
+        if (templateId != null) {
+            flowTemplate = flowRepository.queryTemplateById(templateId);
+        } else if (templateCode != null) {
+            flowTemplate = flowRepository.queryTemplateByCode(templateCode, SecurityUtils.getLoginUser().getSysUser().getTenantId());
+        }
         if (flowTemplate == null) {
             throw new ServiceException("没有找到流程模板，流程模板id:" + templateId);
         }

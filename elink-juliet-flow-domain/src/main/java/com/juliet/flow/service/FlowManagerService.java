@@ -12,5 +12,5 @@ public interface FlowManagerService {
 
     GraphVO getGraph(Long id, Long userId);
 
-    GraphVO getTemplateGraph(Long templateId);
+    GraphVO getTemplateGraph(Long templateId, String templateCode);
 }
