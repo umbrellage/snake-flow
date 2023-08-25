@@ -57,10 +57,10 @@ public class FlowVO {
 
     /**
      * @param userId
-     * @param postId
+     * @param postIdList
      * @return 1. 可办
      */
-    public UserExecutor userExecutorInfo(Long userId, Long postId) {
+    public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList) {
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         nodes.forEach(nodeVO -> {
@@ -70,8 +70,11 @@ public class FlowVO {
                 executor.setCanEdit(true);
             }
             // 2. 属于该岗位下，节点未被认领
-            boolean samePostId = nodeVO.getBindPosts().stream()
-                .anyMatch(post -> post.getPostId().equals(String.valueOf(postId)));
+            List<Long> postIds = nodeVO.getBindPosts().stream()
+                .map(PostVO::getPostId)
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+            boolean samePostId = !Collections.disjoint(postIdList, postIds);
             if (samePostId && nodeVO.getStatus() == 2) {
                 executor.setCanEdit(true);
             }
