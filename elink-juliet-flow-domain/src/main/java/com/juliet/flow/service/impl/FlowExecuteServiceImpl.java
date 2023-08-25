@@ -633,9 +633,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node subNode = subFlow.findNode(node.getName());
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
+        flowRepository.add(subFlow);
         List<History> forwardHistory = subFlow.forwardHistory(subNode.getId(), dto.getExecuteId());
         historyRepository.add(forwardHistory);
-        flowRepository.add(subFlow);
         // 发送消息提醒
         List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
             .flatMap(Collection::stream)
