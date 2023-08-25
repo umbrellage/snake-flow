@@ -70,11 +70,15 @@ public class FlowVO {
                 executor.setCanEdit(true);
             }
             // 2. 属于该岗位下，节点未被认领
-            List<Long> postIds = nodeVO.getBindPosts().stream()
-                .map(PostVO::getPostId)
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
-            boolean samePostId = !Collections.disjoint(postIdList, postIds);
+            List<Long> postIds = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(nodeVO.getBindPosts())) {
+                postIds = nodeVO.getBindPosts().stream()
+                    .map(PostVO::getPostId)
+                    .filter(Objects::nonNull)
+                    .map(Long::valueOf)
+                    .collect(Collectors.toList());
+            }
+            boolean samePostId = !Collections.disjoint(postIdList, postIds) || postIds.stream().anyMatch(postId -> postId == -1);
             if (samePostId && nodeVO.getStatus() == 2) {
                 executor.setCanEdit(true);
             }
