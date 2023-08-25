@@ -76,13 +76,15 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
             graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
-            graphNodeVO.getProperties().setNodeId(String.valueOf(getNodeIdByName(graphNodeVO, flow)));
-            Long nodeId = Long.valueOf(graphNodeVO.getProperties().getNodeId());
-            LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
-            Long processBy = nodeMap.get(nodeId).getProcessedBy();
-            graphNodeVO.getProperties().setProcessBy(processBy);
-            if (time != null) {
-                graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
+            Long nodeId = getNodeIdByName(graphNodeVO, flow);
+            if (nodeId != null) {
+                graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
+                LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
+                Long processBy = nodeMap.get(nodeId).getProcessedBy();
+                graphNodeVO.getProperties().setProcessBy(processBy);
+                if (time != null) {
+                    graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
+                }
             }
         }
         return graphVO;

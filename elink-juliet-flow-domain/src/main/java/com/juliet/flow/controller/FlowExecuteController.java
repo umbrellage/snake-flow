@@ -166,6 +166,7 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success(flowVOList);
     }
 
+    @ApiOperation("获取流程图")
     @Override
     public AjaxResult<GraphVO> graph(Long id, Long userId) {
         return AjaxResult.success(flowManagerService.getGraph(id, userId));
