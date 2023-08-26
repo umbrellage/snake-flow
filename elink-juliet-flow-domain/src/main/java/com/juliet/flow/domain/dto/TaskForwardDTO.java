@@ -21,21 +21,18 @@ public class TaskForwardDTO {
     /**
      * 操作节点
      */
-//    private Node executeNode;
-
-    private Long nodeId;
+    private Node executeNode;
     /**
      * 操作人
      */
     private Long executeId;
     private Map<String, Object> data;
 
-    public static TaskForwardDTO valueOf(Flow flow, Long nodeId, Long userId, Map<String, Object> data) {
+    public static TaskForwardDTO valueOf(Flow flow, Node node, Long userId, Map<String, Object> data) {
         TaskForwardDTO res = new TaskForwardDTO();
         res.setData(data);
         res.setExecuteId(userId);
-//        res.setExecuteNode(node);
-        res.setNodeId(nodeId);
+        res.setExecuteNode(node);
         res.setMainFlow(flow);
         return res;
     }

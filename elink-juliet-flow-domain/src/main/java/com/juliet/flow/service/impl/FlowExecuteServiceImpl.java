@@ -540,7 +540,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //                    .collect(Collectors.toList());
 //                callback(notifyDTOList);
 //                return;
-                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node.getId(), userId, data);
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
                 return createSubFlowTask(forwardDTO);
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
@@ -565,7 +565,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //                historyRepository.add(forwardHistory);
 //                callback(flow.normalNotifyList());
 //                callback(Collections.singletonList(node.toNotifyComplete(flow)));
-                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, nodeId, userId, data);
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
                 return forwardMainFlowTask(forwardDTO);
             }
         }
@@ -603,7 +603,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //            // 异步发送消息提醒
 //            callback(errorFlow.normalNotifyList());
 //            callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
-            TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, nodeId, userId, data);
+            node = new Node();
+            node.setId(nodeId);
+            TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
 
             return forwardSubFlowTask(forwardDTO);
         }
@@ -684,7 +686,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     public List<HistoricTaskInstance> forwardSubFlowTask(TaskForwardDTO dto) {
-        Node node1 = dto.getExecuteNode();
+        Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         boolean end = false;
         // 查询异常流程
