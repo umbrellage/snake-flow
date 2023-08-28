@@ -15,4 +15,5 @@ public class UserExecutor {
     private Boolean willEdit;
     private Boolean canChange;
     private Boolean adjustOperator;
+    private Boolean currentOperator;// 当前操作人
 }

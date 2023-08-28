@@ -94,6 +94,10 @@ public class FlowVO {
             if (nodeVO.getStatus() == 4 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
                 userDoneNodeList.add(nodeVO);
             }
+            // 当前可以操作
+            if (nodeVO.getStatus() == 3 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
+                executor.setCurrentOperator(true);
+            }
             // 调整操作人
             executor.setAdjustOperator(adjustOperator(userId));
         });
