@@ -464,7 +464,7 @@ public class Flow extends BaseModel {
     }
 
     public void activeNode(Node node, Map<String, Object> param) {
-        log.debug("node:{}", JSON.toJSON(node));
+        log.info("node:{}", JSON.toJSON(node));
         boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf(this));
         // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
         if (preHandled) {
