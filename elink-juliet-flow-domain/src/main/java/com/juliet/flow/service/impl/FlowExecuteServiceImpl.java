@@ -200,12 +200,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .orElse(null);
         }
         if (node == null) {
-            Node canDoNode = flow.findCanDoAndCanExecuteNodeAny(dto.getPostIdList());
+            Node canDoNode = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList());
             if (canDoNode != null) {
                 return canDoNode.toNodeVo(null);
             }
             Node subCandoNode = findSubFlowList(flow.getId()).stream()
-                .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getPostIdList()))
+                .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList()))
                 .filter(Objects::nonNull)
                 .findAny()
                 .orElse(null);
