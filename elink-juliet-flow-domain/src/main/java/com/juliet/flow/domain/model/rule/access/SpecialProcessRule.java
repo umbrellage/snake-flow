@@ -1,7 +1,9 @@
 package com.juliet.flow.domain.model.rule.access;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.flow.domain.model.BaseRule;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Component;
  * @date 2023/8/24
  */
 @Component
+@Slf4j
 public class SpecialProcessRule extends BaseRule {
 
     @Override
@@ -20,6 +23,7 @@ public class SpecialProcessRule extends BaseRule {
 
     @Override
     public boolean accessRule(Map<String, Object> params) {
+        log.info("param:{}", JSON.toJSONString(params));
         return  (boolean) params.get("specialTec");
     }
 }
