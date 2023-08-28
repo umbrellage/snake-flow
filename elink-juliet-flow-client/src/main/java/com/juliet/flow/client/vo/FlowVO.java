@@ -97,21 +97,21 @@ public class FlowVO {
             }
         });
         // 说明该流程为异常流程或者不存在变更的节点，则不允许变更
-        executor.setCanChange(nodes.stream().anyMatch(nodeVO -> nodeVO != null && nodeVO.getStatus() == 4 && nodeVO.getProcessedBy().equals(userId)));
-//        if (parentId != 0 || CollectionUtils.isEmpty(userDoneNodeList)) {
-//            return executor;
-//        }
-//
-//        if (CollectionUtils.isEmpty(subFlowList)) {
-//            executor.setCanChange(true);
-//            return executor;
-//        }
-//
-//        boolean canChange = userDoneNodeList.stream()
-//            .anyMatch(nodeVO -> subFlowList.stream()
-//                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
-//            );
-//        executor.setCanChange(canChange);
+//        executor.setCanChange(nodes.stream().anyMatch(nodeVO -> nodeVO != null && nodeVO.getStatus() == 4 && nodeVO.getProcessedBy().equals(userId)));
+        if (parentId != 0 || CollectionUtils.isEmpty(userDoneNodeList)) {
+            return executor;
+        }
+
+        if (CollectionUtils.isEmpty(subFlowList)) {
+            executor.setCanChange(true);
+            return executor;
+        }
+
+        boolean canChange = userDoneNodeList.stream()
+            .anyMatch(nodeVO -> subFlowList.stream()
+                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
+            );
+        executor.setCanChange(canChange);
         return executor;
     }
 
