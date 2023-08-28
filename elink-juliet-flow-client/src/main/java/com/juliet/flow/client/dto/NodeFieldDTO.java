@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,5 +22,5 @@ public class NodeFieldDTO {
     private Long flowId;
     private Long userId;
 
-    private Map<String, Object> data;
+    private Map<String, Object> data = new HashMap<>();
 }
