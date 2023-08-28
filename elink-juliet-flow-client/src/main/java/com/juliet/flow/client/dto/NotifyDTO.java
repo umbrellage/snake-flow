@@ -1,6 +1,7 @@
 package com.juliet.flow.client.dto;
 
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import java.util.List;
 import lombok.Data;
@@ -29,5 +30,5 @@ public class NotifyDTO {
     private List<ProcessedByVO> preprocessedBy;
     private Long tenantId;
     private String remark;
-
+    private TodoNotifyEnum todoNotify;
 }

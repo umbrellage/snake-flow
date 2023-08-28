@@ -10,7 +10,7 @@ import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.common.enums.TodoNotifyEnum;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
 import java.time.LocalDateTime;
@@ -171,6 +171,7 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
+        ret.setTodoNotify(todoNotify);
         if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
             ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
         }
@@ -194,6 +195,7 @@ public class Node extends BaseModel {
     public NotifyDTO toNotifyComplete(Flow flow) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
+        ret.setTodoNotify(todoNotify);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
@@ -206,6 +208,7 @@ public class Node extends BaseModel {
     public NotifyDTO toNotifyDelete(Flow flow) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
+        ret.setTodoNotify(todoNotify);
         ret.setNodeName(name);
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
@@ -219,6 +222,7 @@ public class Node extends BaseModel {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
+        ret.setTodoNotify(todoNotify);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
         ret.setMainFlowId(flow.getParentId());
@@ -443,6 +447,7 @@ public class Node extends BaseModel {
         NotifyDTO data = new NotifyDTO();
         data.setNodeId(id);
         data.setCode(flow.getTemplateCode());
+        data.setTodoNotify(todoNotify);
         data.setType(NotifyTypeEnum.DELETE);
         data.setTenantId(flow.getTenantId());
         data.setFlowId(flowId);

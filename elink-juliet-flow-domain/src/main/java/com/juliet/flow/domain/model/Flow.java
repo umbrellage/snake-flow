@@ -2,7 +2,6 @@ package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NotifyTypeEnum;
-import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -11,7 +10,7 @@ import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.common.enums.TodoNotifyEnum;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;

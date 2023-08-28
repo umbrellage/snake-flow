@@ -9,7 +9,6 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
-import com.juliet.flow.client.dto.ForwardDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
@@ -24,7 +23,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
-import com.juliet.flow.common.enums.TodoNotifyEnum;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.dto.TaskForwardDTO;
 import com.juliet.flow.domain.model.Flow;
@@ -763,7 +762,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     private void callback(List<NotifyDTO> list) {
         if (CollectionUtils.isNotEmpty(list)) {
-            CompletableFuture.runAsync(() -> msgNotifyCallbacks.forEach(callback -> callback.notify(list)));
+            CompletableFuture.runAsync(() ->
+                msgNotifyCallbacks.forEach(callback ->
+                    callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY).collect(Collectors.toList()))));
         }
     }
 
