@@ -94,6 +94,8 @@ public class FlowVO {
             if (nodeVO.getStatus() == 4 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
                 userDoneNodeList.add(nodeVO);
             }
+            // 调整操作人
+            executor.setAdjustOperator(adjustOperator(userId));
         });
         // 说明该流程为异常流程或者不存在变更的节点，则不允许变更
 //        executor.setCanChange(nodes.stream().anyMatch(nodeVO -> nodeVO != null && nodeVO.getStatus() == 4 && nodeVO.getProcessedBy().equals(userId)));
@@ -106,12 +108,21 @@ public class FlowVO {
             return executor;
         }
 
+        boolean adjustOperator= subFlowList.stream().anyMatch(subFlow -> subFlow.adjustOperator(userId)) || executor.getAdjustOperator();
+        executor.setAdjustOperator(adjustOperator);
         boolean canChange = userDoneNodeList.stream()
             .anyMatch(nodeVO -> subFlowList.stream()
                 .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
             );
         executor.setCanChange(canChange);
         return executor;
+    }
+
+    public boolean adjustOperator(Long userId) {
+        return nodes.stream()
+            .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
+            .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
+            .anyMatch(nodeVO -> nodeVO.getSupervisorIds().contains(userId));
     }
 
     public Boolean nodeIsHandled(String nodeName) {

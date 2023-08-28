@@ -14,4 +14,5 @@ public class UserExecutor {
     private Boolean canEdit;
     private Boolean willEdit;
     private Boolean canChange;
+    private Boolean adjustOperator;
 }
