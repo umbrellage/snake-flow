@@ -697,4 +697,13 @@ public class Flow extends BaseModel {
 //        }
 
     }
+
+    public Node findCanDoAndCanExecuteNodeAny(List<Long> postIdList) {
+        return nodes.stream()
+            .filter(node -> node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY)
+            .filter(node -> node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED || node.getStatus() == NodeStatusEnum.ACTIVE)
+            .filter(node -> !Collections.disjoint(postIdList, node.postIdList()))
+            .findAny()
+            .orElse(null);
+    }
 }
