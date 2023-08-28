@@ -41,10 +41,10 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Override
     public GraphVO getGraph(Long id) {
-        Flow flow = flowRepository.queryLatestByParentId(id);
-        if (flow == null) {
-            flow = flowRepository.queryById(id);
-        }
+//        Flow flow = flowRepository.queryLatestByParentId(id);
+//        if (flow == null) {
+//        }
+        Flow flow = flowRepository.queryById(id);
         if (flow == null) {
             throw new ServiceException("没有找到流程，id:" + id);
         }
