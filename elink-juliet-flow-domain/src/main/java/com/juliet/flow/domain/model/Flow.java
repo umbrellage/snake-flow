@@ -515,7 +515,7 @@ public class Flow extends BaseModel {
             }
         });
         // 修改节点消息通知状态
-        modifyNodeTodoStatusAndActiveSelf(this, param);
+        modifyNodeTodoStatusAndActiveSelf(this, nodeId, param);
         nextNameList.stream()
             .map(this::findNode)
             .forEach(node -> activeNode(node, param));
@@ -554,7 +554,7 @@ public class Flow extends BaseModel {
 //        });
     }
 
-    public void modifyNodeTodoStatusAndActiveSelf(Flow flow, Map<String, Object> param) {
+    public void modifyNodeTodoStatusAndActiveSelf(Flow flow, Long completeNodeId, Map<String, Object> param) {
         nodes.stream()
             .filter(node -> node.getActiveRule() != null)
             .forEach(node -> {
@@ -566,11 +566,12 @@ public class Flow extends BaseModel {
                     }
                     activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
                 });
-
+                if (completeNodeId.equals(node.getId())) {
+                    return;
+                }
                 boolean active = node.getActiveRule().activeSelf(flow);
-                if (active) {
+                if (active && node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
                     activeNode(node, param);
-                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
                 }
             });
     }
