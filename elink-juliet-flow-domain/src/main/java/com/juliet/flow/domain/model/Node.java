@@ -13,6 +13,7 @@ import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
+
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,11 +22,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -135,10 +138,10 @@ public class Node extends BaseModel {
 
     /**
      * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法
-     * @see NodeEntity#supervisorIds()
      *
      * @param supervisorId
      * @return
+     * @see NodeEntity#supervisorIds()
      */
     public String formatOf(Long supervisorId) {
         if (supervisorId == null) {
@@ -146,7 +149,6 @@ public class Node extends BaseModel {
         }
         return "^" + supervisorId + "^";
     }
-
 
 
     public LocalDateTime getProcessedTime() {
@@ -239,8 +241,8 @@ public class Node extends BaseModel {
             return Collections.emptyList();
         }
         return bindPosts.stream()
-            .map(Post::getPostId)
-            .collect(Collectors.toList());
+                .map(Post::getPostId)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -258,10 +260,10 @@ public class Node extends BaseModel {
             return true;
         }
         List<Long> sourcePostIdList = bindPosts.stream()
-            .map(Post::getPostId)
-            .filter(Objects::nonNull)
-            .map(Long::parseLong)
-            .collect(Collectors.toList());
+                .map(Post::getPostId)
+                .filter(Objects::nonNull)
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
 
         return !Collections.disjoint(postIdList, sourcePostIdList);
     }
@@ -286,7 +288,7 @@ public class Node extends BaseModel {
             return Collections.emptyList();
         }
         return Arrays.stream(preName.split(","))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -299,7 +301,7 @@ public class Node extends BaseModel {
             return Collections.emptyList();
         }
         return Arrays.stream(nextName.split(","))
-            .collect(Collectors.toList());
+                .collect(Collectors.toList());
     }
 
     /**
@@ -367,6 +369,37 @@ public class Node extends BaseModel {
     }
 
     /**
+     * 判断是否某个用户可办
+     */
+    public boolean isUserCando(Long userId, List<Long> postIds) {
+        if (todoNotify != TodoNotifyEnum.NO_NOTIFY) {
+            return false;
+        }
+        if (status == NodeStatusEnum.ACTIVE) {
+            return userId != null && userId.equals(processedBy);
+        }
+        if (status == NodeStatusEnum.TO_BE_CLAIMED) {
+            return isPostMatch(postIds);
+        }
+        return false;
+    }
+
+    /**
+     * 判断岗位是否匹配
+     */
+    public boolean isPostMatch(List<Long> postIds) {
+        if (CollectionUtils.isEmpty(bindPosts)) {
+            return false;
+        }
+        if (bindPosts.stream().anyMatch(post -> "-1".equals(post.getPostId()))) {
+            return true;
+        }
+        return !Collections.disjoint(postIds.stream().map(String::valueOf).collect(Collectors.toList()), bindPosts.stream()
+                .map(Post::getPostId)
+                .collect(Collectors.toList()));
+    }
+
+    /**
      * @param flow 当前流程
      * @return
      */
@@ -388,8 +421,8 @@ public class Node extends BaseModel {
         data.setProcessedBy(processedBy);
         if (CollectionUtils.isNotEmpty(bindPosts)) {
             List<PostVO> postVOList = bindPosts.stream()
-                .map(Post::toPost)
-                .collect(Collectors.toList());
+                    .map(Post::toPost)
+                    .collect(Collectors.toList());
             data.setBindPosts(postVOList);
         }
         data.setSupervisorIds(supervisorIds);
@@ -407,10 +440,10 @@ public class Node extends BaseModel {
 
     public List<ProcessedByVO> processedByList(Flow flow) {
         return preNameList().stream()
-            .map(flow::findNode)
-            .filter(Objects::nonNull)
-            .map(node -> ProcessedByVO.of(node.getId(), node.getProcessedBy(), node.getProcessedTime()))
-            .collect(Collectors.toList());
+                .map(flow::findNode)
+                .filter(Objects::nonNull)
+                .map(node -> ProcessedByVO.of(node.getId(), node.getProcessedBy(), node.getProcessedTime()))
+                .collect(Collectors.toList());
     }
 
     public Node copyNode() {
@@ -453,7 +486,6 @@ public class Node extends BaseModel {
         data.setFlowId(flowId);
         return data;
     }
-
 
 
 }
