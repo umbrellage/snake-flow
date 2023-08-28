@@ -390,7 +390,9 @@ public class Node extends BaseModel {
         if (bindPosts.stream().anyMatch(post -> "-1".equals(post.getPostId()))) {
             return true;
         }
-        return !Collections.disjoint(postIds.stream().map(String::valueOf).collect(Collectors.toList()), bindPosts);
+        return !Collections.disjoint(postIds.stream().map(String::valueOf).collect(Collectors.toList()), bindPosts.stream()
+                .map(Post::getPostId)
+                .collect(Collectors.toList()));
     }
 
     /**
