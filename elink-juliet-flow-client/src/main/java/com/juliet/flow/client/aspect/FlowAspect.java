@@ -124,9 +124,9 @@ public class FlowAspect {
             if (flowResult.getCode() != 200 || flowResult.getData() == null) {
                 throw new ServiceException("当前用户没有操作权限");
             }
-            if (flowResult.getData().end()) {
-                throw new ServiceException("流程已经结束");
-            }
+//            if (flowResult.getData().end()) {
+//                throw new ServiceException("流程已经结束");
+//            }
             NodeVO node = flowResult.getData().getNodes().stream()
                 .filter(nodeVO -> nodeVO.getId().equals(julietNodeId))
                 .findAny()
