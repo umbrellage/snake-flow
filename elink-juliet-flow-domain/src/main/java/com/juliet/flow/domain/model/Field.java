@@ -1,6 +1,8 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.flow.client.vo.FieldVO;
+import com.juliet.flow.common.utils.IdGenerator;
+import java.util.Date;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,5 +29,18 @@ public class Field extends BaseModel {
         FieldVO data = new FieldVO();
         BeanUtils.copyProperties(this, data);
         return data;
+    }
+
+    public Field deepCopy() {
+        Field ret = new Field();
+        ret.setId(IdGenerator.getId());
+        ret.setCode(code);
+        ret.setName(name);
+        ret.setTenantId(getTenantId());
+        ret.setCreateBy(getCreateBy());
+        ret.setUpdateBy(getUpdateBy());
+        ret.setCreateTime(new Date());
+        ret.setUpdateTime(new Date());
+        return ret;
     }
 }

@@ -454,10 +454,27 @@ public class Node extends BaseModel {
         node.name = name;
         node.preName = preName;
         node.nextName = nextName;
-        node.form = form;
+        if (form != null) {
+            Form newForm = new Form();
+            newForm.setId(IdGenerator.getId());
+            newForm.setName(form.getName());
+            newForm.setPath(form.getPath());
+            newForm.setCode(form.getCode());
+            newForm.setFields(form.getFields().stream().map(Field::deepCopy).collect(Collectors.toList()));
+            newForm.setCreateBy(form.getCreateBy());
+            newForm.setCreateTime(new Date());
+            newForm.setUpdateBy(form.getUpdateBy());
+            newForm.setUpdateTime(new Date());
+            newForm.setTenantId(form.getTenantId());
+            node.form = newForm;
+        }
         node.status = status;
         node.type = type;
-        node.bindPosts = bindPosts;
+        if (CollectionUtils.isNotEmpty(bindPosts)) {
+            node.bindPosts = bindPosts.stream()
+                .map(Post::deepCopy)
+                .collect(Collectors.toList());
+        }
         node.accessRule = accessRule;
         node.submitRule = submitRule;
         node.processedBy = processedBy;
