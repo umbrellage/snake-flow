@@ -62,6 +62,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             log.error("read {} fail!", jsonFilePath, e);
         }
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
+        fillDefaultRequire(vo);
         fillFlowInfo(flow, vo);
         return vo;
     }
@@ -214,5 +215,16 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
         return node.getName().equals(graphNodeVO.getId()) || node.getName().equals(graphNodeVO.getProperties().getName());
+    }
+
+    /**
+     * 默认不设计required时，为true，即：有通知的待办节点
+     */
+    private void fillDefaultRequire(GraphVO graphVO) {
+        graphVO.getNodes().forEach(graphNodeVO -> {
+            if (graphNodeVO.getProperties().getRequired() == null) {
+                graphNodeVO.getProperties().setRequired(true);
+            }
+        });
     }
 }
