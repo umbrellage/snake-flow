@@ -475,6 +475,11 @@ public class Node extends BaseModel {
                 .map(Post::deepCopy)
                 .collect(Collectors.toList());
         }
+        if (CollectionUtils.isNotEmpty(bindSuppliers)) {
+            node.bindSuppliers = bindSuppliers.stream()
+                .map(Supplier::deepCopy)
+                .collect(Collectors.toList());
+        }
         node.accessRule = accessRule;
         node.submitRule = submitRule;
         node.processedBy = processedBy;
