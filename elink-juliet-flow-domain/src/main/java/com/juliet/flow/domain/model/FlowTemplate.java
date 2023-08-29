@@ -37,20 +37,17 @@ public class FlowTemplate extends BaseModel {
         Flow flow = new Flow();
         flow.setFlowTemplateId(this.id);
         flow.setTenantId(getTenantId());
-        nodes.forEach(node -> {
-            Date now = new Date();
-            node.setCreateTime(now);
-            node.setUpdateTime(now);
-        });
-        Node start = nodes.stream()
+        List<Node> nodeList = nodes.stream()
+            .map(Node::copyNode)
+            .collect(Collectors.toList());
+        Node start = nodeList.stream()
             .filter(node -> node.getType().equals(NodeTypeEnum.START))
             .findAny()
             .orElseThrow(() -> new ServiceException("找不到开始节点"));
-//        start.setStatus(NodeStatusEnum.PROCESSED);
         start.setStatus(NodeStatusEnum.ACTIVE);
         start.setProcessedTime(LocalDateTime.now());
         start.setProcessedBy(userId);
-        flow.setNodes(nodes);
+        flow.setNodes(nodeList);
         flow.setTenantId(getTenantId());
         flow.setStatus(FlowStatusEnum.IN_PROGRESS);
         cleanFlowId(flow);

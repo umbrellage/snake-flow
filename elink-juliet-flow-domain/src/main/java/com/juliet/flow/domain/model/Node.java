@@ -42,6 +42,8 @@ public class Node extends BaseModel {
 
     private Long flowId;
 
+    private Long mainFlowId;
+
     private String title;
 
     private String name;
@@ -473,6 +475,11 @@ public class Node extends BaseModel {
         if (CollectionUtils.isNotEmpty(bindPosts)) {
             node.bindPosts = bindPosts.stream()
                 .map(Post::deepCopy)
+                .collect(Collectors.toList());
+        }
+        if (CollectionUtils.isNotEmpty(bindSuppliers)) {
+            node.bindSuppliers = bindSuppliers.stream()
+                .map(Supplier::deepCopy)
                 .collect(Collectors.toList());
         }
         node.accessRule = accessRule;

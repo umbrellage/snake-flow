@@ -1,5 +1,7 @@
 package com.juliet.flow.domain.model;
 
+import com.juliet.flow.common.utils.IdGenerator;
+import java.util.Date;
 import lombok.Data;
 
 /**
@@ -14,4 +16,17 @@ public class Supplier extends BaseModel {
     private String supplierType;
 
     private Long supplierId;
+
+    public Supplier deepCopy() {
+        Supplier ret = new Supplier();
+        ret.setId(IdGenerator.getId());
+        ret.setSupplierId(supplierId);
+        ret.setSupplierType(supplierType);
+        ret.setTenantId(getTenantId());
+        ret.setCreateBy(getCreateBy());
+        ret.setUpdateBy(getUpdateBy());
+        ret.setCreateTime(new Date());
+        ret.setUpdateTime(new Date());
+        return ret;
+    }
 }

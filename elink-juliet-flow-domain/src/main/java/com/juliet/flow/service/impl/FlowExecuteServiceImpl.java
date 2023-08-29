@@ -190,18 +190,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         } else {
             node = flow.findTodoNode(dto.getUserId());
         }
-
-        if (node == null) {
-            node = findSubFlowList(flow.getId()).stream()
-                .map(subFlow -> subFlow.findTodoNode(dto.getUserId()))
-                .filter(Objects::nonNull)
-                .findAny()
-                .orElse(null);
+        if (node != null) {
+            return node.toNodeVo(flow);
         }
+        node = findSubFlowList(flow.getId()).stream()
+            .map(subFlow -> subFlow.findTodoNode(dto.getUserId()))
+            .filter(Objects::nonNull)
+            .findAny()
+            .orElse(null);
         if (node == null) {
             Node canDoNode = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList());
             if (canDoNode != null) {
-                return canDoNode.toNodeVo(null);
+                return canDoNode.toNodeVo(flow);
             }
             Node subCandoNode = findSubFlowList(flow.getId()).stream()
                 .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList()))
@@ -209,11 +209,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .findAny()
                 .orElse(null);
             if (subCandoNode != null) {
-                return subCandoNode.toNodeVo(null);
+                return subCandoNode.toNodeVo(flow);
             }
             return null;
         }
-        return node.toNodeVo(null);
+        return node.toNodeVo(flow);
 
         //  不做岗位的校验了
 //        if (CollectionUtils.isEmpty(dto.getPostIdList())) {
@@ -668,7 +668,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(dto.getMainFlow().getId());
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-        calibrateFlowList.add(dto.getMainFlow());
+//        calibrateFlowList.add(dto.getMainFlow());
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         flow.modifyNextNodeStatus(node.getId(), dto.getData());
