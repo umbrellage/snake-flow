@@ -373,7 +373,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntityFactory.fillNodeForm(nodes, formEntities);
         // 填充字段信息
         List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
-            .in(FieldEntity::getFormId,
+            .in(CollectionUtils.isNotEmpty(formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())), FieldEntity::getFormId,
                 formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())));
         FlowEntityFactory.fillNodeField(nodes, fieldEntities);
         // 填充岗位信息
