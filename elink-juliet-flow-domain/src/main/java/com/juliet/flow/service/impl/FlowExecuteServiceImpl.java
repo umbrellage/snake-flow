@@ -648,6 +648,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
         flowRepository.add(subFlow);
+        calibrateFlowList.forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         List<History> forwardHistory = subFlow.forwardHistory(subNode.getId(), dto.getExecuteId());
         historyRepository.add(forwardHistory);
         // 发送消息提醒
@@ -680,6 +681,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
             log.info("流程结束发送通知");
         }
+        calibrateFlowList.forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         flowRepository.update(flow);
         // 发送消息提醒
         if (end) {
@@ -717,6 +719,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
         errorFlow.modifyNextNodeStatus(node.getId(), dto.getData());
         syncFlow(calibrateFlowList, errorFlow);
+        calibrateFlowList.forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
             flow.setStatus(FlowStatusEnum.END);
             exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
