@@ -668,7 +668,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(dto.getMainFlow().getId());
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-        calibrateFlowList.add(dto.getMainFlow());
+//        calibrateFlowList.add(dto.getMainFlow());
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         flow.modifyNextNodeStatus(node.getId(), dto.getData());
