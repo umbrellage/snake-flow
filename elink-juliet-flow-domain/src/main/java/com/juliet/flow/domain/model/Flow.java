@@ -519,39 +519,6 @@ public class Flow extends BaseModel {
         nextNameList.stream()
             .map(this::findNode)
             .forEach(node -> activeNode(node, param));
-//        nodes.forEach(node -> {
-//            if (nextNameList.contains(node.getName())) {
-//                boolean preHandled = ifPreNodeIsHandle(node.getName());
-//                // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
-//                if (preHandled) {
-//                    if (node.getAccessRule() != null) {
-//                        param.put(FlowConstant.INNER_FLOW, this);
-//                        param.put(FlowConstant.CURRENT_NODE, node);
-//                        boolean flag = node.getAccessRule().accessRule(param);
-//                        // 如果规则不匹配，递归修改后面节点的状态为忽略
-//                        if (!flag) {
-//                            ignoreEqualAfterNode(node);
-//                        }
-//                    }
-//                    if (node.getType() == NodeTypeEnum.END) {
-//                        node.setStatus(NodeStatusEnum.PROCESSED);
-//                        return;
-//                    }
-//                    if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-//                        node.regularDistribution(param, this);
-//                        if (node.nodeTodo()) {
-//                            node.setStatus(NodeStatusEnum.ACTIVE);
-//                        } else {
-//                            node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
-//                        }
-//                        return;
-//                    }
-//                    if (node.getStatus() == NodeStatusEnum.PROCESSED) {
-//                        node.setStatus(NodeStatusEnum.ACTIVE);
-//                    }
-//                }
-//            }
-//        });
     }
 
     public void modifyNodeTodoStatusAndActiveSelf(Flow flow, Long completeNodeId, Map<String, Object> param) {

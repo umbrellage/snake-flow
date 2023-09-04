@@ -22,6 +22,11 @@ public class DataReviewRule extends BaseRule {
         return "supplier_settle_data_review";
     }
 
+    /**
+     * isLink：true， 资料初审
+     * @param params
+     * @return
+     */
     @Override
     public boolean accessRule(Map<String, Object> params) {
         if (!params.containsKey("supplierSettled")) {
