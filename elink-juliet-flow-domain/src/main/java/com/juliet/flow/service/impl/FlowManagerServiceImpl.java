@@ -155,16 +155,19 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             Node sourceNode = flow.getNodes().stream()
                 .filter(node -> isNodeMatched(node, sourceNodeGraph))
                 .findAny()
-                .orElseThrow(() -> new ServiceException("程图配置有问题，你再去检查下"));
+                .orElse(null);
 
             Node targetNode = flow.getNodes().stream()
                 .filter(node -> isNodeMatched(node, targetNodeGraph))
                 .findAny()
-                .orElseThrow(() -> new ServiceException("程图配置有问题，你再去检查下"));
-
+                .orElse(null);
             Property property = edge.getProperties();
             if (property == null) {
                 property = new Property();
+            }
+            if (sourceNode == null || targetNode == null) {
+                property.setActivated(false);
+                continue;
             }
             // 表示这个节点被激活或者已经激活过操作完了，所以这条线不出意外是要被激活的
             if (targetNode.getStatus() == NodeStatusEnum.ACTIVE ||
