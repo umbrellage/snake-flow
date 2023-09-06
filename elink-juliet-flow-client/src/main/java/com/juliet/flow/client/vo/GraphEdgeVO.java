@@ -23,6 +23,8 @@ public class GraphEdgeVO {
 
     private PointVO endPoint;
 
+    private Property properties;
+
     private List<PointVO> pointsList;
 
     @Data
@@ -32,4 +34,9 @@ public class GraphEdgeVO {
 
         private Integer y;
     }
+    @Data
+    public static class Property {
+        private boolean activated;
+    }
+
 }

@@ -32,16 +32,27 @@ public class GraphNodeVO {
         private String text;
 
         private String name;
+        /**
+         * 是否是当前节点
+         */
+        private boolean activated;
+        /**
+         * 是否是待办节点
+         */
+        private Boolean required;
 
-        private boolean active;
-
-        private boolean disabled;
+        /**
+         * 是否已完成
+         */
+        private Boolean finished;
+        /**
+         * 是否禁用
+         */
+        private Boolean disabled;
 
         private boolean canClick;
 
         private boolean canClickError;
-
-        private Boolean required;
 
         private String clickRemark;
 

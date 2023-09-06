@@ -1,9 +1,12 @@
 package com.juliet.flow.client.vo;
 
+import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import lombok.Data;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author xujianjie
@@ -30,4 +33,5 @@ public class GraphVO {
 
         return canClick > 0 || canClickError <= 0;
     }
+
 }

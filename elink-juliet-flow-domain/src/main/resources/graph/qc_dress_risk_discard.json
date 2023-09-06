@@ -67,7 +67,7 @@
   "edges": [
     {
       "id": "3bd4e8be-d24c-4465-b3f5-91db75f606ac",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "b",
       "targetNodeId": "c",
       "startPoint": {
@@ -92,7 +92,7 @@
     },
     {
       "id": "976d9c43-8598-4ee9-b629-8cd8bb63ceb3",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "c",
       "targetNodeId": "end",
       "startPoint": {

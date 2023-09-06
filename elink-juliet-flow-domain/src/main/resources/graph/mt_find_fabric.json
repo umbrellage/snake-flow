@@ -108,7 +108,7 @@
   "edges": [
     {
       "id": "76f3b830-38a5-4472-a914-96480f5ed839",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "a",
       "targetNodeId": "b",
       "startPoint": {
@@ -133,7 +133,7 @@
     },
     {
       "id": "8b0b730a-499e-469c-b646-19a078c8951a",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "b",
       "targetNodeId": "c",
       "startPoint": {
@@ -158,7 +158,7 @@
     },
     {
       "id": "997bbf2e-5bb1-4176-86bb-d991ba768373",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "c",
       "targetNodeId": "d",
       "startPoint": {

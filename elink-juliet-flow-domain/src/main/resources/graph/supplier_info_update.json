@@ -109,7 +109,7 @@
   "edges": [
     {
       "id": "e181a4ed-a091-46b3-94f0-3f1c7692991a",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "b",
       "targetNodeId": "c",
       "startPoint": {
@@ -143,7 +143,7 @@
     },
     {
       "id": "9a6ec943-7213-44bc-8ed1-c7d4f18f39fd",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "b",
       "targetNodeId": "d",
       "startPoint": {
@@ -177,7 +177,7 @@
     },
     {
       "id": "c19ecf30-83de-44bc-aa80-029fdd99eb1f",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "d",
       "targetNodeId": "e",
       "startPoint": {
@@ -203,7 +203,7 @@
     },
     {
       "id": "232b7937-fae1-430f-8198-62b47de1ed13",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "c",
       "targetNodeId": "end",
       "startPoint": {
@@ -245,7 +245,7 @@
     },
     {
       "id": "b9c23404-9721-4c09-869b-3ca0f130e278",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "e",
       "targetNodeId": "end",
       "startPoint": {

@@ -5,6 +5,10 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.common.security.utils.SecurityUtils;
+import com.juliet.flow.client.common.TodoNotifyEnum;
+import com.juliet.flow.client.vo.FlowVO;
+import com.juliet.flow.client.vo.GraphEdgeVO;
+import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -41,9 +46,6 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Override
     public GraphVO getGraph(Long id) {
-//        Flow flow = flowRepository.queryLatestByParentId(id);
-//        if (flow == null) {
-//        }
         Flow flow = flowRepository.queryById(id);
         if (flow == null) {
             throw new ServiceException("没有找到流程，id:" + id);
@@ -62,8 +64,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             log.error("read {} fail!", jsonFilePath, e);
         }
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
-        fillDefaultRequire(vo);
+//        fillDefaultRequire(vo);
         fillFlowInfo(flow, vo);
+        fillEdgeInfo(flow, vo);
         return vo;
     }
 
@@ -119,7 +122,10 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             return;
         }
         for (GraphNodeVO graphNodeVO : vo.getNodes()) {
-            graphNodeVO.getProperties().setActive(isActive(flow.getNodes(), graphNodeVO));
+            graphNodeVO.getProperties().setActivated(isActive(flow.getNodes(), graphNodeVO));
+            graphNodeVO.getProperties().setFinished(isFinished(flow.getNodes(), graphNodeVO));
+            graphNodeVO.getProperties().setDisabled(isDisabled(flow.getNodes(), graphNodeVO));
+            graphNodeVO.getProperties().setRequired(isRequire(flow.getNodes(), graphNodeVO));
             String text = getText(flow.getNodes(), graphNodeVO);
             if (text != null) {
                 graphNodeVO.getProperties().setText(text);
@@ -127,6 +133,50 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                     graphNodeVO.getText().setValue(text);
                 }
             }
+        }
+    }
+
+    private void fillEdgeInfo(Flow flow, GraphVO vo) {
+        if (org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getEdges()) ||
+            org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getNodes())) {
+            return;
+        }
+        for (GraphEdgeVO edge: vo.getEdges()) {
+            String sourceNodeId = edge.getSourceNodeId();
+            String targetNodeId = edge.getTargetNodeId();
+            GraphNodeVO sourceNodeGraph = vo.getNodes().stream()
+                .filter(node -> StringUtils.equals(sourceNodeId, node.getId()))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
+            GraphNodeVO targetNodeGraph = vo.getNodes().stream()
+                .filter(node -> StringUtils.equals(targetNodeId, node.getId()))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
+            Node sourceNode = flow.getNodes().stream()
+                .filter(node -> isNodeMatched(node, sourceNodeGraph))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("程图配置有问题，你再去检查下"));
+
+            Node targetNode = flow.getNodes().stream()
+                .filter(node -> isNodeMatched(node, targetNodeGraph))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("程图配置有问题，你再去检查下"));
+
+            Property property = edge.getProperties();
+            if (property == null) {
+                property = new Property();
+            }
+            // 表示这个节点被激活或者已经激活过操作完了，所以这条线不出意外是要被激活的
+            if (targetNode.getStatus() == NodeStatusEnum.ACTIVE ||
+                targetNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
+                targetNode.getStatus() == NodeStatusEnum.PROCESSED) {
+                // 但是如果前置节点如果是ignore了那么这条线不应该被激活
+                if (sourceNode.getStatus() != NodeStatusEnum.IGNORE) {
+                    property.setActivated(true);
+                    continue;
+                }
+            }
+            property.setActivated(false);
         }
     }
 
@@ -145,6 +195,33 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 if (node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    private boolean isRequire(List<Node> nodes, GraphNodeVO graphNodeVO) {
+        for (Node node : nodes) {
+            if (isNodeMatched(node, graphNodeVO)) {
+                return node.getTodoNotify() == TodoNotifyEnum.NOTIFY;
+            }
+        }
+        return false;
+    }
+
+    private boolean isDisabled(List<Node> nodes, GraphNodeVO graphNodeVO) {
+        for (Node node : nodes) {
+            if (isNodeMatched(node, graphNodeVO)) {
+                return node.getStatus() == NodeStatusEnum.IGNORE;
+            }
+        }
+        return false;
+    }
+
+    private boolean isFinished(List<Node> nodes, GraphNodeVO graphNodeVO) {
+        for (Node node : nodes) {
+            if (isNodeMatched(node, graphNodeVO)) {
+                return node.getStatus() == NodeStatusEnum.PROCESSED;
             }
         }
         return false;

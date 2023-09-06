@@ -109,7 +109,7 @@
   "edges": [
     {
       "id": "32f741ea-8672-47dc-9610-880cafd0454b",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "9e6dca7e-5918-417d-9937-6344b1b825c9",
       "targetNodeId": "a17f8fc0-98f4-4ce4-b5e4-e00242975bc1",
       "startPoint": {
@@ -135,7 +135,7 @@
     },
     {
       "id": "d49ed146-da9b-490c-bf41-d581bc138e4f",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "a17f8fc0-98f4-4ce4-b5e4-e00242975bc1",
       "targetNodeId": "ada31e6e-80b5-4ea4-be18-32d265cc7d0e",
       "startPoint": {
@@ -161,7 +161,7 @@
     },
     {
       "id": "a9582e94-740e-4bdb-bf74-6de4ef2805e1",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "ada31e6e-80b5-4ea4-be18-32d265cc7d0e",
       "targetNodeId": "58668fd8-b1a0-4b44-a2a8-0158a039f6d3",
       "startPoint": {
@@ -187,7 +187,7 @@
     },
     {
       "id": "93200442-953b-44db-b21d-5cb422b7996d",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "58668fd8-b1a0-4b44-a2a8-0158a039f6d3",
       "targetNodeId": "d50e754a-5a5b-4ed8-85d2-2dac87fa7833",
       "startPoint": {
