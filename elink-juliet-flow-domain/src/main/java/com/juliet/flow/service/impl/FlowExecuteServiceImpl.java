@@ -527,97 +527,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             }
             // 当节点是异常节点时
             if (node.isProcessed()) {
-//                // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
-//                // 判断有没有必要创建一条异常流程
-//                List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
-//                if (CollectionUtils.isNotEmpty(subList)) {
-//                    boolean flag = subList.stream()
-//                        .allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
-//                    if (!flag) {
-//                        throw new ServiceException("有流程将经过当前节点，不可变更");
-//                    }
-//                }
-//                Flow subFlow = flow.subFlow();
-//                subFlow.modifyNodeStatus(node);
-//                Node subNode = subFlow.findNode(node.getName());
-//                subFlow.modifyNextNodeStatus(subNode.getId(), data);
-//                syncFlow(calibrateFlowList, subFlow);
-//                List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
-//                historyRepository.add(forwardHistory);
-//                flowRepository.add(subFlow);
-//                // 发送消息提醒
-//                List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
-//                    .flatMap(Collection::stream)
-//                    .collect(Collectors.toList());
-//                callback(notifyDTOList);
-//                return;
                 TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
                 return createSubFlowTask(forwardDTO);
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-//                flow.modifyNextNodeStatus(nodeId, data);
-//                syncFlow(calibrateFlowList, flow);
-//                if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
-//                    .allMatch(Flow::isEnd))) {
-//                    end = true;
-//                    flow.setStatus(FlowStatusEnum.END);
-//                    exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
-//                    exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
-//                    log.info("流程结束发送通知");
-//                }
-//                flowRepository.update(flow);
-//                // 发送消息提醒
-//                if (end) {
-//                    callback(Collections.singletonList(flow.flowEndNotify()));
-//                }
-//                List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
-//                historyRepository.add(forwardHistory);
-//                callback(flow.normalNotifyList());
-//                callback(Collections.singletonList(node.toNotifyComplete(flow)));
                 TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
                 return forwardMainFlowTask(forwardDTO);
             }
         }
         if (node == null) {
-//            // 如果是异常流程的节点
-//            Flow errorFlow = exFlowList.stream()
-//                .filter(exFlow -> exFlow.findNode(nodeId) != null)
-//                .findAny().orElse(null);
-//            if (errorFlow == null) {
-//                return;
-//            }
-//            Node errorNode = errorFlow.findNode(nodeId);
-//            if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
-//                throw new ServiceException("该节点未被认领");
-//            }
-//            errorFlow.modifyNextNodeStatus(nodeId, data);
-//            syncFlow(calibrateFlowList, errorFlow);
-//            if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
-//                flow.setStatus(FlowStatusEnum.END);
-//                exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
-//                exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
-//                flow.setStatus(FlowStatusEnum.END);
-//                flowRepository.update(flow);
-//                end = true;
-//                log.info("流程结束发送通知");
-//            } else {
-//                flowRepository.update(errorFlow);
-//            }
-//            List<History> forwardHistory = flow.forwardHistory(nodeId, userId);
-//            historyRepository.add(forwardHistory);
-//
-//            if (end) {
-//                callback(Collections.singletonList(flow.flowEndNotify()));
-//            }
-//            // 异步发送消息提醒
-//            callback(errorFlow.normalNotifyList());
-//            callback(Collections.singletonList(errorNode.toNotifyComplete(errorFlow)));
             node = new Node();
             node.setId(nodeId);
             TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
-
             return forwardSubFlowTask(forwardDTO);
         }
         return Collections.emptyList();
@@ -668,7 +591,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(dto.getMainFlow().getId());
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-//        calibrateFlowList.add(dto.getMainFlow());
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         flow.modifyNextNodeStatus(node.getId(), dto.getData());
