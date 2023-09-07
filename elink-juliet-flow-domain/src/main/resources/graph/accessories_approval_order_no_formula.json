@@ -58,7 +58,7 @@
       "x": 550,
       "y": 520,
       "properties": {
-        "text": "分析师",
+        "text": "辅料分析师审核",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -75,7 +75,7 @@
       "text": {
         "x": 550,
         "y": 520,
-        "value": "分析师"
+        "value": "辅料分析师审核"
       }
     },
     {
@@ -84,7 +84,7 @@
       "x": 710,
       "y": 520,
       "properties": {
-        "text": "辅料开发员",
+        "text": "辅料开发员结束",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -101,7 +101,7 @@
       "text": {
         "x": 710,
         "y": 520,
-        "value": "辅料开发员"
+        "value": "辅料开发员结束"
       }
     },
     {
@@ -134,7 +134,7 @@
   "edges": [
     {
       "id": "399485fd-5bd9-40c8-b351-a7dbeb6c2857",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "17aa8119-a1a9-4e83-830c-2ae9fbc4ac7c",
       "targetNodeId": "f69a5595-c545-466b-b19e-88be92079c88",
       "startPoint": {
@@ -159,7 +159,7 @@
     },
     {
       "id": "560b83c8-cbf1-4fbf-b9d2-ee6a7c1b2bd1",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "f69a5595-c545-466b-b19e-88be92079c88",
       "targetNodeId": "545860d1-d70f-4ebd-9275-532d521037b0",
       "startPoint": {
@@ -184,7 +184,7 @@
     },
     {
       "id": "c7547f43-7944-4b04-94df-e84f635295ee",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "545860d1-d70f-4ebd-9275-532d521037b0",
       "targetNodeId": "e6ac6508-b1d5-4300-898c-bb4b024be7f6",
       "startPoint": {
@@ -209,7 +209,7 @@
     },
     {
       "id": "05587393-3e20-41d4-933e-d626ba047a79",
-      "type": "polyline",
+      "type": "flowEdge",
       "sourceNodeId": "e6ac6508-b1d5-4300-898c-bb4b024be7f6",
       "targetNodeId": "f3524385-7ad5-4d28-80e9-db032a359f3e",
       "startPoint": {
