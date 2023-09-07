@@ -481,7 +481,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .values());
 
         for (Node node : nodeList) {
-            List<HistoricTaskInstance> taskInstances = task(mainFlow.getId(), node.getId(), node.getProcessedBy(), dto.getData());
+            List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(), dto.getData());
             historicTaskInstanceList.addAll(taskInstances);
         }
 
@@ -502,24 +502,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
      * 4. 当前节点为异常流程中的节点，且该异常流程并未结束 --------> 按照处理异常流程和正常流程的方式处理
      * </ul>
      *
-     * @param flowId 主流程节点
+     * @param mainFlow 主流程
      * @param nodeId
      * @param userId
      */
-    @Override
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<HistoricTaskInstance> task(Long flowId, Long nodeId, Long userId, Map<String, Object> data) {
-        Flow flow = flowRepository.queryById(flowId);
-        if (flow == null || flow.hasParentFlow()) {
-            log.error("流程存在异常{}", JSON.toJSONString(flow));
-            throw new ServiceException("流程存在异常");
-        }
+    public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId, Map<String, Object> data) {
         // 查询异常流程
-        List<Flow> exFlowList = flowRepository.listFlowByParentId(flowId);
+        List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-        calibrateFlowList.add(flow);
+        calibrateFlowList.add(mainFlow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
-        Node node = flow.findNode(nodeId);
+        Node node = mainFlow.findNode(nodeId);
         // 如果是主流程的节点
         if (node != null) {
             if (!node.isExecutable()) {
@@ -527,20 +521,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             }
             // 当节点是异常节点时
             if (node.isProcessed()) {
-                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
                 return createSubFlowTask(forwardDTO);
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+                TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
                 return forwardMainFlowTask(forwardDTO);
             }
         }
         if (node == null) {
             node = new Node();
             node.setId(nodeId);
-            TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(flow, node, userId, data);
+            TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
             return forwardSubFlowTask(forwardDTO);
         }
         return Collections.emptyList();

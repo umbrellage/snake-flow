@@ -111,6 +111,7 @@ public interface JulietFlowClient {
      * @param dto 必填
      * @return
      */
+    @Deprecated
     @PostMapping("/bpm/task")
     AjaxResult<List<HistoricTaskInstance>> task(@RequestBody TaskDTO dto);
 

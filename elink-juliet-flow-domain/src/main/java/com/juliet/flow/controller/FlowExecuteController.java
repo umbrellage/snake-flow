@@ -135,7 +135,6 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("执行一个节点任务")
     @Override
     public AjaxResult<List<HistoricTaskInstance>> task(TaskDTO dto) {
-        flowExecuteService.task(dto.getFlowId(), dto.getNodeId(), dto.getUserId(), Collections.emptyMap());
         return AjaxResult.success();
     }
 

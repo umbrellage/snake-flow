@@ -156,7 +156,6 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 .filter(node -> isNodeMatched(node, sourceNodeGraph))
                 .findAny()
                 .orElse(null);
-
             Node targetNode = flow.getNodes().stream()
                 .filter(node -> isNodeMatched(node, targetNodeGraph))
                 .findAny()
