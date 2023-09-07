@@ -9,6 +9,7 @@ import lombok.Data;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 
 /**
  * @author xujianjie
@@ -75,6 +76,10 @@ public class NodeQuery {
         if (CollectionUtils.isNotEmpty(postIdList)) {
             data.setPostIds(postIdList.stream().map(String::valueOf).collect(Collectors.toList()));
         }
+        if (data.getPostIds() == null) {
+            data.setPostIds(Lists.newArrayList());
+        }
+        data.getPostIds().add("-1");
         data.setStatusList(Stream.of(NodeStatusEnum.TO_BE_CLAIMED, NodeStatusEnum.ACTIVE).map(NodeStatusEnum::getCode)
             .collect(Collectors.toList()));
         return data;
