@@ -50,6 +50,10 @@ public class FlowContext {
         LOCAL_CACHE.set(local);
     }
 
+    public static void putAutoOperator(Long userId) {
+        putAttachment("autoOperator", userId);
+    }
+
     public static Object getAttachment(String key) {
         Map<String, Object> local = LOCAL_CACHE.get();
         if (local != null) {
