@@ -5,6 +5,7 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.common.security.utils.SecurityUtils;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
@@ -12,13 +13,16 @@ import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
+import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.repository.FlowRepository;
+import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -43,6 +47,8 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Autowired
     private FlowRepository flowRepository;
+    @Autowired
+    private HistoryRepository historyRepository;
 
     @Override
     public GraphVO getGraph(Long id) {
@@ -63,10 +69,11 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         } catch (IOException e) {
             log.error("read {} fail!", jsonFilePath, e);
         }
+        List<History> historyList = historyRepository.queryByFlowId(id);
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
 //        fillDefaultRequire(vo);
         fillFlowInfo(flow, vo);
-        fillEdgeInfo(flow, vo);
+        fillEdgeInfo(flow, vo, historyList);
         return vo;
     }
 
@@ -136,7 +143,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
     }
 
-    private void fillEdgeInfo(Flow flow, GraphVO vo) {
+    private void fillEdgeInfo(Flow flow, GraphVO vo, List<History> historyList) {
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getEdges()) ||
             org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getNodes())) {
             return;
@@ -168,16 +175,23 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 property.setActivated(false);
                 continue;
             }
-            // 表示这个节点被激活或者已经激活过操作完了，所以这条线不出意外是要被激活的
-            if (targetNode.getStatus() == NodeStatusEnum.ACTIVE ||
-                targetNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
-                targetNode.getStatus() == NodeStatusEnum.PROCESSED) {
-                // 但是如果前置节点如果是ignore了那么这条线不应该被激活
-                if (sourceNode.getStatus() != NodeStatusEnum.IGNORE) {
-                    property.setActivated(true);
-                    continue;
-                }
+
+            if (historyList.stream()
+                    .filter(history -> history.getAction() == OperateTypeEnum.FORWARD)
+                    .anyMatch(history -> Objects.equals(history.getSourceNodeId(), sourceNode.getId()) && Objects.equals(history.getTargetNodeId(), targetNode.getId()))) {
+                property.setActivated(true);
+                continue;
             }
+//            // 表示这个节点被激活或者已经激活过操作完了，所以这条线不出意外是要被激活的
+//            if (targetNode.getStatus() == NodeStatusEnum.ACTIVE ||
+//                targetNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
+//                targetNode.getStatus() == NodeStatusEnum.PROCESSED) {
+//                // 但是如果前置节点如果是ignore了那么这条线不应该被激活
+//                if (sourceNode.getStatus() != NodeStatusEnum.IGNORE) {
+//                    property.setActivated(true);
+//                    continue;
+//                }
+//            }
             property.setActivated(false);
         }
     }

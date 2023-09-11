@@ -154,6 +154,9 @@ public class Node extends BaseModel {
 
 
     public LocalDateTime getProcessedTime() {
+        if (processedBy == null || processedBy == 0L) {
+            return null;
+        }
         return JulietTimeMemo.toDateTime(getUpdateTime());
     }
 

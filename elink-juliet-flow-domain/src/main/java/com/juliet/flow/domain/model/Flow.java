@@ -15,6 +15,8 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,21 +68,21 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         Node end = nodes.stream()
-            .filter(e -> e.getType() == NodeTypeEnum.END).findAny()
-            .orElseThrow(() -> new ServiceException("不存在结束节点，流程异常，流程id：" + id));
+                .filter(e -> e.getType() == NodeTypeEnum.END).findAny()
+                .orElseThrow(() -> new ServiceException("不存在结束节点，流程异常，流程id：" + id));
         List<Node> nodeList = end.preNameList().stream()
-            .map(this::findNode)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+                .map(this::findNode)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
         return nodeList.stream().map(Node::getProcessedBy).filter(Objects::nonNull)
-            .distinct()
-            .collect(Collectors.toList());
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public void reject() {
         nodes.forEach(node -> {
             if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
-                node.setStatus(NodeStatusEnum.PROCESSED);
+                node.setStatus(NodeStatusEnum.IGNORE);
             }
         });
         status = FlowStatusEnum.END;
@@ -102,9 +104,10 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return currentNode.nextNameList().stream()
-            .map(this::findNode)
-            .map(node -> History.of(this, userId, nodeId, node.getId()))
-            .collect(Collectors.toList());
+                .map(this::findNode)
+                .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+                .map(node -> History.of(this, userId, nodeId, node.getId()))
+                .collect(Collectors.toList());
     }
 
 
@@ -135,9 +138,9 @@ public class Flow extends BaseModel {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
         return nodes.stream().allMatch(
-            node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
-                node.getStatus() == NodeStatusEnum.IGNORE ||
-                node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
+                node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+                        node.getStatus() == NodeStatusEnum.IGNORE ||
+                        node.getTodoNotify() == TodoNotifyEnum.NO_NOTIFY);
     }
 
 
@@ -149,15 +152,15 @@ public class Flow extends BaseModel {
      */
     public Node findNode(List<String> fieldCodeList) {
         return nodes.stream().filter(node -> {
-                Form form = node.getForm();
-                List<String> codeList = form.getFields().stream()
-                    .map(Field::getCode)
-                    .collect(Collectors.toList());
+                    Form form = node.getForm();
+                    List<String> codeList = form.getFields().stream()
+                            .map(Field::getCode)
+                            .collect(Collectors.toList());
 
-                return codeList.containsAll(fieldCodeList) && fieldCodeList.size() == codeList.size();
-            })
-            .findAny()
-            .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
+                    return codeList.containsAll(fieldCodeList) && fieldCodeList.size() == codeList.size();
+                })
+                .findAny()
+                .orElseThrow(() -> new ServiceException("提交的表单数据无法查询到相应的流程，请检查提交的参数"));
     }
 
 
@@ -166,9 +169,9 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
-            .findAny()
-            .orElse(null);
+                .filter(node -> userId.equals(node.getProcessedBy()) && node.isTodoNode())
+                .findAny()
+                .orElse(null);
     }
 
 
@@ -177,8 +180,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElse(null);
+                .filter(node -> node.getId().equals(nodeId)).findAny()
+                .orElse(null);
     }
 
     public Node findNodeThrow(Long nodeId) {
@@ -186,8 +189,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getId().equals(nodeId)).findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(node -> node.getId().equals(nodeId)).findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
     }
 
     public Node findNode(String name) {
@@ -195,8 +198,8 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getName().equals(name)).findAny()
-            .orElse(null);
+                .filter(node -> node.getName().equals(name)).findAny()
+                .orElse(null);
     }
 
     public Node findNodeThrow(String name) {
@@ -204,16 +207,16 @@ public class Flow extends BaseModel {
             return null;
         }
         return nodes.stream()
-            .filter(node -> node.getName().equals(name)).findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(node -> node.getName().equals(name)).findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
     }
 
     public Node startNode() {
         if (CollectionUtils.isNotEmpty(nodes)) {
             return nodes.stream()
-                .filter(node -> node.getType().equals(NodeTypeEnum.START))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("找不到开始节点"));
+                    .filter(node -> node.getType().equals(NodeTypeEnum.START))
+                    .findAny()
+                    .orElseThrow(() -> new ServiceException("找不到开始节点"));
         }
         throw new ServiceException("节点为空");
     }
@@ -244,9 +247,9 @@ public class Flow extends BaseModel {
          * 只判断当前节点的前一级节点
          */
         return Arrays.stream(currentNode.getPreName().split(","))
-            .map(this::findNode)
-            .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
-            node.getStatus() == NodeStatusEnum.IGNORE);
+                .map(this::findNode)
+                .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED ||
+                        node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
     public List<Node> recursionGetPreNode(String name) {
@@ -268,8 +271,8 @@ public class Flow extends BaseModel {
 
     public List<Node> getPreNode(Node node) {
         return node.preNameList().stream()
-            .map(this::findNode)
-            .collect(Collectors.toList());
+                .map(this::findNode)
+                .collect(Collectors.toList());
     }
 
 
@@ -286,8 +289,8 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(node -> nodeStatusList.contains(node.getStatus()))
-            .collect(Collectors.toList());
+                .filter(node -> nodeStatusList.contains(node.getStatus()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -337,8 +340,8 @@ public class Flow extends BaseModel {
         data.setTenantId(tenantId);
         if (CollectionUtils.isNotEmpty(nodes)) {
             List<NodeVO> nodeVOList = nodes.stream()
-                .map(e -> e.toNodeVo(this))
-                .collect(Collectors.toList());
+                    .map(e -> e.toNodeVo(this))
+                    .collect(Collectors.toList());
             data.setNodes(nodeVOList);
         }
         data.setHasSubFlow(CollectionUtils.isNotEmpty(subFlowList));
@@ -352,9 +355,9 @@ public class Flow extends BaseModel {
     public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
         FlowVO data = flowVO(subFlowList);
         Map<Long, History> historyMap = historyList.stream()
-            .filter(history -> history.getTargetNodeId() != null)
-            .collect(Collectors.toMap(History::getTargetNodeId, Function.identity(),
-                (x, y) -> x.getCreateTime().isAfter(y.getCreateTime()) ? x : y));
+                .filter(history -> history.getTargetNodeId() != null)
+                .collect(Collectors.toMap(History::getTargetNodeId, Function.identity(),
+                        (x, y) -> x.getCreateTime().isAfter(y.getCreateTime()) ? x : y));
         data.getNodes().forEach(node -> {
             History history = historyMap.get(node.getId());
             if (history != null) {
@@ -373,8 +376,8 @@ public class Flow extends BaseModel {
         flow.setFlowTemplateId(flowTemplateId);
         flow.setParentId(id);
         List<Node> nodeList = nodes.stream()
-            .map(Node::copyNode)
-            .collect(Collectors.toList());
+                .map(Node::copyNode)
+                .collect(Collectors.toList());
         flow.setNodes(nodeList);
         flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
@@ -412,12 +415,12 @@ public class Flow extends BaseModel {
         ignoreNode.setStatus(NodeStatusEnum.IGNORE);
         List<String> nextNameList = ignoreNode.nextNameList();
         List<Node> ignoreNodeList = nextNameList.stream()
-            .map(this::findNode)
-            .filter(node -> node.preNameList().stream()
                 .map(this::findNode)
-                .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
-            .distinct()
-            .collect(Collectors.toList());
+                .filter(node -> node.preNameList().stream()
+                        .map(this::findNode)
+                        .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
+                .distinct()
+                .collect(Collectors.toList());
 
         for (Node node : ignoreNodeList) {
             ignoreEqualAfterNode(node);
@@ -434,9 +437,9 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(Node::isTodoNode)
-            .map(node -> node.toNotifyNormal(this))
-            .collect(Collectors.toList());
+                .filter(Node::isTodoNode)
+                .map(node -> node.toNotifyNormal(this))
+                .collect(Collectors.toList());
     }
 
     public NotifyDTO flowEndNotify() {
@@ -458,14 +461,14 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-            .filter(Node::isToBeExecuted)
-            .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
-            .collect(Collectors.toList());
+                .filter(Node::isToBeExecuted)
+                .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
+                .collect(Collectors.toList());
     }
 
     public void activeNode(Node node, Map<String, Object> param) {
         log.info("node:{}", JSON.toJSON(node));
-        boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule()== null || node.getActiveRule().activeSelf(this));
+        boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule() == null || node.getActiveRule().activeSelf(this));
         // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
         if (preHandled) {
             if (node.getAccessRule() != null) {
@@ -479,6 +482,7 @@ public class Flow extends BaseModel {
             }
             if (node.getType() == NodeTypeEnum.END) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
+                node.setProcessedTime(LocalDateTime.now());
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
@@ -517,30 +521,30 @@ public class Flow extends BaseModel {
         // 修改节点消息通知状态
         modifyNodeTodoStatusAndActiveSelf(this, nodeId, param);
         nextNameList.stream()
-            .map(this::findNode)
-            .forEach(node -> activeNode(node, param));
+                .map(this::findNode)
+                .forEach(node -> activeNode(node, param));
     }
 
     public void modifyNodeTodoStatusAndActiveSelf(Flow flow, Long completeNodeId, Map<String, Object> param) {
         nodes.stream()
-            .filter(node -> node.getActiveRule() != null)
-            .forEach(node -> {
-                List<Long> nodeIdList = node.getActiveRule().notifyNodeIds(flow);
-                nodeIdList.forEach(nodeId -> {
-                    Node activeNode = findNode(nodeId);
-                    if (activeNode == null) {
-                        throw new ServiceException("node active rule configuration error, nodeId:" + nodeId);
+                .filter(node -> node.getActiveRule() != null)
+                .forEach(node -> {
+                    List<Long> nodeIdList = node.getActiveRule().notifyNodeIds(flow);
+                    nodeIdList.forEach(nodeId -> {
+                        Node activeNode = findNode(nodeId);
+                        if (activeNode == null) {
+                            throw new ServiceException("node active rule configuration error, nodeId:" + nodeId);
+                        }
+                        activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
+                    });
+                    if (completeNodeId.equals(node.getId())) {
+                        return;
                     }
-                    activeNode.setTodoNotify(TodoNotifyEnum.NOTIFY);
+                    boolean active = node.getActiveRule().activeSelf(flow);
+                    if (active && node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                        activeNode(node, param);
+                    }
                 });
-                if (completeNodeId.equals(node.getId())) {
-                    return;
-                }
-                boolean active = node.getActiveRule().activeSelf(flow);
-                if (active && node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
-                    activeNode(node, param);
-                }
-            });
     }
 
     /**
@@ -564,7 +568,7 @@ public class Flow extends BaseModel {
     public List<NotifyDTO> calibrateFlow(Flow standardFlow) {
         List<NotifyDTO> notifyNodeList = new ArrayList<>();
         Map<String, Node> nodeMap = standardFlow.getNodes().stream()
-            .collect(Collectors.toMap(Node::getName, Function.identity()));
+                .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
             if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
@@ -595,7 +599,7 @@ public class Flow extends BaseModel {
     public List<Node> calibrateFlowV2(Flow standardFlow) {
         List<Node> notifyNodeList = new ArrayList<>();
         Map<String, Node> nodeMap = standardFlow.getNodes().stream()
-            .collect(Collectors.toMap(Node::getName, Function.identity()));
+                .collect(Collectors.toMap(Node::getName, Function.identity()));
         nodes.forEach(node -> {
             Node standardNode = nodeMap.get(node.getName());
             if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
@@ -633,9 +637,9 @@ public class Flow extends BaseModel {
         // 上一个节点
         if (dto.getRollbackType() == 1) {
             List<Node> notifyNode = node.preNameList().stream()
-                .map(this::findNode)
-                .peek(preNode -> preNode.setStatus(NodeStatusEnum.ACTIVE))
-                .collect(Collectors.toList());
+                    .map(this::findNode)
+                    .peek(preNode -> preNode.setStatus(NodeStatusEnum.ACTIVE))
+                    .collect(Collectors.toList());
             node.setStatus(NodeStatusEnum.NOT_ACTIVE);
             return notifyNode.get(0);
         }
@@ -669,8 +673,8 @@ public class Flow extends BaseModel {
 
     public Node findCanDoAndCanExecuteNodeAny(Long userId, List<Long> postIdList) {
         return nodes.stream()
-            .filter(node -> node.isUserCando(userId, postIdList))
-            .findAny()
-            .orElse(null);
+                .filter(node -> node.isUserCando(userId, postIdList))
+                .findAny()
+                .orElse(null);
     }
 }

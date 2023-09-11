@@ -116,6 +116,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
         flowRepository.update(dbFlow);
+        List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
+        historyRepository.add(forwardHistory);
         callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
@@ -136,9 +138,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (dbFlow.isEnd()) {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
-        List<History> forwardHistory = flow.forwardHistory(node.getId(), dto.getUserId());
-        historyRepository.add(forwardHistory);
         flowRepository.update(dbFlow);
+        List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
+        historyRepository.add(forwardHistory);
         callback(dbFlow.normalNotifyList());
 
         return forwardHistory.stream()

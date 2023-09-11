@@ -59,6 +59,9 @@ public class History {
     public HistoryEntity to() {
         HistoryEntity entity = new HistoryEntity();
         BeanUtils.copyProperties(this, entity);
+        if (action != null) {
+            entity.setAction(action.getCode());
+        }
         entity.setCreateTime(new Date());
         return entity;
     }
