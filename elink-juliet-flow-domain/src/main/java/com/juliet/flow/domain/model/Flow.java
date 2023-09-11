@@ -15,6 +15,8 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 
 import com.juliet.flow.constant.FlowConstant;
+
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -479,6 +481,7 @@ public class Flow extends BaseModel {
             }
             if (node.getType() == NodeTypeEnum.END) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
+                node.setProcessedTime(LocalDateTime.now());
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
