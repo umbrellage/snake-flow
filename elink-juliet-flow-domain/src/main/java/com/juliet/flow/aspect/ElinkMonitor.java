@@ -17,6 +17,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -47,6 +48,8 @@ public class ElinkMonitor {
         logger.info("Request start... uuid:{}, url:{},method:{}, body:{}, aop time:{} ms", data.getUuid(), data.getUrl(),
             data.getHttpMethod(), data.getBody(), timeConsuming.consume());
 
+        MDC.put("logId", data.getUuid());
+
         Object response = point.proceed();
 
         logger.trace("Response print.uuid:{}, url:{},method:{}, body:{} response:{}",
@@ -56,7 +59,6 @@ public class ElinkMonitor {
 
         logger.info("Performance monitoring, uuid:{}, url:{}, status code:{}, cost time:{} ms ",
             data.getUuid(), data.getUrl(), status, timeConsuming.consume());
-
         return response;
     }
 

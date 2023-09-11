@@ -27,6 +27,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import java.util.Collections;
 import java.util.List;
+
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -173,7 +175,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @Override
     public AjaxResult<GraphVO> templateGraph(Long id, String templateCode) {
-        return AjaxResult.success(flowManagerService.getTemplateGraph(id, templateCode));
+         return AjaxResult.success(flowManagerService.getTemplateGraph(id, templateCode));
     }
 
     @Override
