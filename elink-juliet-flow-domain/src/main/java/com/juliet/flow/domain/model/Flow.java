@@ -82,7 +82,7 @@ public class Flow extends BaseModel {
     public void reject() {
         nodes.forEach(node -> {
             if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
-                node.setStatus(NodeStatusEnum.PROCESSED);
+                node.setStatus(NodeStatusEnum.IGNORE);
             }
         });
         status = FlowStatusEnum.END;
