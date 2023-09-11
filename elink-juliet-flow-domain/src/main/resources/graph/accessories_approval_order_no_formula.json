@@ -33,7 +33,7 @@
       "y": 520,
       "properties": {
         "text": "辅料开发员",
-        "name": "",
+        "name": "a",
         "post": [],
         "distributeInfo": {
           "type": 0,
@@ -59,7 +59,7 @@
       "y": 520,
       "properties": {
         "text": "辅料分析师审核",
-        "name": "",
+        "name": "b",
         "post": [],
         "distributeInfo": {
           "type": 0,
@@ -85,7 +85,7 @@
       "y": 520,
       "properties": {
         "text": "辅料开发员结束",
-        "name": "",
+        "name": "c",
         "post": [],
         "distributeInfo": {
           "type": 0,
@@ -111,7 +111,7 @@
       "y": 520,
       "properties": {
         "text": "结束",
-        "name": "",
+        "name": "end",
         "post": [],
         "distributeInfo": {
           "type": 0,
