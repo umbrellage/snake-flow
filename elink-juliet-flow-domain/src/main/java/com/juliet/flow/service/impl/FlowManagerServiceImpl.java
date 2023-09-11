@@ -22,6 +22,7 @@ import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -177,7 +178,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
             if (historyList.stream()
                     .filter(history -> history.getAction() == OperateTypeEnum.FORWARD)
-                    .anyMatch(history -> history.getSourceNodeId().equals(sourceNode.getId()) && history.getTargetNodeId().equals(targetNode.getId()))) {
+                    .anyMatch(history -> Objects.equals(history.getSourceNodeId(), sourceNode.getId()) && Objects.equals(history.getTargetNodeId(), targetNode.getId()))) {
                 property.setActivated(true);
                 continue;
             }
