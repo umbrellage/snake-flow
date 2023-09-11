@@ -5,7 +5,7 @@
     <!-- 日志输出格式 -->
     <conversionRule conversionWord="trace" converterClass="com.juliet.flow.common.utils.TraceIdPatten" />
     <springProperty scope="context" name="appName" source="spring.application.name"/>
-    <property name="log.pattern" value="[%d{yyyy-MM-dd HH:mm:ss}][%thread][%level][%logger{20},%method,%line][%trace][${appName}] - %msg%n"/>
+    <property name="log.pattern" value="[%d{yyyy-MM-dd HH:mm:ss}][%thread][%level][%logger{20},%method,%line][%X{logId}][${appName}] - %msg%n"/>
 
     <!-- 控制台输出 -->
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
