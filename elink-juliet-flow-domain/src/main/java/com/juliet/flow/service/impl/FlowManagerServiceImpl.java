@@ -5,6 +5,7 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.common.security.utils.SecurityUtils;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
@@ -174,8 +175,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 continue;
             }
 
-            if (historyList.stream().anyMatch(history ->
-                    history.getSourceNodeId().equals(sourceNode.getId()) && history.getTargetNodeId().equals(targetNode.getId()))) {
+            if (historyList.stream()
+                    .filter(history -> history.getAction() == OperateTypeEnum.FORWARD)
+                    .anyMatch(history -> history.getSourceNodeId().equals(sourceNode.getId()) && history.getTargetNodeId().equals(targetNode.getId()))) {
                 property.setActivated(true);
                 continue;
             }
