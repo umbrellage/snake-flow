@@ -466,6 +466,16 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 流程自检，当发起了一条异常流程时，可能会改变原有的路线，所以我们在新发起的异常流程中进行了流程同步，但是由于被同步的流程是不进行
+     * @param param
+     */
+    public void flowSelfCheck(Map<String, Object> param) {
+        nodes.stream()
+                .filter(node -> node.getStatus() == NodeStatusEnum.NOT_ACTIVE)
+                .forEach(node -> activeNode(node, param));
+    }
+
     public void activeNode(Node node, Map<String, Object> param) {
         log.info("node:{}", JSON.toJSON(node));
         boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule() == null || node.getActiveRule().activeSelf(this));
