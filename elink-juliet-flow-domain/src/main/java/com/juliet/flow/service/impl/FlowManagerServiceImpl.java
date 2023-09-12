@@ -11,6 +11,7 @@ import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.History;
@@ -182,6 +183,12 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 property.setActivated(true);
                 continue;
             }
+            // 结束节点的线特殊处理
+            if (targetNode.getType() == NodeTypeEnum.END && sourceNode.getStatus() == NodeStatusEnum.PROCESSED) {
+                property.setActivated(true);
+                continue;
+            }
+            // 这是旧的一种解决方案，通过节点的状态来处理，新的解决方案是通过流程流转的记录
 //            // 表示这个节点被激活或者已经激活过操作完了，所以这条线不出意外是要被激活的
 //            if (targetNode.getStatus() == NodeStatusEnum.ACTIVE ||
 //                targetNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
