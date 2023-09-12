@@ -44,7 +44,7 @@ public class ElinkMonitor {
         }
 
         ReqData data = printReqParam(point);
-        MDC.put("logId", data.getUuid());
+        MDC.put("traceId", data.getUuid());
         logger.info("Request start... uuid:{}, url:{},method:{}, body:{}, aop time:{} ms", data.getUuid(), data.getUrl(),
             data.getHttpMethod(), data.getBody(), timeConsuming.consume());
 
