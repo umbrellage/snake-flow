@@ -105,7 +105,9 @@ public class Flow extends BaseModel {
         }
         return currentNode.nextNameList().stream()
                 .map(this::findNode)
-                .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE || node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+                .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE ||
+                        node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
+                        node.getStatus() == NodeStatusEnum.NOT_ACTIVE)
                 .map(node -> History.of(this, userId, nodeId, node.getId()))
                 .collect(Collectors.toList());
     }
@@ -468,6 +470,7 @@ public class Flow extends BaseModel {
 
     /**
      * 流程自检，当发起了一条异常流程时，可能会改变原有的路线，所以我们在新发起的异常流程中进行了流程同步，但是由于被同步的流程是不进行
+     *
      * @param param
      */
     public void flowSelfCheck(Map<String, Object> param) {
