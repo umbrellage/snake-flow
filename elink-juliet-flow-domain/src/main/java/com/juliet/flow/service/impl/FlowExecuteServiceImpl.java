@@ -6,6 +6,7 @@ import static java.util.stream.Collectors.toCollection;
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.callback.MsgNotifyCallback;
+import com.juliet.flow.client.common.thread.ThreadPoolFactory;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
@@ -45,6 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -402,20 +404,41 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     public List<NodeVO> todoNodeList(UserDTO dto, TodoNotifyEnum notify) {
-        List<Node> userIdNodeList = flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId()));
-        List<Node> supervisorIdNodeList = flowRepository.listNode(NodeQuery.findBySupervisorId(dto.getUserId()));
+        List<Node> userIdNodeList = new ArrayList<>();
+        List<Node> supervisorIdNodeList = new ArrayList<>();
         List<Node> postIdNodeList = new ArrayList<>();
+        List<Node> supplierNodeList = new ArrayList<>();
+        Future<List<Node>> supplierNodeFuture = null;
+        Future<List<Node>> postIdNodeListFuture = null;
+
+        Future<List<Node>> userIdNodeFuture = ThreadPoolFactory.THREAD_POOL_TODO_MAIN
+            .submit(() -> flowRepository.listNode(NodeQuery.findByUserId(dto.getUserId())));
+
+        Future<List<Node>> supervisorIdNodeFuture = ThreadPoolFactory.THREAD_POOL_TODO_MAIN
+            .submit(() -> flowRepository.listNode(NodeQuery.findBySupervisorId(dto.getUserId())));
+
         if (CollectionUtils.isNotEmpty(dto.getPostId())) {
-            postIdNodeList = flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())).stream()
+            postIdNodeListFuture = ThreadPoolFactory.THREAD_POOL_TODO_MAIN
+                .submit(() -> flowRepository.listNode(NodeQuery.findByPostId(dto.getPostId())));
+        }
+        if (dto.getSupplier() != null) {
+            supplierNodeFuture = ThreadPoolFactory.THREAD_POOL_TODO_MAIN
+                .submit(() -> flowRepository.listNode(dto.supplierId(), dto.supplierType()));
+        }
+
+        userIdNodeList = ThreadPoolFactory.get(userIdNodeFuture);
+        supervisorIdNodeList = ThreadPoolFactory.get(supervisorIdNodeFuture);
+        if (postIdNodeListFuture != null) {
+            postIdNodeList = ThreadPoolFactory.get(postIdNodeListFuture).stream()
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
                 .collect(Collectors.toList());
         }
-        List<Node> supplierNodeList = new ArrayList<>();
-        if (dto.getSupplier() != null) {
-            supplierNodeList = flowRepository.listNode(dto.supplierId(), dto.supplierType()).stream()
+        if (supplierNodeFuture != null) {
+            supplierNodeList = ThreadPoolFactory.get(supplierNodeFuture).stream()
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy() == 0L)
                 .collect(Collectors.toList());
         }
+
         List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .map(Node::getFlowId)

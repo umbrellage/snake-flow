@@ -60,7 +60,8 @@ public class TestController {
     public AjaxResult send() {
         NotifyDTO dto = new NotifyDTO();
         dto.setCode("dd");
-        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
+//        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
+        log.info("data:{}", JSON.toJSONString(dto));
         return AjaxResult.success();
     }
 
