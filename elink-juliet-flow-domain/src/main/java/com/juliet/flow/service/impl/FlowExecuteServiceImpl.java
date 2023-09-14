@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
 import com.alibaba.fastjson2.JSON;
+import com.google.common.collect.Lists;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.common.thread.ThreadPoolFactory;
@@ -53,13 +54,13 @@ import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import org.springframework.util.StopWatch;
 
 /**
  * @author xujianjie
@@ -263,7 +264,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     public List<String> customerStatus(String code, Long tenantId) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code, tenantId);
         if (flowTemplate == null) {
-            return Lists.newArrayList();
+            return Collections.emptyList();
         }
         return flowTemplate.getNodes().stream()
             .map(Node::getCustomStatus)
@@ -404,6 +405,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     public List<NodeVO> todoNodeList(UserDTO dto, TodoNotifyEnum notify) {
+        StopWatch watch = new StopWatch("待办或者可办代码执行时间监测");
+        watch.start("数据库待办节点查询");
         List<Node> userIdNodeList = new ArrayList<>();
         List<Node> supervisorIdNodeList = new ArrayList<>();
         List<Node> postIdNodeList = new ArrayList<>();
@@ -447,18 +450,23 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (CollectionUtils.isEmpty(flowIdList)) {
             return Collections.emptyList();
         }
+        watch.stop();
 
-        Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
-            .collect(Collectors.toMap(Flow::getId, Function.identity()));
-
+        watch.start("流程查询");
+        List<List<Long>> parts = Lists.partition(flowIdList, 40);
+        Map<Long, Flow> flowMap = flowRepository.queryOnlyFlowByIdList(flowIdList).stream()
+            .collect(Collectors.toMap(Flow::getId, Function.identity(), (v1, v2) -> v1));
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .filter(node -> node.getTodoNotify() == notify)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
 
-        return nodeVOList.stream().collect(collectingAndThen(toCollection(() ->
+        List<NodeVO> result = nodeVOList.stream().collect(collectingAndThen(toCollection(() ->
             new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+        watch.stop();
+        log.debug("data {}", watch.prettyPrint());
+        return result;
     }
 
     @Override

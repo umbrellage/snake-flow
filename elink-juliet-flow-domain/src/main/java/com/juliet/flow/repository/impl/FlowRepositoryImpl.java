@@ -191,6 +191,34 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public List<Flow> queryOnlyFlowByIdList(List<Long> idList) {
+        if (CollectionUtils.isEmpty(idList)) {
+            return Collections.emptyList();
+        }
+        if (idList.size() <= 50) {
+            List<FlowEntity> flowList = flowDao.selectList(
+                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
+            return flowList.stream()
+                .map(FlowEntityFactory::toFlow)
+                .collect(Collectors.toList());
+        }
+
+        List<Future<List<FlowEntity>>> futureList = new ArrayList<>();
+        List<List<Long>> parts = Lists.partition(idList, 40);
+        parts.forEach(part -> {
+            Future<List<FlowEntity>> future = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(() ->
+                flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList)));
+            futureList.add(future);
+        });
+
+        return futureList.stream()
+            .map(ThreadPoolFactory::get)
+            .flatMap(Collection::stream)
+            .map(FlowEntityFactory::toFlow)
+            .collect(Collectors.toList());
+    }
+
+    @Override
     public List<Flow> listFlowByIdOrParentId(List<Long> idList) {
         List<FlowEntity> flowList = flowDao.selectList(
             Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList)
