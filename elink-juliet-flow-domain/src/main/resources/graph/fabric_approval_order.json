@@ -6,7 +6,7 @@
       "x": 130,
       "y": 530,
       "properties": {
-        "text": "开发员",
+        "text": "面料开发员",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -23,7 +23,7 @@
       "text": {
         "x": 130,
         "y": 530,
-        "value": "开发员"
+        "value": "面料开发员"
       }
     },
     {
@@ -58,7 +58,7 @@
       "x": 460,
       "y": 530,
       "properties": {
-        "text": "计划员",
+        "text": "面料计划员",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -75,7 +75,7 @@
       "text": {
         "x": 460,
         "y": 530,
-        "value": "计划员"
+        "value": "面料计划员"
       }
     },
     {
