@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ActiveRule
@@ -12,7 +13,7 @@ public abstract class NotifyRule {
 
     public abstract String notifyRuleName();
 
-    public abstract List<Long> notifyNodeIds(Flow flow);
+    public abstract List<Long> notifyNodeIds(Flow flow, Map<String, Object> param);
 
     public abstract boolean activeSelf(Flow flow);
 

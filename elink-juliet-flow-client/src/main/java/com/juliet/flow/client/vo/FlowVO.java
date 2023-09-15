@@ -173,6 +173,10 @@ public class FlowVO {
             .collect(Collectors.toList());
     }
 
+    /**
+     * 当前操作人
+     * @return
+     */
     public List<Long> processedBy() {
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.add(this);
