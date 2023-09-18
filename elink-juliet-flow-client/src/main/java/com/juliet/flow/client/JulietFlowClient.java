@@ -174,7 +174,7 @@ public interface JulietFlowClient {
     AjaxResult<Void> invalid(@RequestBody InvalidDTO dto);
 
     @ApiOperation("触发待办")
-    @PostMapping("/bpm/invalid")
+    @PostMapping("/bpm/trigger")
     AjaxResult<Void> triggerTodo(Long flowId, Map<String, Object> triggerParam);
 
 }
