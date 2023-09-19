@@ -16,7 +16,9 @@ public enum OperateTypeEnum {
      * 回退
      */
     ROLLBACK(1),
-
+    /**
+     * 拒绝
+     */
     REJECT(2),
 
     /**
@@ -24,7 +26,15 @@ public enum OperateTypeEnum {
      */
     FORWARD(3),
 
+    /**
+     * 异常关闭
+     */
     ERROR_CLOSE(4),
+
+    /**
+     * 重做
+     */
+    REDO(5),
 
     ;
 

@@ -9,6 +9,7 @@ import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
+import com.juliet.flow.client.dto.RedoDTO;
 import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
@@ -182,6 +183,12 @@ public class FlowExecuteController implements JulietFlowClient {
     @Override
     public AjaxResult<Void> reject(RejectDTO dto) {
         flowExecuteService.execute(dto);
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<Void> bpmRedo(RedoDTO redo) {
+        flowExecuteService.execute(redo);
         return AjaxResult.success();
     }
 

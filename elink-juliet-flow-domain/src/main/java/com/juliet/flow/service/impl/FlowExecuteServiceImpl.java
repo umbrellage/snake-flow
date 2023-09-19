@@ -15,6 +15,7 @@ import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RedoDTO;
 import com.juliet.flow.client.dto.RejectDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskDTO;
@@ -282,6 +283,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 break;
             case REJECT:
                 reject(dto);
+            case REDO:
+                redo(dto);
             default:
                 break;
         }
@@ -303,6 +306,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             flowRepository.update(data);
             callback(data.normalNotifyList());
         });
+    }
+
+    private void redo(TaskExecute dto) {
+        RedoDTO redo = (RedoDTO) dto;
+        Flow flow = flowRepository.queryById(redo.getFlowId());
+        if (flow == null) {
+            throw new ServiceException("不存在该流程，亲你再检查下吧！");
+        }
+        Node node = flow.findNodeThrow(redo.getNodeId());
+        Flow newFlow = flow.subFlow();
+        newFlow.cleanParentId();
+        Node executeNode = newFlow.findNode(node.getName());
+        newFlow.modifyNodeStatus(executeNode);
+        flowRepository.add(newFlow);
     }
 
     public void reject(TaskExecute dto) {

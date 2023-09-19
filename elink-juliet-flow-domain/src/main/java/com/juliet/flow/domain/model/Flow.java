@@ -79,6 +79,10 @@ public class Flow extends BaseModel {
             .collect(Collectors.toList());
     }
 
+    public void cleanParentId() {
+        parentId = null;
+    }
+
     public void reject() {
         nodes.forEach(node -> {
             if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
