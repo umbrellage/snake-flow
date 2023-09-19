@@ -311,6 +311,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
+        Long redoNodeId = null;
         Flow flow = flowRepository.queryById(redo.getFlowId());
         if (flow == null) {
             throw new ServiceException("不存在该流程，亲你再检查下吧！");
@@ -322,7 +323,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .peek(Flow::earlyEndFlow)
             .forEach(e -> flowRepository.update(e));
 
-        Node node = flow.findNodeThrow(redo.getNodeId());
+        if (redo.getNodeId() == null) {
+            redoNodeId = flow.startNode().getId();
+        }
+        Node node = flow.findNodeThrow(redoNodeId);
         Flow newFlow = flow.subFlow();
         newFlow.cleanParentId();
         Node executeNode = newFlow.findNode(node.getName());

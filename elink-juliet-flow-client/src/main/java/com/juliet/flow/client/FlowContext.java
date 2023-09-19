@@ -1,9 +1,11 @@
 package com.juliet.flow.client;
 
 import com.alibaba.ttl.TransmittableThreadLocal;
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
 
+import com.juliet.flow.client.dto.RedoDTO;
 import java.util.List;
 import java.util.function.Function;
 
@@ -80,6 +82,27 @@ public class FlowContext {
                 throw new RuntimeException("juliet flow init error!");
             }
             return initResult.getData();
+        } finally {
+            clean();
+        }
+    }
+
+    public static Long redo() {
+        try {
+            NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+            RedoDTO redo = new RedoDTO();
+            redo.setFlowId(nodeFieldDTO.getFlowId());
+            redo.setUserId(nodeFieldDTO.getUserId());
+
+            AjaxResult<List<HistoricTaskInstance>> initResult = julietFlowClient.bpmRedo(redo);
+            if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
+                log.error("juliet flow redo error! response:{}", initResult);
+                throw new RuntimeException("juliet flow redo error!");
+            }
+            if (CollectionUtils.isEmpty(initResult.getData())) {
+                throw new ServiceException("操作记录不存在，请检查");
+            }
+            return initResult.getData().get(0).flowId();
         } finally {
             clean();
         }
