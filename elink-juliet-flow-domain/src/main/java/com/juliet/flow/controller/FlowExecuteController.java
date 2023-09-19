@@ -203,6 +203,12 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+    @Override
+    public AjaxResult<Void> earlyEndFlow(Long flowId) {
+        flowExecuteService.earlyEndFlow(flowId);
+        return AjaxResult.success();
+    }
+
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
         if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {

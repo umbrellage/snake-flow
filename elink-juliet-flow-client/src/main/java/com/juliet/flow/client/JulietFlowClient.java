@@ -185,5 +185,8 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/trigger")
     AjaxResult<Void> triggerTodo(@RequestParam Long flowId,
                                  @RequestBody Map<String, Object> triggerParam);
+    @ApiOperation("提前结束流程")
+    @PostMapping("/bpm/earlyEnd")
+    AjaxResult<Void> earlyEndFlow(@RequestParam Long flowId);
 
 }

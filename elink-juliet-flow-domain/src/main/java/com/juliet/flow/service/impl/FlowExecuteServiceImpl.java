@@ -309,6 +309,20 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         });
     }
 
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void earlyEndFlow(Long flowId) {
+        Flow flow = flowRepository.queryById(flowId);
+        if (flow == null) {
+            throw new ServiceException("流程要不要再检查下呢");
+        }
+        List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
+        flowList.add(flow);
+        flowList.stream()
+            .peek(Flow::earlyEndFlow)
+            .forEach(e -> flowRepository.update(e));
+    }
+
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
         Long redoNodeId = null;
