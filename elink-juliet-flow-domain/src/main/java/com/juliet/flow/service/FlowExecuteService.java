@@ -56,7 +56,7 @@ public interface FlowExecuteService {
 
     List<String> customerStatus(String code, Long tenantId);
 
-    void execute(TaskExecute dto);
+    List<HistoricTaskInstance> execute(TaskExecute dto);
 
     void invalid(InvalidDTO dto);
 

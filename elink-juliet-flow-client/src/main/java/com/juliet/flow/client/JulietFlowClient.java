@@ -72,7 +72,7 @@ public interface JulietFlowClient {
      * @return 流程实例id
      */
     @PostMapping("/bpm/redo")
-    AjaxResult<Void> bpmRedo(@RequestBody RedoDTO redo);
+    AjaxResult<List<HistoricTaskInstance>> bpmRedo(@RequestBody RedoDTO redo);
 
     /**
      * 发起一个新的流程

@@ -187,9 +187,8 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
-    public AjaxResult<Void> bpmRedo(RedoDTO redo) {
-        flowExecuteService.execute(redo);
-        return AjaxResult.success();
+    public AjaxResult<List<HistoricTaskInstance>> bpmRedo(RedoDTO redo) {
+        return AjaxResult.success(flowExecuteService.execute(redo));
     }
 
     @Override

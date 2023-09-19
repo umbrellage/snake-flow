@@ -276,17 +276,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void execute(TaskExecute dto) {
+    public List<HistoricTaskInstance> execute(TaskExecute dto) {
         switch (dto.getTaskType()) {
             case ROLLBACK:
                 rollback(dto);
-                break;
+                return Collections.emptyList();
             case REJECT:
                 reject(dto);
+                return Collections.emptyList();
             case REDO:
-                redo(dto);
+                return redo(dto);
             default:
-                break;
+                return Collections.emptyList();
         }
 }
 
@@ -308,7 +309,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         });
     }
 
-    private void redo(TaskExecute dto) {
+    private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
         Flow flow = flowRepository.queryById(redo.getFlowId());
         if (flow == null) {
@@ -321,7 +322,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         newFlow.modifyNodeStatus(executeNode);
         flowRepository.add(newFlow);
 
+        List<History> historyList = flow.forwardHistory(executeNode.getId(), redo.getUserId());
+        historyRepository.add(historyList);
         callback(newFlow.normalNotifyList());
+        return historyList.stream()
+            .map(History::toHistoricTask)
+            .collect(Collectors.toList());
     }
 
     public void reject(TaskExecute dto) {
