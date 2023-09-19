@@ -175,6 +175,7 @@ public interface JulietFlowClient {
 
     @ApiOperation("触发待办")
     @PostMapping("/bpm/trigger")
-    AjaxResult<Void> triggerTodo(Long flowId, Map<String, Object> triggerParam);
+    AjaxResult<Void> triggerTodo(@RequestParam Long flowId,
+                                 @RequestBody Map<String, Object> triggerParam);
 
 }
