@@ -288,7 +288,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             default:
                 break;
         }
-    }
+}
 
     @Override
     public void invalid(InvalidDTO dto) {
@@ -314,12 +314,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (flow == null) {
             throw new ServiceException("不存在该流程，亲你再检查下吧！");
         }
-        Node node = flow.findNodeThrow(redo.getNodeId());
+//        Node node = flow.findNodeThrow(redo.getNodeId());
         Flow newFlow = flow.subFlow();
         newFlow.cleanParentId();
-        Node executeNode = newFlow.findNode(node.getName());
-        newFlow.modifyNodeStatus(executeNode);
+//        Node executeNode = newFlow.findNode(newFlow.startNode());
+        newFlow.modifyNodeStatus(newFlow.startNode());
         flowRepository.add(newFlow);
+
+        callback(newFlow.normalNotifyList());
     }
 
     public void reject(TaskExecute dto) {

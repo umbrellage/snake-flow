@@ -15,8 +15,8 @@ public class RedoDTO implements TaskExecute{
 
     @NotNull
     private Long flowId;
-    @NotNull
-    private Long nodeId;
+//    @NotNull
+//    private Long nodeId;
 
     @Override
     public OperateTypeEnum getTaskType() {
