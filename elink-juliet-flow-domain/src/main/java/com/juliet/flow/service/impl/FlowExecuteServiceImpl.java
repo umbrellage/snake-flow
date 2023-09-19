@@ -315,6 +315,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (flow == null) {
             throw new ServiceException("不存在该流程，亲你再检查下吧！");
         }
+        // 重做后将老的流程以及异常流程都结束掉
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(redo.getFlowId());
+        subFlowList.add(flow);
+        subFlowList.stream()
+            .peek(Flow::earlyEndFlow)
+            .forEach(e -> flowRepository.update(e));
+
         Node node = flow.findNodeThrow(redo.getNodeId());
         Flow newFlow = flow.subFlow();
         newFlow.cleanParentId();

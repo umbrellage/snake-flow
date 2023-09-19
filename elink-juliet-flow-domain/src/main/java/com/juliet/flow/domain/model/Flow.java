@@ -63,6 +63,9 @@ public class Flow extends BaseModel {
 
     private Long tenantId;
 
+    /**
+     * 最后操作的操作人
+     */
     public List<Long> theLastProcessedBy() {
         if (FlowStatusEnum.END != status) {
             return Collections.emptyList();
@@ -83,6 +86,9 @@ public class Flow extends BaseModel {
         parentId = null;
     }
 
+    /**
+     * 拒绝
+     */
     public void reject() {
         nodes.forEach(node -> {
             if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
@@ -287,6 +293,7 @@ public class Flow extends BaseModel {
     }
 
     /**
+     * 通过节点状态获取节点
      * @param nodeStatusList 节点状态
      * @return 节点列表
      */
@@ -715,5 +722,17 @@ public class Flow extends BaseModel {
             .filter(node -> node.isUserCando(userId, postIdList))
             .findAny()
             .orElse(null);
+    }
+
+    /**
+     * 提前结束流程
+     */
+    public void earlyEndFlow() {
+        nodes.forEach(node -> {
+            if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
+                node.setStatus(NodeStatusEnum.PROCESSED);
+            }
+        });
+        setStatus(FlowStatusEnum.END);
     }
 }
