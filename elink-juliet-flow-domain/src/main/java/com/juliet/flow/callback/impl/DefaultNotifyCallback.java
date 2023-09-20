@@ -39,14 +39,6 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}", JSON.toJSONString(list));
         try {
-            for (NotifyDTO notifyDTO : list) {
-                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
-                rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
-            }
-        } catch (Exception e) {
-            log.error("send callback msg to mq fail!", e);
-        }
-        try {
             AjaxResult<Void> result = callbackClient.callback(list.stream()
                 .filter(e -> e.getType() != NotifyTypeEnum.END && e.getType() != NotifyTypeEnum.INVALID)
                 .collect(Collectors.toList())
@@ -54,6 +46,18 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
             log.info("callback result:{}", result);
         } catch (Exception e) {
             log.error("callback error!", e);
+        }
+    }
+
+    @Override
+    public void message(List<NotifyDTO> list) {
+        try {
+            for (NotifyDTO notifyDTO : list) {
+                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
+                rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
+            }
+        } catch (Exception e) {
+            log.error("send callback msg to mq fail!", e);
         }
     }
 

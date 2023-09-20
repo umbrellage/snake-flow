@@ -781,8 +781,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     private void callback(List<NotifyDTO> list) {
         if (CollectionUtils.isNotEmpty(list)) {
             CompletableFuture.runAsync(() ->
-                msgNotifyCallbacks.forEach(callback ->
-                    callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY).collect(Collectors.toList()))));
+                msgNotifyCallbacks.forEach(callback -> {
+                    callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY).collect(Collectors.toList()));
+                    callback.message(list);
+                })
+            );
         }
     }
 

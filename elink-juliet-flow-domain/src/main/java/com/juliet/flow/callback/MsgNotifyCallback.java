@@ -18,4 +18,7 @@ public interface MsgNotifyCallback {
      */
     void notify(List<NotifyDTO> list);
 
+
+    void message(List<NotifyDTO> list);
+
 }
