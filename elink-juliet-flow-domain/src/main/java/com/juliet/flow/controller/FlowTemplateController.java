@@ -8,6 +8,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
 import com.juliet.flow.service.FlowTemplateService;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,8 @@ public class FlowTemplateController {
     @Autowired
     private FlowTemplateService flowTemplateService;
 
+
+    @ApiOperation("添加模版")
     @PostMapping("/add")
     public AjaxResult add(@RequestBody FlowTemplateAddDTO dto) {
         flowTemplateService.add(dto);
