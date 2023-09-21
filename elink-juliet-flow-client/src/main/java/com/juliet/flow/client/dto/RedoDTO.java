@@ -1,6 +1,7 @@
 package com.juliet.flow.client.dto;
 
 import com.juliet.flow.client.common.OperateTypeEnum;
+import java.util.Map;
 import javax.validation.constraints.NotNull;
 import lombok.Data;
 
@@ -18,6 +19,8 @@ public class RedoDTO implements TaskExecute{
     private Long nodeId;
     @NotNull
     private Long userId;
+    @NotNull
+    private Map<String, Object> param;
 
     @Override
     public OperateTypeEnum getTaskType() {

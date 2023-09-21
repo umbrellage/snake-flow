@@ -93,6 +93,7 @@ public class FlowContext {
             RedoDTO redo = new RedoDTO();
             redo.setFlowId(nodeFieldDTO.getFlowId());
             redo.setUserId(nodeFieldDTO.getUserId());
+            redo.setParam(nodeFieldDTO.getData());
 
             AjaxResult<List<HistoricTaskInstance>> initResult = julietFlowClient.bpmRedo(redo);
             if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
