@@ -347,7 +347,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         newFlow.modifyNodeStatus(executeNode);
         flowRepository.add(newFlow);
 
-        List<History> historyList = flow.forwardHistory(executeNode.getId(), redo.getUserId());
+        List<History> historyList = newFlow.forwardHistory(executeNode.getId(), redo.getUserId());
         historyRepository.add(historyList);
         callback(newFlow.normalNotifyList());
         return historyList.stream()
