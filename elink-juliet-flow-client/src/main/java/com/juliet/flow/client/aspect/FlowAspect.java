@@ -118,34 +118,34 @@ public class FlowAspect {
                 FlowContext.setClient(julietFlowClient, bpmDTO);
             }
         } else {
-            FlowIdDTO id = new FlowIdDTO();
-            id.setFlowId(julietFlowId);
-            AjaxResult<FlowVO> flowResult = julietFlowClient.flow(id);
-            if (flowResult.getCode() != 200 || flowResult.getData() == null) {
-                throw new ServiceException("当前用户没有操作权限");
-            }
-//            if (flowResult.getData().end()) {
-//                throw new ServiceException("流程已经结束");
+//            FlowIdDTO id = new FlowIdDTO();
+//            id.setFlowId(julietFlowId);
+//            AjaxResult<FlowVO> flowResult = julietFlowClient.flow(id);
+//            if (flowResult.getCode() != 200 || flowResult.getData() == null) {
+//                throw new ServiceException("当前用户没有操作权限");
 //            }
-            NodeVO node = flowResult.getData().getNodes().stream()
-                .filter(nodeVO -> nodeVO.getId().equals(julietNodeId))
-                .findAny()
-                .orElse(null);
-            if (flowResult.getData().getSubFlowCount() >= 10 && node != null && node.getStatus() == 4) {
-                throw new ServiceException("当前已存在10条子流程，目前只允许创建10条.");
-            }
-            TaskDTO dto = new TaskDTO();
-            dto.setFlowId(julietFlowId);
-            dto.setNodeId(julietNodeId);
-            AjaxResult<NodeVO> result = julietFlowClient.findNodeByFlowIdAndNodeId(dto);
-            if (result.getCode() != 200 || result.getData() == null) {
-                log.error("error data:{}", result);
-                throw new ServiceException(result.getMsg());
-            }
-            NodeVO nodeVO = result.getData();
-            if (!userId.equals(nodeVO.getProcessedBy())) {
-                throw new ServiceException("当前用户没有操作权限");
-            }
+////            if (flowResult.getData().end()) {
+////                throw new ServiceException("流程已经结束");
+////            }
+//            NodeVO node = flowResult.getData().getNodes().stream()
+//                .filter(nodeVO -> nodeVO.getId().equals(julietNodeId))
+//                .findAny()
+//                .orElse(null);
+//            if (flowResult.getData().getSubFlowCount() >= 10 && node != null && node.getStatus() == 4) {
+//                throw new ServiceException("当前已存在10条子流程，目前只允许创建10条.");
+//            }
+//            TaskDTO dto = new TaskDTO();
+//            dto.setFlowId(julietFlowId);
+//            dto.setNodeId(julietNodeId);
+//            AjaxResult<NodeVO> result = julietFlowClient.findNodeByFlowIdAndNodeId(dto);
+//            if (result.getCode() != 200 || result.getData() == null) {
+//                log.error("error data:{}", result);
+//                throw new ServiceException(result.getMsg());
+//            }
+//            NodeVO nodeVO = result.getData();
+//            if (!userId.equals(nodeVO.getProcessedBy())) {
+//                throw new ServiceException("当前用户没有操作权限");
+//            }
             log.info("juliet flow pre forward!");
             NodeFieldDTO nodeFieldDTO = new NodeFieldDTO();
             nodeFieldDTO.setFieldCodeList(fields);

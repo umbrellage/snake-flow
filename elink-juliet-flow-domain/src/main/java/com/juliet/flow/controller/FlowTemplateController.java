@@ -33,7 +33,7 @@ public class FlowTemplateController {
         return AjaxResult.success();
     }
 
-
+    @ApiOperation("修改模版")
     @PostMapping("/update")
     public AjaxResult update(@RequestBody FlowTemplateAddDTO dto) {
         flowTemplateService.update(dto);

@@ -90,6 +90,7 @@ public class FlowContext {
     public static Long redo() {
         try {
             NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+            nodeFieldDTO.setData(LOCAL_CACHE.get());
             RedoDTO redo = new RedoDTO();
             redo.setFlowId(nodeFieldDTO.getFlowId());
             redo.setUserId(nodeFieldDTO.getUserId());
