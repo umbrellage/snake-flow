@@ -32,6 +32,9 @@ public class SampleReviewImport extends NotifyRule {
             log.info("param is null");
             return Collections.emptyList();
         }
+        if (!param.containsKey("sampleReviewImport")) {
+            return Collections.emptyList();
+        }
         Boolean complete = (Boolean) param.get("sampleReviewImport");
         if (complete) {
             return flow.getNodes().stream()
