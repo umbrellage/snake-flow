@@ -516,11 +516,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         watch.stop();
 
         watch.start("流程查询");
-        // TODO: 2023/9/22 优化查询
         Map<Long, Flow> flowMap = flowRepository.queryOnlyFlowByIdList(flowIdList).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity(), (v1, v2) -> v1));
-//        Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList).stream()
-//            .collect(Collectors.toMap(Flow::getId, Function.identity(), (v1, v2) -> v1));
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
             .filter(node -> node.getTodoNotify() == notify)
