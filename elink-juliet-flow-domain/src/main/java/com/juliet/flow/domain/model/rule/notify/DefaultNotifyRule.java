@@ -58,4 +58,9 @@ public class DefaultNotifyRule extends NotifyRule {
             .filter(node -> StringUtils.equalsAny(node.getName(), "c", "d", "g"))
             .allMatch(node -> node.getStatus() == NodeStatusEnum.PROCESSED);
     }
+
+    @Override
+    public boolean notifySelf(Flow flow, Map<String, Object> param) {
+        return false;
+    }
 }

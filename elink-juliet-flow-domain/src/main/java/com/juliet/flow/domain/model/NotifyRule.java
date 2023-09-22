@@ -17,4 +17,6 @@ public abstract class NotifyRule {
 
     public abstract boolean activeSelf(Flow flow);
 
+    public abstract boolean notifySelf(Flow flow, Map<String, Object> param);
+
 }

@@ -289,7 +289,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             default:
                 return Collections.emptyList();
         }
-}
+    }
 
     @Override
     public void invalid(InvalidDTO dto) {
@@ -440,7 +440,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .findAny()
                 .orElseThrow(() -> new ServiceException("找不到节点"));
         }
-        BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR, "当前操作人没有权限调整");
+        BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR,
+            "当前操作人没有权限调整");
         node.setProcessedBy(dto.getUserId());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
@@ -575,7 +576,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .values());
 
         for (Node node : nodeList) {
-            List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(), dto.getData());
+            List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(),
+                dto.getData());
             historicTaskInstanceList.addAll(taskInstances);
         }
 
@@ -601,7 +603,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
      * @param userId
      */
     @Transactional(rollbackFor = Exception.class)
-    public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId, Map<String, Object> data) {
+    public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId,
+        Map<String, Object> data) {
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
@@ -660,8 +663,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         syncFlow(calibrateFlowList, subFlow);
         flowRepository.add(subFlow);
         calibrateFlowList.stream()
-                .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
-                .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
+            .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
+            .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         List<History> forwardHistory = subFlow.forwardHistory(subNode.getId(), dto.getExecuteId());
         historyRepository.add(forwardHistory);
         // 发送消息提醒
@@ -694,8 +697,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             log.info("流程结束发送通知");
         }
         calibrateFlowList.stream()
-                .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
-                .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
+            .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
+            .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         flowRepository.update(flow);
         // 发送消息提醒
         if (end) {
@@ -734,8 +737,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         errorFlow.modifyNextNodeStatus(node.getId(), dto.getData());
         syncFlow(calibrateFlowList, errorFlow);
         calibrateFlowList.stream()
-                .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
-                .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
+            .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
+            .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
             flow.setStatus(FlowStatusEnum.END);
             exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
@@ -783,7 +786,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (CollectionUtils.isNotEmpty(list)) {
             CompletableFuture.runAsync(() ->
                 msgNotifyCallbacks.forEach(callback -> {
-                    callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY).collect(Collectors.toList()));
+                    callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY)
+                        .collect(Collectors.toList()));
                     callback.message(list);
                 })
             );
