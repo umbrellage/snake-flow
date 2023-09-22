@@ -33,13 +33,15 @@ public class SampleReviewCompleted extends NotifyRule {
             log.info("param is null");
             return Collections.emptyList();
         }
-        Boolean complete = (Boolean) param.get("sampleReviewCompleted");
-        if (complete) {
-            return flow.getNodes().stream()
-                .filter(e -> StringUtils.equals(e.getModifyOtherTodoName(), notifyRuleName()))
-                .map(Node::getId)
-                .collect(Collectors.toList());
+        if (param.containsKey("sampleReviewCompleted")) {
+            Boolean complete = (Boolean) param.get("sampleReviewCompleted");
+            if (complete) {
+                return flow.getNodes().stream()
+                        .filter(e -> StringUtils.equals(e.getModifyOtherTodoName(), notifyRuleName()))
+                        .map(Node::getId)
+                        .collect(Collectors.toList());
 
+            }
         }
         return Collections.emptyList();
     }
