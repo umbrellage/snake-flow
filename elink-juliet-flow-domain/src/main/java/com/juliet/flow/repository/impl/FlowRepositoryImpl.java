@@ -108,7 +108,8 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Override
     public void updateTemplate(FlowTemplate flowTemplate) {
         FlowTemplate flowTemplateOld = queryTemplateById(flowTemplate.getId());
-        BusinessAssert.assertNotNull(flowTemplateOld, StatusCode.ILLEGAL_PARAMS, "找不到模板，id：" + flowTemplate.getId());
+        BusinessAssert.assertNotNull(flowTemplateOld, StatusCode.ILLEGAL_PARAMS,
+            "找不到模板，id：" + flowTemplate.getId());
         flowTemplate.setCreateBy(flowTemplateOld.getCreateBy());
         FlowTemplateEntity flowTemplateEntity = FlowEntityFactory.toFlowTemplateEntity(flowTemplate);
         flowTemplateDao.updateById(flowTemplateEntity);
@@ -211,10 +212,21 @@ public class FlowRepositoryImpl implements FlowRepository {
             futureList.add(future);
         });
 
-        return futureList.stream()
+        List<Flow> flowList = futureList.stream()
             .map(ThreadPoolFactory::get)
             .flatMap(Collection::stream)
             .map(FlowEntityFactory::toFlow)
+            .collect(Collectors.toList());
+
+        List<Long> templateIdList = flowList.stream()
+            .map(Flow::getFlowTemplateId)
+            .filter(Objects::nonNull).distinct()
+            .collect(Collectors.toList());
+
+        Map<Long, String> codeMap = flowTemplateDao.selectBatchIds(templateIdList).stream()
+            .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode, (v1, v2) -> v1));
+        return flowList.stream()
+            .peek(flow -> flow.setTemplateCode(codeMap.get(flow.getFlowTemplateId())))
             .collect(Collectors.toList());
     }
 
@@ -401,7 +413,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowEntityFactory.fillNodeForm(nodes, formEntities);
         // 填充字段信息
         List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
-            .in(CollectionUtils.isNotEmpty(formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())), FieldEntity::getFormId,
+            .in(CollectionUtils.isNotEmpty(
+                    formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())),
+                FieldEntity::getFormId,
                 formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList())));
         FlowEntityFactory.fillNodeField(nodes, fieldEntities);
         // 填充岗位信息
