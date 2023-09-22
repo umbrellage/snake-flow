@@ -15,6 +15,11 @@ public abstract class NotifyRule {
 
     public abstract List<Long> notifyNodeIds(Flow flow, Map<String, Object> param);
 
+    /**
+     * 没有规则默认喂true
+     * @param flow
+     * @return
+     */
     public abstract boolean activeSelf(Flow flow);
 
     public abstract boolean notifySelf(Flow flow, Map<String, Object> param);

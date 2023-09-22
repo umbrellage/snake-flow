@@ -48,7 +48,7 @@ public class SampleReviewImport extends NotifyRule {
 
     @Override
     public boolean activeSelf(Flow flow) {
-        return false;
+        return true;
     }
 
     @Override
