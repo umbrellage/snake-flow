@@ -117,7 +117,8 @@ public class Flow extends BaseModel {
             .map(this::findNode)
             .filter(node -> node.getStatus() == NodeStatusEnum.ACTIVE ||
                 node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED ||
-                node.getStatus() == NodeStatusEnum.NOT_ACTIVE)
+                node.getStatus() == NodeStatusEnum.NOT_ACTIVE ||
+                node.getType() == NodeTypeEnum.END)
             .map(node -> History.of(this, userId, nodeId, node.getId()))
             .collect(Collectors.toList());
     }
