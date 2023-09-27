@@ -544,6 +544,7 @@ public class Flow extends BaseModel {
             if (node.getId().equals(nodeId)) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
                 node.setUpdateTime(new Date());
+                node.setProcessedTime(LocalDateTime.now());
             }
         });
         // 修改节点消息通知状态
