@@ -196,13 +196,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();
         }
-        if (idList.size() <= 50) {
-            List<FlowEntity> flowList = flowDao.selectList(
-                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-            return flowList.stream()
-                .map(FlowEntityFactory::toFlow)
-                .collect(Collectors.toList());
-        }
 
         List<Future<List<FlowEntity>>> futureList = new ArrayList<>();
         List<List<Long>> parts = Lists.partition(idList, 40);

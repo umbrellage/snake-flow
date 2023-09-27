@@ -55,18 +55,22 @@ public class TestController {
     }
 
 
-    @ApiOperation("回调消息")
-    @PostMapping("/send")
-    public AjaxResult send() {
-        NotifyDTO dto = new NotifyDTO();
-        dto.setCode("dd");
-//        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
-        log.info("data:{}", JSON.toJSONString(dto));
-        return AjaxResult.success();
-    }
-
+//    @ApiOperation("回调消息")
+//    @PostMapping("/send")
+//    public AjaxResult send() {
+//        NotifyDTO dto = new NotifyDTO();
+//        dto.setCode("dd");
+////        String msg = "[{\"code\":\"flow_dev_process_ty\",\"filedList\":[\"saveTemp\",\"基础信息.category\",\"submit\",\"errorEdit\"],\"flowId\":1156689548882481152,\"mainFlowId\":0,\"nodeId\":1156689548949590018,\"nodeName\":\"e\",\"postIdList\":[\"1698724444273\"],\"preprocessedBy\":[{\"nodeId\":1156689548945395712,\"processedBy\":1686845188273,\"processedTime\":\"2023-09-27 20:31:19\"}],\"supervisorIds\":[1686900881810],\"tenantId\":161,\"todoNotify\":0,\"type\":1,\"userId\":1686847445255}]";
+////        rabbitTemplate.convertAndSend("flow.process.callback", "default", msg);
+////        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
+//
+//        log.info("data:{}", JSON.toJSONString(dto));
+//        return AjaxResult.success();
+//    }
+//
 //    @RabbitListener(queues = "juliet_test_queue")
 //    public void consumer(String data, Channel channel, Message message) {
+//        log.info("{}", data);
 //        long tag = message.getMessageProperties().getDeliveryTag();
 //        try {
 //            channel.basicAck(tag, false);
