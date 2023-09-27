@@ -347,7 +347,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node executeNode = newFlow.findNode(node.getName());
         newFlow.modifyNodeStatus(executeNode);
         newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getParam());
-        flowRepository.add(newFlow);
+        Long newFlowId =flowRepository.add(newFlow);
+        newFlow.setId(newFlowId);
 
         List<History> historyList = newFlow.forwardHistory(executeNode.getId(), redo.getUserId());
         historyRepository.add(historyList);
