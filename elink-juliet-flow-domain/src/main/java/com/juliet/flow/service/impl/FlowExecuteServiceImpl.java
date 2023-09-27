@@ -39,6 +39,7 @@ import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowExecuteService;
 
 import com.juliet.flow.service.TaskService;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -443,6 +444,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR,
             "当前操作人没有权限调整");
         node.setProcessedBy(dto.getUserId());
+        node.setProcessedTime(LocalDateTime.now());
         if (flow.hasParentFlow()) {
             flow = flowRepository.queryById(flow.getParentId());
         }
