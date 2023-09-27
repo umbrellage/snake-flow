@@ -51,6 +51,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 
     @Override
     public void message(List<NotifyDTO> list) {
+        log.info("mq message:{}", JSON.toJSONString(list));
         try {
             for (NotifyDTO notifyDTO : list) {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);
