@@ -176,7 +176,7 @@ public class Node extends BaseModel {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
-        ret.setFlowId(flowId);
+        ret.setFlowId(flowId == null ? flow.getId(): flowId);
         ret.setTodoNotify(todoNotify);
         if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
             ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
