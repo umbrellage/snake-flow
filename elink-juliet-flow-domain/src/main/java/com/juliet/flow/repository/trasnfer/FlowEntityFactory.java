@@ -288,7 +288,7 @@ public class FlowEntityFactory {
         nodeEntity.setUpdateBy(node.getUpdateBy());
         Date now = new Date();
         nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
-        nodeEntity.setUpdateTime(node.getUpdateTime() == null ? now : node.getUpdateTime());
+        nodeEntity.setUpdateTime(node.getProcessedTime() == null ? now : JulietTimeMemo.toDate(node.getProcessedTime()));
         nodeEntity.setModifyOtherTodoName(node.getModifyOtherTodoName());
         nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
 
