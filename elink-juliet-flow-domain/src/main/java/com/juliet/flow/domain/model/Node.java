@@ -152,13 +152,6 @@ public class Node extends BaseModel {
         return "^" + supervisorId + "^";
     }
 
-    public LocalDateTime getProcessedTime() {
-        if (processedBy == null || processedBy == 0L) {
-            return null;
-        }
-        return JulietTimeMemo.toDateTime(getUpdateTime());
-    }
-
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             processedBy = assignRule.getAssignUserId(params, flow);
