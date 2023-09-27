@@ -91,7 +91,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             Long nodeId = getNodeIdByName(graphNodeVO, flow);
             if (nodeId != null) {
                 graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
-                LocalDateTime time = nodeMap.get(nodeId).getProcessedTime();
+                LocalDateTime time = nodeMap.get(nodeId).processedTime();
                 Long processBy = nodeMap.get(nodeId).getProcessedBy();
                 graphNodeVO.getProperties().setProcessBy(processBy);
                 if (time != null) {

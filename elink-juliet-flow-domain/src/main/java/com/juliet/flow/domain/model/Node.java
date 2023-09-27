@@ -152,6 +152,13 @@ public class Node extends BaseModel {
         return "^" + supervisorId + "^";
     }
 
+    public LocalDateTime processedTime() {
+        if (processedBy == null || processedBy == 0L) {
+            return null;
+        }
+        return processedTime;
+    }
+
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             processedBy = assignRule.getAssignUserId(params, flow);
@@ -439,7 +446,7 @@ public class Node extends BaseModel {
         return preNameList().stream()
                 .map(flow::findNode)
                 .filter(Objects::nonNull)
-                .map(node -> ProcessedByVO.of(node.getId(), node.getProcessedBy(), node.getProcessedTime()))
+                .map(node -> ProcessedByVO.of(node.getId(), node.getProcessedBy(), node.processedTime()))
                 .collect(Collectors.toList());
     }
 
