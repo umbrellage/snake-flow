@@ -212,10 +212,13 @@ public class FlowRepositoryImpl implements FlowRepository {
             futureList.add(future);
         });
 
+        Map<Long, List<Node>> nodeMap = nodeList(idList).stream().collect(Collectors.groupingBy(Node::getFlowId));
+
         List<Flow> flowList = futureList.stream()
             .map(ThreadPoolFactory::get)
             .flatMap(Collection::stream)
             .map(FlowEntityFactory::toFlow)
+            .peek(e -> e.setNodes(nodeMap.get(e.getId())))
             .collect(Collectors.toList());
 
         List<Long> templateIdList = flowList.stream()
@@ -423,6 +426,13 @@ public class FlowRepositoryImpl implements FlowRepository {
             .in(PostEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodePost(nodes, postEntities);
         return nodes;
+    }
+
+    private List<Node> nodeList(List<Long> flowIdList) {
+        List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
+            .in(NodeEntity::getFlowId, flowIdList));
+        return  FlowEntityFactory.toNodes(nodeEntityList);
+
     }
 
     public List<Flow> assembleFlow(List<FlowEntity> flowList) {

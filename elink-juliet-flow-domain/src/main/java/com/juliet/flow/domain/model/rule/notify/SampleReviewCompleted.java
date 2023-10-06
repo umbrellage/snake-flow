@@ -50,7 +50,7 @@ public class SampleReviewCompleted extends NotifyRule {
 
     @Override
     public boolean activeSelf(Flow flow) {
-        return false;
+        return true;
     }
 
     @Override
