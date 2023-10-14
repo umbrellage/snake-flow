@@ -1,0 +1,9 @@
+spring:
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: 10.98.250.69:8848
+      config:
+        # 配置中心地址
+        server-addr: 10.98.250.69:8848
