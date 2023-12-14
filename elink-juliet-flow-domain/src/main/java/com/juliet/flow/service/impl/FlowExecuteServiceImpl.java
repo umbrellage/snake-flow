@@ -785,6 +785,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     private void callback(List<NotifyDTO> list) {
+        list.stream()
+            .filter(e -> StringUtils.isBlank(e.getCode()))
+            .findAny()
+            .ifPresent(e -> {
+                throw new ServiceException("终于找到你了，模版code为空，代码有bug，请检查");
+            });
         if (CollectionUtils.isNotEmpty(list)) {
             CompletableFuture.runAsync(() ->
                 msgNotifyCallbacks.forEach(callback -> {
