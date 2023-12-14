@@ -394,6 +394,7 @@ public class Flow extends BaseModel {
         List<Node> nodeList = nodes.stream()
             .map(Node::copyNode)
             .collect(Collectors.toList());
+        flow.setTemplateCode(templateCode);
         flow.setNodes(nodeList);
         flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
