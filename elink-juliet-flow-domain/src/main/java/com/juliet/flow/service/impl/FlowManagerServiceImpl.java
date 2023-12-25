@@ -10,6 +10,7 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
+import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.domain.model.Flow;
@@ -18,6 +19,7 @@ import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
+import com.juliet.flow.domain.model.Post;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
@@ -93,6 +95,14 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
                 LocalDateTime time = nodeMap.get(nodeId).processedTime();
                 Long processBy = nodeMap.get(nodeId).getProcessedBy();
+                List<Post> postList = nodeMap.get(nodeId).getBindPosts();
+                if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(postList)) {
+                    List<PostVO> postVOList = postList.stream()
+                        .filter(Objects::nonNull)
+                        .map(Post::toPost)
+                        .collect(Collectors.toList());
+                    graphNodeVO.getProperties().setBindPost(postVOList);
+                }
                 graphNodeVO.getProperties().setProcessBy(processBy);
                 if (time != null) {
                     graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
