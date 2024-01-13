@@ -55,11 +55,11 @@ public class FlowVO {
 
     private List<FlowVO> subFlowList;
 
-    public List<String> getFlowCustomerStatus() {
+/*    public List<String> getFlowCustomerStatus() {
         return this.flowCustomerStatus();
     }
 
-    private List<String> flowCustomerStatus;
+    private List<String> flowCustomerStatus;*/
 
     /**
      * @param userId
