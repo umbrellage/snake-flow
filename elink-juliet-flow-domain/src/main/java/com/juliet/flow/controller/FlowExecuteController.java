@@ -158,6 +158,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("获取流程")
     @Override
+    @PostMapping("/bpm/flow")
     public AjaxResult<FlowVO> flow(@RequestBody FlowIdDTO dto) {
         FlowVO flowVO = flowExecuteService.flow(dto.getFlowId());
         return AjaxResult.success(flowVO);
