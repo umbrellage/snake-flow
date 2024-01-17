@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
  * @author Geweilang
  * @date 2024/1/17
  */
-@FeignClient(name = "elink-juliet-flow", path = "/juliet/flow/template")
+@FeignClient(name = "julietTemplateClient", path = "/juliet/flow/template")
 public interface JulietTemplateClient {
 
     @PostMapping("/add")
