@@ -5,7 +5,7 @@ import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.NodeDTO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
+import com.juliet.flow.client.dto.FlowTemplateAddDTO;
 import com.juliet.flow.service.FlowTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

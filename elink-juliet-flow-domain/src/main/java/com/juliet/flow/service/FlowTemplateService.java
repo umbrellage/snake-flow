@@ -1,6 +1,6 @@
 package com.juliet.flow.service;
 
-import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
+import com.juliet.flow.client.dto.FlowTemplateAddDTO;
 import com.juliet.flow.domain.model.FlowTemplate;
 
 /**

@@ -1,4 +1,4 @@
-package com.juliet.flow.domain.dto;
+package com.juliet.flow.client.dto;
 
 import com.juliet.flow.client.dto.NodeDTO;
 import lombok.Data;
