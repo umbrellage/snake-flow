@@ -3,36 +3,10 @@
     {
       "id": "b",
       "type": "flowNode",
-      "x": 130,
-      "y": 530,
-      "properties": {
-        "text": "设计师",
-        "name": "",
-        "post": [],
-        "distributeInfo": {
-          "type": 0,
-          "rules": []
-        },
-        "auditType": 0,
-        "fieldConfig": [],
-        "inputConditionList": [],
-        "outputConditionList": [],
-        "active": false,
-        "disabled": false
-      },
-      "text": {
-        "x": 130,
-        "y": 530,
-        "value": "设计师"
-      }
-    },
-    {
-      "id": "c",
-      "type": "flowNode",
       "x": 350,
-      "y": 530,
+      "y": 170,
       "properties": {
-        "text": "面料开发员",
+        "text": "理单员",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -48,17 +22,17 @@
       },
       "text": {
         "x": 350,
-        "y": 530,
-        "value": "面料开发员"
+        "y": 170,
+        "value": "理单员"
       }
     },
     {
-      "id": "d",
+      "id": "c",
       "type": "flowNode",
-      "x": 580,
-      "y": 530,
+      "x": 590,
+      "y": 170,
       "properties": {
-        "text": "设计师",
+        "text": "外发部经理",
         "name": "",
         "post": [],
         "distributeInfo": {
@@ -73,16 +47,68 @@
         "disabled": false
       },
       "text": {
-        "x": 580,
-        "y": 530,
-        "value": "设计师"
+        "x": 590,
+        "y": 170,
+        "value": "外发部经理"
+      }
+    },
+    {
+      "id": "d",
+      "type": "flowNode",
+      "x": 850,
+      "y": 170,
+      "properties": {
+        "text": "核价部经理",
+        "name": "",
+        "post": [],
+        "distributeInfo": {
+          "type": 0,
+          "rules": []
+        },
+        "auditType": 0,
+        "fieldConfig": [],
+        "inputConditionList": [],
+        "outputConditionList": [],
+        "active": false,
+        "disabled": false
+      },
+      "text": {
+        "x": 850,
+        "y": 170,
+        "value": "核价部经理"
+      }
+    },
+    {
+      "id": "e",
+      "type": "flowNode",
+      "x": 1130,
+      "y": 170,
+      "properties": {
+        "text": "供应链总经理",
+        "name": "",
+        "post": [],
+        "distributeInfo": {
+          "type": 0,
+          "rules": []
+        },
+        "auditType": 0,
+        "fieldConfig": [],
+        "inputConditionList": [],
+        "outputConditionList": [],
+        "active": false,
+        "disabled": false
+      },
+      "text": {
+        "x": 1130,
+        "y": 170,
+        "value": "供应链总经理"
       }
     },
     {
       "id": "end",
       "type": "flowNode",
-      "x": 810,
-      "y": 530,
+      "x": 1380,
+      "y": 170,
       "properties": {
         "text": "结束",
         "name": "",
@@ -99,85 +125,110 @@
         "disabled": false
       },
       "text": {
-        "x": 810,
-        "y": 530,
+        "x": 1380,
+        "y": 205,
         "value": "结束"
       }
     }
   ],
   "edges": [
     {
-      "id": "76f3b830-38a5-4472-a914-96480f5ed839",
-      "type": "flowEdge",
+      "id": "b74329ad-078b-4ac2-aff1-ebcad111b164",
+      "type": "polyline",
       "sourceNodeId": "b",
       "targetNodeId": "c",
       "startPoint": {
-        "x": 180,
-        "y": 530
+        "x": 400,
+        "y": 170
       },
       "endPoint": {
-        "x": 240,
-        "y": 530
-      },
-      "properties": {},
-      "pointsList": [
-        {
-          "x": 180,
-          "y": 530
-        },
-        {
-          "x": 300,
-          "y": 530
-        }
-      ]
-    },
-    {
-      "id": "8b0b730a-499e-469c-b646-19a078c8951a",
-      "type": "flowEdge",
-      "sourceNodeId": "c",
-      "targetNodeId": "d",
-      "startPoint": {
-        "x": 340,
-        "y": 530
-      },
-      "endPoint": {
-        "x": 410,
-        "y": 530
+        "x": 540,
+        "y": 170
       },
       "properties": {},
       "pointsList": [
         {
           "x": 400,
-          "y": 530
+          "y": 170
         },
         {
-          "x": 530,
-          "y": 530
+          "x": 540,
+          "y": 170
         }
       ]
     },
     {
-      "id": "997bbf2e-5bb1-4176-86bb-d991ba768373",
-      "type": "flowEdge",
-      "sourceNodeId": "d",
-      "targetNodeId": "end",
+      "id": "cdcd96d0-1234-4cee-b059-f439bc0ffb5e",
+      "type": "polyline",
+      "sourceNodeId": "c",
+      "targetNodeId": "d",
       "startPoint": {
-        "x": 510,
-        "y": 530
+        "x": 640,
+        "y": 170
       },
       "endPoint": {
-        "x": 580,
-        "y": 530
+        "x": 800,
+        "y": 170
       },
       "properties": {},
       "pointsList": [
         {
-          "x": 630,
-          "y": 530
+          "x": 640,
+          "y": 170
         },
         {
-          "x": 760,
-          "y": 530
+          "x": 800,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "id": "2ab1195a-a987-4150-af2d-d87ac91d0030",
+      "type": "polyline",
+      "sourceNodeId": "d",
+      "targetNodeId": "e",
+      "startPoint": {
+        "x": 900,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 1080,
+        "y": 170
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 900,
+          "y": 170
+        },
+        {
+          "x": 1080,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "id": "9e5381c5-2fa0-4dbd-8429-0d43a59d33c1",
+      "type": "polyline",
+      "sourceNodeId": "e",
+      "targetNodeId": "end",
+      "startPoint": {
+        "x": 1180,
+        "y": 170
+      },
+      "endPoint": {
+        "x": 1360,
+        "y": 170
+      },
+      "properties": {},
+      "pointsList": [
+        {
+          "x": 1180,
+          "y": 170
+        },
+        {
+          "x": 1360,
+          "y": 170
         }
       ]
     }
