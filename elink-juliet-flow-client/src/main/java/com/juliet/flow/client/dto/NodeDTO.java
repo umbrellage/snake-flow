@@ -84,6 +84,8 @@ public class NodeDTO {
 
     private String customStatus;
 
+    private Long customStatusId;
+
     /**
      * TodoNotifyEnum
      */
