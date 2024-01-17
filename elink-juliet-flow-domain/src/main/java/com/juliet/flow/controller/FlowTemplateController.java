@@ -1,6 +1,7 @@
 package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.JulietTemplateClient;
 import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.NodeDTO;
 import com.juliet.flow.common.StatusCode;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "流程模板管理")
 @RequestMapping("/juliet/flow/template")
 @RestController
-public class FlowTemplateController {
+public class FlowTemplateController implements JulietTemplateClient {
 
     @Autowired
     private FlowTemplateService flowTemplateService;
