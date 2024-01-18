@@ -8,7 +8,7 @@ import com.juliet.flow.domain.model.FlowTemplate;
  * @date 2023-05-09
  */
 public interface FlowTemplateService {
-    void add(FlowTemplateAddDTO flowTemplateAddDTO);
+    Long add(FlowTemplateAddDTO flowTemplateAddDTO);
 
     void update(FlowTemplateAddDTO flowTemplateAddDTO);
 

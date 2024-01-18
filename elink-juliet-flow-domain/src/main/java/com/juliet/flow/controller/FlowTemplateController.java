@@ -30,8 +30,8 @@ public class FlowTemplateController implements JulietTemplateClient {
     @ApiOperation("添加模版")
     @PostMapping("/add")
     public AjaxResult add(@RequestBody FlowTemplateAddDTO dto) {
-        flowTemplateService.add(dto);
-        return AjaxResult.success();
+        Long flowTemplateId = flowTemplateService.add(dto);
+        return AjaxResult.success(flowTemplateId);
     }
 
     @ApiOperation("修改模版")

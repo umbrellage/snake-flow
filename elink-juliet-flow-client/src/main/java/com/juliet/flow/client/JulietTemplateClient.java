@@ -16,5 +16,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 public interface JulietTemplateClient {
 
     @PostMapping("/add")
-    AjaxResult add(@RequestBody FlowTemplateAddDTO dto);
+    AjaxResult<Long> add(@RequestBody FlowTemplateAddDTO dto);
 }

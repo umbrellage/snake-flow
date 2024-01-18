@@ -34,12 +34,12 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void add(FlowTemplateAddDTO flowTemplateAddDTO) {
+    public Long add(FlowTemplateAddDTO flowTemplateAddDTO) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         flowTemplateAddDTO.setCreateBy(sysUser.getUserId());
         flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
         flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
-        flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
+        return flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Override

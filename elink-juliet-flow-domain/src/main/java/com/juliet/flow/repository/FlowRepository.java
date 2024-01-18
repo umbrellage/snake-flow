@@ -20,7 +20,7 @@ public interface FlowRepository {
 
     Long add(Flow flow);
 
-    void addTemplate(FlowTemplate flowTemplate);
+    Long addTemplate(FlowTemplate flowTemplate);
 
     void update(Flow flow);
 
