@@ -4,12 +4,14 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietTemplateClient;
 import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.NodeDTO;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FlowTemplateAddDTO;
 import com.juliet.flow.service.FlowTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +34,11 @@ public class FlowTemplateController implements JulietTemplateClient {
     public AjaxResult add(@RequestBody FlowTemplateAddDTO dto) {
         Long flowTemplateId = flowTemplateService.add(dto);
         return AjaxResult.success(flowTemplateId);
+    }
+
+    @Override
+    public AjaxResult<List<NodeVO>> nodeList(Long id) {
+        return null;
     }
 
     @ApiOperation("修改模版")
