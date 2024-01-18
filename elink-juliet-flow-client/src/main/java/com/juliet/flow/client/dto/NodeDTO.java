@@ -14,6 +14,9 @@ public class NodeDTO {
 
     private String id;
 
+    // TODO: 2024/1/18  
+    private String externalNodeId;
+
     private String title;
 
     @NotNull
