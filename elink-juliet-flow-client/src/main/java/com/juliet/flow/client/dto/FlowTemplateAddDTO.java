@@ -27,4 +27,6 @@ public class FlowTemplateAddDTO {
     private Long updateBy;
 
     private Long tenantId;
+
+    private ProcessConfigRPCDTO dto;
 }
