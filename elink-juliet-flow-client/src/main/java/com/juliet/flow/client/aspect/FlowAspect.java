@@ -111,6 +111,7 @@ public class FlowAspect {
             }
             bpmInit = true;
             BpmDTO bpmDTO = toBpmDTO(julietFlowCode, userId, tenantId);
+            log.info("bpmDTO:{}", JSON.toJSONString(bpmDTO));
             if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
                 julietFlowId = function(julietFlowClient::initBmp, bpmDTO);
             }
