@@ -22,6 +22,9 @@ public class AutoOperatorRule extends BaseAssignRule {
         if (value instanceof Long) {
             return (Long) value;
         }
+        if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        }
         if (value instanceof String) {
             return Long.valueOf(String.valueOf(params.get("autoOperator")));
         }
