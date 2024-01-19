@@ -21,6 +21,8 @@ public interface JulietTemplateClient {
 
     @PostMapping("/add")
     AjaxResult<Long> add(@RequestBody FlowTemplateAddDTO dto);
+    @PostMapping("/update")
+    AjaxResult update(@RequestBody FlowTemplateAddDTO dto);
     @GetMapping("/nodeList")
     AjaxResult<List<NodeVO>> nodeList(@RequestParam("id") Long id);
 
