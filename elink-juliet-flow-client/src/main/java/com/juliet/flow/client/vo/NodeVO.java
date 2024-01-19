@@ -23,7 +23,6 @@ public class NodeVO {
 
     private Long id;
 
-    // TODO: 2024/1/18
     private String externalNodeId;
 
     private Long tenantId;

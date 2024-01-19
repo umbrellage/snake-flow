@@ -266,6 +266,7 @@ public class FlowEntityFactory {
         }
         nodeEntity.setId(node.getId());
         nodeEntity.setTitle(node.getTitle());
+        nodeEntity.setExternalNodeId(node.getExternalNodeId());
         nodeEntity.setName(node.getName());
         nodeEntity.setPreName(node.getPreName());
         nodeEntity.setNextName(node.getNextName());
@@ -327,6 +328,7 @@ public class FlowEntityFactory {
         node.setFlowId(nodeEntity.getFlowId());
         node.setTitle(nodeEntity.getTitle());
         node.setName(nodeEntity.getName());
+        node.setExternalNodeId(nodeEntity.getExternalNodeId());
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
 
