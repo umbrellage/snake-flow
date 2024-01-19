@@ -22,6 +22,8 @@ public class NodeEntity extends BaseEntity {
 
     @TableId
     private Long id;
+    @TableField(value = "external_node_id")
+    private String externalNodeId;
 
     private String title;
 

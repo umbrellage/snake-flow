@@ -8,6 +8,7 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.client.dto.FlowTemplateAddDTO;
+import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.service.FlowTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -38,7 +39,8 @@ public class FlowTemplateController implements JulietTemplateClient {
 
     @Override
     public AjaxResult<List<NodeVO>> nodeList(Long id) {
-        return null;
+        List<NodeVO> nodeVOList = flowTemplateService.nodeList(id);
+        return AjaxResult.success(nodeVOList);
     }
 
     @ApiOperation("修改模版")

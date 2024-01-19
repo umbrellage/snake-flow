@@ -2,8 +2,10 @@ package com.juliet.flow.service.impl;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
 import com.juliet.api.development.domain.entity.SysUser;
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.dto.*;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -15,6 +17,8 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -65,6 +69,16 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         flowRepository.updateFlowTemplateStatusById(FlowTemplateStatusEnum.DISABLE, flowTemplateId);
     }
 
+    @Override
+    public List<NodeVO> nodeList(Long id) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateById(id);
+        Optional.ofNullable(flowTemplate).orElseThrow(() -> new ServiceException("流程模版不存在"));
+        return flowTemplate.getNodes()
+            .stream()
+            .map(e -> e.toNodeVo(null))
+            .collect(Collectors.toList());
+    }
+
     private FlowTemplate toFlowTemplate(FlowTemplateAddDTO dto) {
         BusinessAssert.assertNotEmpty(dto.getNodes(), StatusCode.ILLEGAL_PARAMS, "Node节点不能空!");
         FlowTemplate flowTemplate = new FlowTemplate();
@@ -74,6 +88,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
                 .collect(Collectors.toList()));
         flowTemplate.setName(dto.getName());
         flowTemplate.setCode(dto.getCode());
+        flowTemplate.setDto(dto.getDto());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);
         flowTemplate.setTenantId(dto.getTenantId());
         flowTemplate.setCreateBy(dto.getCreateBy());
@@ -89,6 +104,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
         node.setTitle(nodeDTO.getTitle());
         node.setName(nodeDTO.getName());
+        node.setExternalNodeId(nodeDTO.getExternalNodeId());
         node.setPreName(nodeDTO.getPreName());
         node.setNextName(nodeDTO.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));

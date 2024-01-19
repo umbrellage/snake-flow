@@ -1,5 +1,6 @@
 package com.juliet.flow.repository.trasnfer;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.utils.StringUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.common.enums.FlowStatusEnum;
@@ -95,6 +96,7 @@ public class FlowEntityFactory {
 //                node.setId(IdGenerator.getId());
 //            }
 //        }
+        flowTemplateEntity.setProcessConfig(JSON.toJSONString(flowTemplate.getDto()));
         flowTemplateEntity.setCreateBy(flowTemplate.getCreateBy());
         flowTemplateEntity.setUpdateBy(flowTemplate.getUpdateBy());
         flowTemplateEntity.setCode(flowTemplate.getCode());

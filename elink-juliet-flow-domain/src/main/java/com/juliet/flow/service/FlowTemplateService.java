@@ -1,7 +1,9 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.client.dto.FlowTemplateAddDTO;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.domain.model.FlowTemplate;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -17,4 +19,6 @@ public interface FlowTemplateService {
     void publish(Long flowTemplateId);
 
     void disable(Long flowTemplateId);
+
+    List<NodeVO> nodeList(Long id);
 }

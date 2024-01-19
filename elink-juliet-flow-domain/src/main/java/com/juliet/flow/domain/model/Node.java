@@ -40,6 +40,7 @@ public class Node extends BaseModel {
 
     private Long id;
 
+    private String externalNodeId;
     private Long flowId;
 
     private Long mainFlowId;
@@ -411,6 +412,7 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
+        data.setExternalNodeId(externalNodeId);
         data.setTitle(title);
         data.setFlowId(flowId);
         data.setPreName(preName);
