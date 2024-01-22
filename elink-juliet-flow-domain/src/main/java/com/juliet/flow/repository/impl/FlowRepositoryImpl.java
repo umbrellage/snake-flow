@@ -69,6 +69,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         nodeDao.insertBatch(nodeEntities);
 
         List<FormEntity> formEntities = FlowEntityFactory.transferFormEntities(nodes);
+
         formDao.insertBatch(formEntities);
 
         List<FieldEntity> fieldEntities = FlowEntityFactory.transferFieldEntities(nodes);
