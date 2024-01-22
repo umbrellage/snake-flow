@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
  * @author Geweilang
  * @date 2024/1/17
  */
-@FeignClient(name = "julietTemplateClient", path = "/juliet/flow/template")
+@FeignClient(contextId = "JulietTemplateClient" , name = "elink-juliet-flow", path = "/juliet/flow/template")
 public interface JulietTemplateClient {
 
     @PostMapping("/add")
