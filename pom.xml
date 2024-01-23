@@ -125,6 +125,18 @@
                 <artifactId>elink-common-mq</artifactId>
                 <version>1.0.0-SNAPSHOT</version>
             </dependency>
+            <dependency>
+                <groupId>cn.snake.kobe</groupId>
+                <artifactId>snake-starter</artifactId>
+                <version>v0.0.5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <artifactId>snake-utils</artifactId>
+                <groupId>cn.snake.kobe</groupId>
+                <version>v0.0.5</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

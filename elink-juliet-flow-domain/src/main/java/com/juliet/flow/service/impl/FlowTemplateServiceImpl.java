@@ -1,6 +1,7 @@
 package com.juliet.flow.service.impl;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
+import com.alibaba.fastjson2.JSON;
 import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.security.utils.SecurityUtils;
@@ -19,6 +20,7 @@ import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * @author xujianjie
  * @date 2023-05-09
  */
+@Slf4j
 @Service
 public class FlowTemplateServiceImpl implements FlowTemplateService {
 
@@ -100,6 +103,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         if (nodeDTO == null) {
             return null;
         }
+        log.info("nodeDTO:{}", JSON.toJSONString(nodeDTO));
         Node node = new Node();
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
         node.setTitle(nodeDTO.getTitle());

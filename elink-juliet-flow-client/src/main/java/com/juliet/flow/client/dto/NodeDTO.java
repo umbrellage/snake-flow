@@ -97,4 +97,6 @@ public class NodeDTO {
 
     private String tenantId;
 
+    private List<AssignmentRuleDTO> assignmentRuleList;
+
 }
