@@ -108,6 +108,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
         node.setTitle(nodeDTO.getTitle());
         node.setName(nodeDTO.getName());
+        node.setRuleList(nodeDTO.getAssignmentRuleList());
         node.setExternalNodeId(nodeDTO.getExternalNodeId());
         node.setPreName(nodeDTO.getPreName());
         node.setNextName(nodeDTO.getNextName());

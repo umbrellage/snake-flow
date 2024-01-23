@@ -3,6 +3,7 @@ package com.juliet.flow.domain.model;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
@@ -117,6 +118,8 @@ public class Node extends BaseModel {
      * 修改其他节点待办配置
      */
     private String modifyOtherTodoName;
+
+    private List<AssignmentRuleDTO> ruleList;
 
 
     public boolean ifLeaderAdjust(Long userId) {
