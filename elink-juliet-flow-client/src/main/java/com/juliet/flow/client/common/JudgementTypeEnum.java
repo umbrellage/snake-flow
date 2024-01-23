@@ -1,5 +1,7 @@
 package com.juliet.flow.client.common;
 
+import java.util.Arrays;
+import java.util.Objects;
 import lombok.Getter;
 
 /**
@@ -27,5 +29,12 @@ public enum JudgementTypeEnum {
     JudgementTypeEnum(Integer code, String name) {
         this.code = code;
         this.name = name;
+    }
+
+    public static JudgementTypeEnum of(Integer code) {
+        return Arrays.stream(values())
+            .filter(e -> Objects.equals(e.getCode(), code))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("未找到对应的枚举值"));
     }
 }
