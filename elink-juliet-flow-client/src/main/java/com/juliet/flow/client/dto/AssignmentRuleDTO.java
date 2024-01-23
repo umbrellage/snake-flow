@@ -15,7 +15,7 @@ import lombok.Data;
 public class AssignmentRuleDTO {
 
     private Long operatorUserId;
-    private Long operatorUserName;
+    private String operatorUserName;
     private List<RuleDTO> rules;
 
 
