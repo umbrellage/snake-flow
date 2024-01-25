@@ -14,8 +14,7 @@ import lombok.Data;
 @Data
 public class AssignmentRuleDTO {
 
-    private Long operatorUserId;
-    private String operatorUserName;
+    private List<Selection<Long>> operatorUser;
     private List<RuleDTO> rules;
 
 
@@ -24,8 +23,7 @@ public class AssignmentRuleDTO {
         private String fieldCode;
         private String fieldName;
         private JudgementTypeEnum  judgementType;
-        private Long fieldValueId;
-        private String fieldValueName;
+        private List<Selection<Long>> fieldValue;
         private ConditionTypeEnum conditionType;
     }
 
