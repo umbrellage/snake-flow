@@ -33,7 +33,7 @@ public class ProcessConfigRPCDTO {
         private String text;
         private String name;
         @ApiModelProperty("分配模式")
-        private Integer distributeType;
+        private List<Integer> distributeType;
         @ApiModelProperty("指定人员")
         private Boolean designatedPerson;
         @ApiModelProperty("审核模式")
