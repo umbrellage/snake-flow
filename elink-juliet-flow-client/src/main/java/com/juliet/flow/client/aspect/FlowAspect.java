@@ -10,6 +10,7 @@ import com.juliet.flow.client.FlowContext;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.callback.ControllerResponseCallback;
 import com.juliet.flow.client.annotation.JulietFlowInterceptor;
+import com.juliet.flow.client.callback.DevProcessConfigCallback;
 import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.common.FlowMode;
@@ -64,6 +65,9 @@ public class FlowAspect {
     @Autowired(required = false)
     private UserInfoCallback userInfoCallback;
 
+    @Autowired
+    private DevProcessConfigCallback processConfigCallback;
+
     private static final String HEADER_NAME_JULIET_FLOW_CODE = "Juliet-Flow-Code";
 
     private static final String PARAM_NAME_JULIET_FLOW_CODE = "julietFlowCode";
@@ -89,7 +93,9 @@ public class FlowAspect {
         }
         HttpServletRequest request = sra.getRequest();
 
-        String julietFlowCode = getJulietFlowCode(request);
+//        String julietFlowCode = getJulietFlowCode(request);
+        String julietFlowCode = processConfigCallback.getProcessConfigId(request);
+
         Long julietFlowId = getJulietFlowId(request);
         Long julietNodeId = getJulietNodeId(request);
 
