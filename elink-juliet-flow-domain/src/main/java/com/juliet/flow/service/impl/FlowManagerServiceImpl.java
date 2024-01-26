@@ -66,12 +66,18 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         // todo 判断flow是否存在
         GraphVO vo = null;
         String json = null;
-        String jsonFilePath = findJsonFile(flowTemplate);
-        try {
-            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
-        } catch (IOException e) {
-            log.error("read {} fail!", jsonFilePath, e);
+
+        if (flowTemplate.getDto() == null) {
+            String jsonFilePath = findJsonFile(flowTemplate);
+            try {
+                json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
+            } catch (IOException e) {
+                log.error("read {} fail!", jsonFilePath, e);
+            }
+        } else {
+            json = JSON.toJSONString(flowTemplate.getDto());
         }
+
         List<History> historyList = historyRepository.queryByFlowId(id);
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
 //        fillDefaultRequire(vo);
@@ -126,11 +132,15 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
         GraphVO vo = null;
         String json = null;
-        String jsonFilePath = findJsonFile(flowTemplate);
-        try {
-            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
-        } catch (IOException e) {
-            log.error("read {} fail!", jsonFilePath, e);
+        if (flowTemplate.getDto() == null) {
+            String jsonFilePath = findJsonFile(flowTemplate);
+            try {
+                json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
+            } catch (IOException e) {
+                log.error("read {} fail!", jsonFilePath, e);
+            }
+        } else {
+            json = JSON.toJSONString(flowTemplate.getDto());
         }
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
         return vo;
