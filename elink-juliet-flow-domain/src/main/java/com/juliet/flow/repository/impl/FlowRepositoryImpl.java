@@ -1,8 +1,10 @@
 package com.juliet.flow.repository.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.google.common.collect.Lists;
 import com.juliet.flow.client.common.thread.ThreadPoolFactory;
+import com.juliet.flow.client.dto.ProcessConfigRPCDTO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
@@ -285,6 +287,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
         FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
         flowTemplate.setNodes(getTemplateStartNodes(flowTemplateEntity.getId()));
+        flowTemplate.setDto(JSON.parseObject(flowTemplateEntity.getProcessConfig(), ProcessConfigRPCDTO.class));
         return flowTemplate;
     }
 
