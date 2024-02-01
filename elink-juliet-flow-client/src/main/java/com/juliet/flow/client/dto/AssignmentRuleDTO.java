@@ -23,7 +23,7 @@ public class AssignmentRuleDTO {
         private String fieldCode;
         private String fieldName;
         private JudgementTypeEnum  judgementType;
-        private List<Selection> fieldValue;
+        private List<Selection<Object>> fieldValue;
         private ConditionTypeEnum conditionType;
     }
 
