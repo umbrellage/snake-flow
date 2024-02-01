@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import org.bouncycastle.util.Longs;
 
 /**
  * @author xujianjie
@@ -29,4 +30,5 @@ public class FlowTemplateAddDTO {
     private Long tenantId;
 
     private ProcessConfigRPCDTO dto;
+
 }
