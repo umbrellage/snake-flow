@@ -258,6 +258,15 @@
             </activation>
         </profile>
         <profile>
+            <id>zly-test2</id>
+            <properties>
+                <profileActive>zly-test2</profileActive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
             <id>zly-uat</id>
             <properties>
                 <profileActive>zly-uat</profileActive>
