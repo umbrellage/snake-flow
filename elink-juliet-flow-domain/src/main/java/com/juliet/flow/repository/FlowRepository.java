@@ -6,6 +6,7 @@ import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
+import com.juliet.flow.domain.query.AssembleFlowCondition;
 
 import java.util.Collection;
 import java.util.List;
@@ -37,6 +38,8 @@ public interface FlowRepository {
 
     List<Flow> queryByIdList(List<Long> idList);
 
+    List<Flow> queryByIdList(List<Long> idList,  AssembleFlowCondition condition);
+
     List<Flow> queryOnlyFlowByIdList(List<Long> idList);
 
     List<Flow> listFlowByIdOrParentId(List<Long> idList);
@@ -44,6 +47,8 @@ public interface FlowRepository {
     List<Flow> listFlowByParentId(Long id);
 
     List<Flow> listFlowByParentId(Collection<Long> idList);
+
+    List<Flow> listFlowByParentId(Collection<Long> idList,  AssembleFlowCondition condition);
 
     List<Flow> queryMainFlowById(Collection<Long> idList);
 

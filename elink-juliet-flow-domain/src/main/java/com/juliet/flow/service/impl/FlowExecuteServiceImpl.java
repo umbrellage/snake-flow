@@ -34,6 +34,7 @@ import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
+import com.juliet.flow.domain.query.AssembleFlowCondition;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowExecuteService;
@@ -236,9 +237,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             log.error("流程ID列表为空");
             return Collections.emptyList();
         }
-        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
+        AssembleFlowCondition condition = new AssembleFlowCondition();
+        condition.setExcludeFields(dto.getExcludeFields());
+        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList(), condition);
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
-        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
+        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList, condition)
             .stream().map(flow -> flow.flowVO(Collections.emptyList()))
             .collect(Collectors.groupingBy(FlowVO::getParentId));
         return mainFlowList.stream()
