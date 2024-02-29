@@ -56,8 +56,8 @@ public class FlowTemplateController implements JulietTemplateClient {
     }
 
 
-    public AjaxResult detailByCode(String code) {
-        return AjaxResult.success(flowTemplateService.queryByCode(code));
+    public AjaxResult<String> updateTimeByCode(String code) {
+        return AjaxResult.success(flowTemplateService.updateTimeByCode(code));
     }
 
     @PostMapping("/disable")

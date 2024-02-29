@@ -63,8 +63,12 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     }
 
     @Override
-    public FlowTemplate queryByCode(String code) {
-        return flowRepository.queryTemplateByCode(code);
+    public String updateTimeByCode(String code) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code);
+        if (flowTemplate.getUpdateTime() == null) {
+            return "0";
+        }
+        return String.valueOf(flowTemplate.getUpdateTime().getTime());
     }
 
     @Override

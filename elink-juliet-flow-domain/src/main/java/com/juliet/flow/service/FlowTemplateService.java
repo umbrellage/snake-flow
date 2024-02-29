@@ -16,7 +16,7 @@ public interface FlowTemplateService {
 
     FlowTemplate queryById(Long id);
 
-    FlowTemplate queryByCode(String code);
+    String updateTimeByCode(String code);
 
     void publish(Long flowTemplateId);
 

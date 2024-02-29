@@ -25,7 +25,9 @@ public interface JulietTemplateClient {
     AjaxResult update(@RequestBody FlowTemplateAddDTO dto);
     @GetMapping("/nodeList")
     AjaxResult<List<NodeVO>> nodeList(@RequestParam("id") Long id);
-    @GetMapping("/detailByCode")
-    AjaxResult detailByCode(@RequestParam("code") String code);
+    @GetMapping("/updateTimeByCode")
+    AjaxResult<String> updateTimeByCode(@RequestParam("code") String code);
+
+
 
 }
