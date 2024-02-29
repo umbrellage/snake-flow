@@ -309,6 +309,8 @@ public class FlowEntityFactory {
         flowTemplate.setTenantId(flowTemplateEntity.getTenantId());
         flowTemplate.setCreateBy(flowTemplateEntity.getCreateBy());
         flowTemplate.setUpdateBy(flowTemplateEntity.getUpdateBy());
+        flowTemplate.setUpdateTime(flowTemplateEntity.getUpdateTime());
+        flowTemplate.setCreateTime(flowTemplateEntity.getCreateTime());
         return flowTemplate;
     }
 
