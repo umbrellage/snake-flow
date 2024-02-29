@@ -12,6 +12,7 @@ import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.dao.*;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
+import com.juliet.flow.domain.query.AssembleFlowCondition;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.trasnfer.FlowEntityFactory;
 import lombok.extern.slf4j.Slf4j;
@@ -190,9 +191,14 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> queryByIdList(List<Long> idList) {
+        return queryByIdList(idList, new AssembleFlowCondition());
+    }
+
+    @Override
+    public List<Flow> queryByIdList(List<Long> idList, AssembleFlowCondition condition) {
         List<FlowEntity> flowList = flowDao.selectList(
-            Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-        return assembleFlow(flowList);
+                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
+        return assembleFlow(flowList,condition);
     }
 
     @Override
@@ -236,7 +242,7 @@ public class FlowRepositoryImpl implements FlowRepository {
             Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList)
                 .or()
                 .in(FlowEntity::getParentId, idList));
-        return assembleFlow(flowList);
+        return assembleFlow(flowList, new AssembleFlowCondition());
     }
 
     @Override
@@ -246,20 +252,25 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
-        return assembleFlow(flowEntities);
+        return assembleFlow(flowEntities, new AssembleFlowCondition());
     }
 
     @Override
     public List<Flow> listFlowByParentId(Collection<Long> idList) {
+        return listFlowByParentId(idList, new AssembleFlowCondition());
+    }
+
+    @Override
+    public List<Flow> listFlowByParentId(Collection<Long> idList, AssembleFlowCondition condition) {
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();
         }
         List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
-            .in(FlowEntity::getParentId, idList));
+                .in(FlowEntity::getParentId, idList));
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
-        return assembleFlow(flowEntities);
+        return assembleFlow(flowEntities, condition);
     }
 
     @Override
@@ -268,7 +279,7 @@ public class FlowRepositoryImpl implements FlowRepository {
             .in(FlowEntity::getId, idList)
             .eq(FlowEntity::getParentId, 0)
         );
-        return assembleFlow(flowEntities);
+        return assembleFlow(flowEntities, new AssembleFlowCondition());
     }
 
     @Override
@@ -447,7 +458,7 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     }
 
-    public List<Flow> assembleFlow(List<FlowEntity> flowList) {
+    public List<Flow> assembleFlow(List<FlowEntity> flowList, AssembleFlowCondition condition) {
         if (CollectionUtils.isEmpty(flowList)) {
             return Collections.emptyList();
         }
@@ -473,7 +484,10 @@ public class FlowRepositoryImpl implements FlowRepository {
 
 //        List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
 //            .in(FieldEntity::getFormId, formIdList));
-        List<FieldEntity> fieldEntities = parallelBatchQueryFieldEntities(formIdList);
+        List<FieldEntity> fieldEntities = new ArrayList<>();
+        if (!Objects.equals(condition.getExcludeFields(), true)) {
+            parallelBatchQueryFieldEntities(formIdList);
+        }
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
         List<SupplierEntity> supplierEntities = ThreadPoolFactory.get(futureSupplierEntities);
 

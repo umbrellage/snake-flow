@@ -18,4 +18,4 @@ sh shutdown.sh
 
 # 启动服务
 echo start ${APPLICATION} Application...
-sh startup.sh $1
+sh startup.sh $1 $2
