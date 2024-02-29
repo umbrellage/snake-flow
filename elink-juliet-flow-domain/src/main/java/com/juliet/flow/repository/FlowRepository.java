@@ -51,6 +51,8 @@ public interface FlowRepository {
 
     FlowTemplate queryTemplateById(Long id);
 
+    FlowTemplate queryTemplateByCode(String code);
+
     FlowTemplate queryTemplateByCode(String code, Long tenantId);
 
     void updateFlowTemplateStatusById(FlowTemplateStatusEnum status, Long id);

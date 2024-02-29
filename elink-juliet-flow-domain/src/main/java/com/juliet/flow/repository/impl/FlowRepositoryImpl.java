@@ -292,6 +292,20 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public FlowTemplate queryTemplateByCode(String code) {
+        FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(Wrappers.<FlowTemplateEntity>lambdaQuery()
+            .eq(FlowTemplateEntity::getCode, code)
+            .last("limit 1"));
+        if (flowTemplateEntity == null) {
+            return null;
+        }
+        FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
+        flowTemplate.setNodes(getTemplateStartNodes(flowTemplateEntity.getId()));
+        flowTemplate.setDto(JSON.parseObject(flowTemplateEntity.getProcessConfig(), ProcessConfigRPCDTO.class));
+        return flowTemplate;
+    }
+
+    @Override
     public FlowTemplate queryTemplateByCode(String code, Long tenantId) {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(
             Wrappers.<FlowTemplateEntity>lambdaQuery().eq(FlowTemplateEntity::getCode, code)

@@ -16,6 +16,8 @@ public interface FlowTemplateService {
 
     FlowTemplate queryById(Long id);
 
+    FlowTemplate queryByCode(String code);
+
     void publish(Long flowTemplateId);
 
     void disable(Long flowTemplateId);

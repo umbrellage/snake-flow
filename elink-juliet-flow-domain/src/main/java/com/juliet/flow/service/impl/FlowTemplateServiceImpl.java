@@ -63,6 +63,11 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     }
 
     @Override
+    public FlowTemplate queryByCode(String code) {
+        return flowRepository.queryTemplateByCode(code);
+    }
+
+    @Override
     public void publish(Long flowTemplateId) {
         flowRepository.updateFlowTemplateStatusById(FlowTemplateStatusEnum.ENABLE, flowTemplateId);
     }
