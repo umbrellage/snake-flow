@@ -661,11 +661,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 throw new ServiceException("有流程将经过当前节点，不可变更");
             }
         }
+        log.info("mamba flow:{}", JSON.toJSONString(flow));
         Flow subFlow = flow.subFlow();
+        log.info("mamba new subFlow:{}", JSON.toJSONString(subFlow));
         subFlow.modifyNodeStatus(node);
         Node subNode = subFlow.findNode(node.getName());
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
+
         flowRepository.add(subFlow);
         calibrateFlowList.stream()
             .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
