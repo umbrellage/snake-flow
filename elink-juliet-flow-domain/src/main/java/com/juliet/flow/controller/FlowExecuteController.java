@@ -73,6 +73,7 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+    @ApiOperation("通过表单字段查询节点，并执行")
     @Override
     public AjaxResult<List<HistoricTaskInstance>> forwardV2(NodeFieldDTO dto) {
         log.info("mamba param:{}", JSON.toJSONString(dto));

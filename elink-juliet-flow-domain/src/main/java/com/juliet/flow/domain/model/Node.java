@@ -165,7 +165,10 @@ public class Node extends BaseModel {
 
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
-            processedBy = assignRule.getAssignUserId(params, flow);
+            Long assignProcessedBy = assignRule.getAssignUserId(params, flow);
+            if (assignProcessedBy != null) {
+                processedBy = assignProcessedBy;
+            }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null) {
                 Supplier supplier = new Supplier();
