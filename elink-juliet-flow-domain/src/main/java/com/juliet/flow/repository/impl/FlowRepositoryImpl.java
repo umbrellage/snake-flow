@@ -252,7 +252,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
-        return assembleFlow(flowEntities, new AssembleFlowCondition());
+        return assembleFlow(flowEntities, AssembleFlowCondition.noExcludeFields());
     }
 
     @Override
@@ -484,9 +484,11 @@ public class FlowRepositoryImpl implements FlowRepository {
 
 //        List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
 //            .in(FieldEntity::getFormId, formIdList));
-        List<FieldEntity> fieldEntities = new ArrayList<>();
+        List<FieldEntity> fieldEntities;
         if (!Objects.equals(condition.getExcludeFields(), true)) {
-            parallelBatchQueryFieldEntities(formIdList);
+            fieldEntities = parallelBatchQueryFieldEntities(formIdList);
+        } else {
+            fieldEntities = new ArrayList<>();
         }
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
         List<SupplierEntity> supplierEntities = ThreadPoolFactory.get(futureSupplierEntities);
