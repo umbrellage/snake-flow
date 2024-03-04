@@ -503,7 +503,7 @@ public class Node extends BaseModel {
         node.setCreateBy(this.getCreateBy());
         node.setUpdateBy(0L);
         node.setCreateTime(new Date());
-        node.setUpdateTime(new Date());
+        node.setUpdateTime(getUpdateTime());
         node.setTenantId(this.getTenantId());
         node.setTodoNotify(todoNotify);
         node.modifyOtherTodoName = modifyOtherTodoName;
