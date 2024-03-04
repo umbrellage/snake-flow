@@ -506,19 +506,9 @@ public class Node extends BaseModel {
         node.setUpdateTime(getUpdateTime());
         node.setTenantId(this.getTenantId());
         node.setTodoNotify(todoNotify);
+        node.setProcessedTime(processedTime);
         node.modifyOtherTodoName = modifyOtherTodoName;
         return node;
-    }
-
-    public NotifyDTO delete(Flow flow) {
-        NotifyDTO data = new NotifyDTO();
-        data.setNodeId(id);
-        data.setCode(flow.getTemplateCode());
-        data.setTodoNotify(todoNotify);
-        data.setType(NotifyTypeEnum.DELETE);
-        data.setTenantId(flow.getTenantId());
-        data.setFlowId(flowId);
-        return data;
     }
 
 
