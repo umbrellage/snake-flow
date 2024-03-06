@@ -99,4 +99,6 @@ public class NodeDTO {
 
     private List<AssignmentRuleDTO> assignmentRuleList;
 
+    private List<RuleDTO> accessRuleList;
+
 }

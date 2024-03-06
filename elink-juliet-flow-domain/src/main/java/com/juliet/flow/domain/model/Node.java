@@ -5,6 +5,7 @@ import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
@@ -120,6 +121,8 @@ public class Node extends BaseModel {
     private String modifyOtherTodoName;
 
     private List<AssignmentRuleDTO> ruleList;
+
+    private List<RuleDTO> accessRuleList;
 
 
     public boolean ifLeaderAdjust(Long userId) {

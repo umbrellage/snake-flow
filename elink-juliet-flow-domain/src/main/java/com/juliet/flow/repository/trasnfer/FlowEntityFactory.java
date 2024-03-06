@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.utils.StringUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
+import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -269,6 +270,7 @@ public class FlowEntityFactory {
         nodeEntity.setTitle(node.getTitle());
         nodeEntity.setExternalNodeId(node.getExternalNodeId());
         nodeEntity.setRuleList(JSON.toJSONString(node.getRuleList()));
+        nodeEntity.setAccessRuleList(JSON.toJSONString(node.getAccessRule()));
         nodeEntity.setName(node.getName());
         nodeEntity.setPreName(node.getPreName());
         nodeEntity.setNextName(node.getNextName());
@@ -334,6 +336,7 @@ public class FlowEntityFactory {
         node.setName(nodeEntity.getName());
         node.setExternalNodeId(nodeEntity.getExternalNodeId());
         node.setRuleList(JSON.parseArray(nodeEntity.getRuleList(), AssignmentRuleDTO.class));
+        node.setAccessRuleList(JSON.parseArray(nodeEntity.getAccessRuleList(), RuleDTO.class));
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
 
