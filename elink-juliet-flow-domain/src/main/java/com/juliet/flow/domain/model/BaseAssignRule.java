@@ -1,6 +1,5 @@
 package com.juliet.flow.domain.model;
 
-import com.juliet.flow.client.dto.SupplierDTO;
 import lombok.Data;
 
 import java.util.Map;
