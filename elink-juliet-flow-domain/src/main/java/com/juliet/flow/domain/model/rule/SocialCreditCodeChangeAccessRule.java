@@ -20,7 +20,7 @@ public class SocialCreditCodeChangeAccessRule extends BaseRule {
     }
 
     @Override
-    public boolean accessRule(Map<String, Object> params) {
+    public boolean accessRule(Map<String, Object> params, Long nodeId) {
         return params != null && params.containsKey("isChange");
     }
 }

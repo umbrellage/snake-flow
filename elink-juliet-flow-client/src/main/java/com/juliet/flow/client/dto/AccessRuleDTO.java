@@ -14,4 +14,7 @@ public class AccessRuleDTO {
 
     private List<RuleDTO> rules;
 
+
+
+
 }

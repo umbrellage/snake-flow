@@ -44,6 +44,7 @@ public class CustomizeAssignRule extends BaseAssignRule {
     }
 
 
+
     private boolean matchRule(Map<String, Object> params, List<RuleDTO> rules) {
 
         List<List<RuleDTO>> ruleGroupList = new ArrayList<>();
@@ -62,4 +63,6 @@ public class CustomizeAssignRule extends BaseAssignRule {
         return ruleGroupList.stream()
             .anyMatch(list -> list.stream().allMatch(rule -> rule.isMatch(params)));
     }
+
+
 }
