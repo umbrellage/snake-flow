@@ -3,6 +3,7 @@ package com.juliet.flow.domain.model;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RuleDTO;
@@ -122,7 +123,7 @@ public class Node extends BaseModel {
 
     private List<AssignmentRuleDTO> ruleList;
 
-    private List<RuleDTO> accessRuleList;
+    private List<AccessRuleDTO> accessRuleList;
 
 
     public boolean ifLeaderAdjust(Long userId) {
