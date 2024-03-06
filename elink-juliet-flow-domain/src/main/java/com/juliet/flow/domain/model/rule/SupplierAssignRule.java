@@ -21,7 +21,7 @@ public class SupplierAssignRule extends BaseAssignRule {
     }
 
     @Override
-    public Long getAssignUserId(Map<String, Object> params, Flow flow) {
+    public Long getAssignUserId(Map<String, Object> params, Flow flow, Long nodeId) {
         return null;
     }
 

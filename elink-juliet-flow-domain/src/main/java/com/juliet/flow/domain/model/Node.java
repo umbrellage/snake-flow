@@ -169,7 +169,7 @@ public class Node extends BaseModel {
 
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
-            Long assignProcessedBy = assignRule.getAssignUserId(params, flow);
+            Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
             if (assignProcessedBy != null) {
                 processedBy = assignProcessedBy;
             }

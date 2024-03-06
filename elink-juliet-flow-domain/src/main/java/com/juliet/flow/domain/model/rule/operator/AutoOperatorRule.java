@@ -14,7 +14,7 @@ public class AutoOperatorRule extends BaseAssignRule {
     }
 
     @Override
-    public Long getAssignUserId(Map<String, Object> params, Flow flow) {
+    public Long getAssignUserId(Map<String, Object> params, Flow flow, Long nodeId) {
         if (params == null || params.get("autoOperator") == null) {
             return null;
         }
