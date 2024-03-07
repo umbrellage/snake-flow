@@ -4,6 +4,7 @@ import com.juliet.flow.client.common.ConditionTypeEnum;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.client.dto.Selection;
+import com.juliet.flow.common.utils.RuleUtil;
 import com.juliet.flow.domain.model.BaseAssignRule;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
@@ -35,34 +36,12 @@ public class CustomizeAssignRule extends BaseAssignRule {
         Node node = flow.findNode(nodeId);
         List<AssignmentRuleDTO> ruleList = node.getRuleList();
         return ruleList.stream()
-            .filter(e -> matchRule(params, e.getRules()))
+            .filter(e -> RuleUtil.matchRule(params, e.getRules()))
             .map(AssignmentRuleDTO::getOperatorUser)
             .flatMap(Collection::stream)
             .map(Selection::getValue)
             .findAny()
             .orElse(null);
     }
-
-
-
-    private boolean matchRule(Map<String, Object> params, List<RuleDTO> rules) {
-
-        List<List<RuleDTO>> ruleGroupList = new ArrayList<>();
-        List<RuleDTO> ruleDTOList = new ArrayList<>();
-        for (RuleDTO ruleDTO : rules) {
-            if (ruleDTO.getConditionType() == ConditionTypeEnum.OR) {
-                ruleDTOList.add(ruleDTO);
-                ruleGroupList.add(ruleDTOList);
-                ruleDTOList = new ArrayList<>();
-            }
-            if (ruleDTO.getConditionType() == ConditionTypeEnum.AND) {
-                ruleDTOList.add(ruleDTO);
-            }
-        }
-
-        return ruleGroupList.stream()
-            .anyMatch(list -> list.stream().allMatch(rule -> rule.isMatch(params)));
-    }
-
 
 }

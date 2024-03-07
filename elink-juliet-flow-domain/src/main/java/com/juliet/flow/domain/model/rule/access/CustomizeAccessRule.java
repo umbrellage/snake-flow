@@ -3,6 +3,7 @@ package com.juliet.flow.domain.model.rule.access;
 import com.juliet.flow.client.common.ConditionTypeEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.RuleDTO;
+import com.juliet.flow.common.utils.RuleUtil;
 import com.juliet.flow.constant.FlowConstant;
 import com.juliet.flow.domain.model.BaseRule;
 import com.juliet.flow.domain.model.Flow;
@@ -35,17 +36,6 @@ public class CustomizeAccessRule extends BaseRule {
         }
         Node node = flow.findNode(nodeId);
         List<AccessRuleDTO> ruleList = node.getAccessRuleList();
-        return ruleList.stream().allMatch(e -> matchRule(params, e.getRules()));
+        return ruleList.stream().allMatch(e -> RuleUtil.matchRule(params, e.getRules()));
     }
-
-
-    private boolean matchRule(Map<String, Object> params, List<RuleDTO> rules) {
-        if (CollectionUtils.isEmpty(rules)) {
-            return true;
-        }
-        return rules.stream()
-            .anyMatch(e -> e.isMatch(params));
-    }
-
-
 }
