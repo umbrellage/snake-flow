@@ -512,6 +512,8 @@ public class Node extends BaseModel {
         node.setTodoNotify(todoNotify);
         node.setProcessedTime(processedTime);
         node.modifyOtherTodoName = modifyOtherTodoName;
+        node.accessRuleList = accessRuleList;
+        node.ruleList = ruleList;
         return node;
     }
 
