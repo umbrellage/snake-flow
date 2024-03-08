@@ -503,7 +503,7 @@ public class Flow extends BaseModel {
             if (node.getAccessRule() != null) {
                 param.put(FlowConstant.INNER_FLOW, this);
                 param.put(FlowConstant.CURRENT_NODE, node);
-                boolean flag = node.getAccessRule().accessRule(param, id);
+                boolean flag = node.getAccessRule().accessRule(param, node.getId());
                 // 如果规则不匹配，递归修改后面节点的状态为忽略
                 if (!flag) {
                     ignoreEqualAfterNode(node);
