@@ -32,8 +32,8 @@
         <result column="update_time" property="updateTime" />
     </resultMap>
 
-    <sql id="fieldList">id, rule_list, external_node_id, title, node_name, pre_name, next_name, flow_id, flow_template_id, access_rule_name, submit_rule_name, assign_rule_name, supervisor_assignment, self_and_supervisor_assignment, rule_assignment, supervisor_ids, node_type, node_status, custom_status, processed_by, del_flag, tenant_id, create_time, update_time, create_by, update_by, todo_notify, modify_other_todo_name</sql>
-    <sql id="fieldListT1">t1.id, t1.rule_list, t1.external_node_id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.access_rule_name, t1.submit_rule_name, t1.assign_rule_name, t1.supervisor_assignment, t1.self_and_supervisor_assignment, t1.rule_assignment, t1.supervisor_ids, t1.node_type, t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time, t1.todo_notify, t1.modify_other_todo_name</sql>
+    <sql id="fieldList">id, access_rule_list, rule_list, external_node_id, title, node_name, pre_name, next_name, flow_id, flow_template_id, access_rule_name, submit_rule_name, assign_rule_name, supervisor_assignment, self_and_supervisor_assignment, rule_assignment, supervisor_ids, node_type, node_status, custom_status, processed_by, del_flag, tenant_id, create_time, update_time, create_by, update_by, todo_notify, modify_other_todo_name</sql>
+    <sql id="fieldListT1">t1.id, t1.access_rule_list, t1.rule_list, t1.external_node_id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.access_rule_name, t1.submit_rule_name, t1.assign_rule_name, t1.supervisor_assignment, t1.self_and_supervisor_assignment, t1.rule_assignment, t1.supervisor_ids, t1.node_type, t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time, t1.todo_notify, t1.modify_other_todo_name</sql>
     <sql id="tableName">jbpm_flow_node</sql>
 
     <select id="listNode" resultMap="BaseResultMap">
