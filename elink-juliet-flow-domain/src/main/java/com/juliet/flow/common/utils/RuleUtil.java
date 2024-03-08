@@ -21,7 +21,7 @@ public final class RuleUtil {
         List<List<RuleDTO>> ruleGroupList = new ArrayList<>();
         List<RuleDTO> ruleDTOList = new ArrayList<>();
         for (RuleDTO ruleDTO : rules) {
-            if (ruleDTO.getConditionType() == ConditionTypeEnum.OR) {
+            if (ruleDTO.getConditionType() == ConditionTypeEnum.OR || ruleDTO.getConditionType() == null) {
                 ruleDTOList.add(ruleDTO);
                 ruleGroupList.add(ruleDTOList);
                 ruleDTOList = new ArrayList<>();

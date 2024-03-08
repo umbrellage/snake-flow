@@ -31,6 +31,6 @@ public class RuleDTO {
             return false;
         }
         // TODO: 2024/3/6 JudgementTypeEnum 如果有其他类型，比如包含 需要修改
-        return Objects.equals(value, fieldValue.get(0).getValue());
+        return Objects.equals(String.valueOf(value), String.valueOf(fieldValue.get(0).getValue()));
     }
 }
