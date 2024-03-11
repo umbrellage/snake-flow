@@ -209,6 +209,11 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<Void> flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        return AjaxResult.success();
+    }
+
+    @Override
     public AjaxResult<Void> earlyEndFlow(Long flowId) {
         flowExecuteService.earlyEndFlow(flowId);
         return AjaxResult.success();
