@@ -146,6 +146,10 @@ public class FlowContext {
         }
     }
 
+    public static void flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        julietFlowClient.flowAutomate(flowId, automateParam);
+    }
+
     public static List<HistoricTaskInstance> forward() {
         try {
             NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
