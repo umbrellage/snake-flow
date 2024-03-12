@@ -21,8 +21,6 @@ public class DefaultFlowAutomateRule extends FlowAutomateRule {
 
     @Override
     public boolean flowAutomate(Flow flow, Map<String, Object> automateParam) {
-
-
-        return false;
+        return true;
     }
 }
