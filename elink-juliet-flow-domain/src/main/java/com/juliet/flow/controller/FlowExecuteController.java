@@ -210,6 +210,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @Override
     public AjaxResult<Void> flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        flowExecuteService.flowAutomate(flowId, automateParam);
         return AjaxResult.success();
     }
 

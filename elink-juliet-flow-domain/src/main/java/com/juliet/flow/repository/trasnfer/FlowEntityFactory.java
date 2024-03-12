@@ -298,6 +298,7 @@ public class FlowEntityFactory {
         nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
         nodeEntity.setUpdateTime(node.getProcessedTime() == null ? now : JulietTimeMemo.toDate(node.getProcessedTime()));
         nodeEntity.setModifyOtherTodoName(node.getModifyOtherTodoName());
+        nodeEntity.setFlowAutomateRuleName(nodeEntity.getFlowAutomateRuleName());
         nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
 
         return nodeEntity;
@@ -363,7 +364,9 @@ public class FlowEntityFactory {
         node.setUpdateTime(nodeEntity.getUpdateTime());
         node.setActiveRule(RuleFactory.activeRule(nodeEntity.getModifyOtherTodoName()));
         node.setTodoNotify(TodoNotifyEnum.of(nodeEntity.getTodoNotify()));
+        node.setFlowAutomateRuleName(nodeEntity.getFlowAutomateRuleName());
         node.setModifyOtherTodoName(nodeEntity.getModifyOtherTodoName());
+        node.setFlowAutomateRule(RuleFactory.flowAutomateRule(nodeEntity.getFlowAutomateRuleName()));
         return node;
     }
 

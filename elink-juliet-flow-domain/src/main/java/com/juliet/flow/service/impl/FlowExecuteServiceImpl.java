@@ -327,6 +327,26 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .forEach(e -> flowRepository.update(e));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        Flow flow = flowRepository.queryById(flowId);
+
+        while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam))) {
+            List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
+            flowAutomateNodeList.forEach(node -> {
+                NodeFieldDTO fieldDTO = new NodeFieldDTO();
+                fieldDTO.setFlowId(flowId);
+                fieldDTO.setNodeId(node.getId());
+                fieldDTO.setData(automateParam);
+                forward(fieldDTO);
+            });
+        }
+
+    }
+
+
+
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
         Long redoNodeId = null;

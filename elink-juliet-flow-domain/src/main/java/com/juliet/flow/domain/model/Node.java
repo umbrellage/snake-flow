@@ -82,6 +82,10 @@ public class Node extends BaseModel {
 
     private NotifyRule activeRule;
 
+    private FlowAutomateRule flowAutomateRule;
+
+    private String flowAutomateRuleName;
+
     /**
      * 主管分配
      */
