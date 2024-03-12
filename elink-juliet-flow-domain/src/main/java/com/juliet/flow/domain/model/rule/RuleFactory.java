@@ -41,6 +41,10 @@ public class RuleFactory {
     private void setActiveRule(List<NotifyRule> rules) {
         RuleFactory.activeRules = rules;
     }
+    @Autowired
+    public void setFlowAutomateRules(List<FlowAutomateRule> flowAutomateRules) {
+        RuleFactory.flowAutomateRules = flowAutomateRules;
+    }
 
     public static NotifyRule activeRule(String name) {
         if (name == null) {
