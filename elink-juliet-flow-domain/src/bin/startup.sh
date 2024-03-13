@@ -19,8 +19,8 @@ APPLICATION_JAR="@build.finalName@.jar"
 
 # bin目录绝对路径
 BIN_PATH=$(
-  cd $(dirname $0)
-  pwd
+    cd $(dirname $0)
+    pwd
 )
 # 进入bin目录
 cd $(dirname $0)
@@ -53,17 +53,17 @@ STARTUP_LOG="================================================ ${NOW_PRETTY} ====
 
 # 如果logs文件夹不存在,则创建文件夹
 if [[ ! -d "${LOG_DIR}" ]]; then
-  mkdir "${LOG_DIR}"
+    mkdir "${LOG_DIR}"
 fi
 
 # 如果logs/back文件夹不存在,则创建文件夹
 if [[ ! -d "${LOG_BACK_DIR}" ]]; then
-  mkdir "${LOG_BACK_DIR}"
+    mkdir "${LOG_BACK_DIR}"
 fi
 
 # 如果项目运行日志存在,则重命名备份
 if [[ -f "${LOG_PATH}" ]]; then
-  mv ${LOG_PATH} "${LOG_BACK_DIR}/${APPLICATION}_back_${NOW}.log"
+    mv ${LOG_PATH} "${LOG_BACK_DIR}/${APPLICATION}_back_${NOW}.log"
 fi
 
 # 创建新的项目运行日志
@@ -85,7 +85,11 @@ echo "" >${LOG_PATH}
 JAVA_OPT="-server -Xms512m -Xmx512m -Xmn256m -XX:MetaspaceSize=64m -XX:MaxMetaspaceSize=128m -XX:CMSInitiatingOccupancyFraction=80 -XX:+UseCMSInitiatingOccupancyOnly -XX:+ExplicitGCInvokesConcurrent -XX:ErrorFile=${LOG_DIR}/hs_err_%p.log -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${LOG_DIR} -Xloggc:${LOG_DIR}/gc.log -XX:+PrintGCDateStamps -XX:+PrintGCDetails -XX:+PrintGCApplicationStoppedTime -XX:+PrintGCCause -XX:MaxTenuringThreshold=15 -XX:SurvivorRatio=10"
 JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 if test -n "$1" && [ $1 = "debug" ]; then
-  JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9907"
+    JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9907"
+fi
+
+if test -n "$2" && [ $2 = "skywalking" ]; then
+    JAVA_OPT="${JAVA_OPT} -javaagent:/usr/local/agent/skywalking-agent/skywalking-agent.jar -DSW_AGENT_NAME=elink::elink-juliet-flow -Dskywalking_config=/usr/local/agent/skywalking-agent/custom.config "
 fi
 
 #=======================================================
@@ -134,7 +138,7 @@ cat ${LOG_PATH}
 PID=$(ps -ef | grep "${APPLICATION_JAR}" | grep -v grep | awk '{ print $2 }')
 
 if [ -z "$PID" ]; then
-  echo $(date +'%Y-%m-%d %H:%M:%S')" ##服务启动失败##"
+    echo $(date +'%Y-%m-%d %H:%M:%S')" ##服务启动失败##"
 else
-  echo $(date +'%Y-%m-%d %H:%M:%S')" ##服务启动成功## PID:"$PID
+    echo $(date +'%Y-%m-%d %H:%M:%S')" ##服务启动成功## PID:"$PID
 fi

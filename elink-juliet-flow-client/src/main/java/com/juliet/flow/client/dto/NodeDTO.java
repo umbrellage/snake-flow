@@ -14,6 +14,8 @@ public class NodeDTO {
 
     private String id;
 
+    private String externalNodeId;
+
     private String title;
 
     @NotNull
@@ -84,6 +86,8 @@ public class NodeDTO {
 
     private String customStatus;
 
+    private Long customStatusId;
+
     /**
      * TodoNotifyEnum
      */
@@ -92,5 +96,9 @@ public class NodeDTO {
     private String modifyOtherTodoName;
 
     private String tenantId;
+
+    private List<AssignmentRuleDTO> assignmentRuleList;
+
+    private List<AccessRuleDTO> accessRuleList;
 
 }

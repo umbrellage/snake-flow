@@ -1,14 +1,18 @@
 package com.juliet.flow.controller;
 
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.flow.client.JulietTemplateClient;
 import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.dto.NodeDTO;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
+import com.juliet.flow.client.dto.FlowTemplateAddDTO;
+import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.service.FlowTemplateService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "流程模板管理")
 @RequestMapping("/juliet/flow/template")
 @RestController
-public class FlowTemplateController {
+public class FlowTemplateController implements JulietTemplateClient {
 
     @Autowired
     private FlowTemplateService flowTemplateService;
@@ -29,8 +33,14 @@ public class FlowTemplateController {
     @ApiOperation("添加模版")
     @PostMapping("/add")
     public AjaxResult add(@RequestBody FlowTemplateAddDTO dto) {
-        flowTemplateService.add(dto);
-        return AjaxResult.success();
+        Long flowTemplateId = flowTemplateService.add(dto);
+        return AjaxResult.success(flowTemplateId);
+    }
+
+    @Override
+    public AjaxResult<List<NodeVO>> nodeList(Long id) {
+        List<NodeVO> nodeVOList = flowTemplateService.nodeList(id);
+        return AjaxResult.success(nodeVOList);
     }
 
     @ApiOperation("修改模版")
@@ -43,6 +53,14 @@ public class FlowTemplateController {
     @GetMapping("/detail")
     public AjaxResult detail(@RequestParam("id") Long id) {
         return AjaxResult.success(flowTemplateService.queryById(id));
+    }
+
+    @ApiOperation("获取更新时间")
+    public AjaxResult<String> updateTimeByCode(String code) {
+        String data = flowTemplateService.updateTimeByCode(code);
+        AjaxResult<String> result = AjaxResult.success();
+        result.setData(data);
+        return result;
     }
 
     @PostMapping("/disable")

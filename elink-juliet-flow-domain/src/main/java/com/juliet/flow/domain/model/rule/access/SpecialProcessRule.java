@@ -22,7 +22,7 @@ public class SpecialProcessRule extends BaseRule {
     }
 
     @Override
-    public boolean accessRule(Map<String, Object> params) {
+    public boolean accessRule(Map<String, Object> params, Long nodeId) {
         log.info("param:{}", JSON.toJSONString(params));
         return  (boolean) params.get("specialTec");
     }

@@ -1,10 +1,11 @@
-package com.juliet.flow.domain.dto;
+package com.juliet.flow.client.dto;
 
 import com.juliet.flow.client.dto.NodeDTO;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import org.bouncycastle.util.Longs;
 
 /**
  * @author xujianjie
@@ -27,4 +28,7 @@ public class FlowTemplateAddDTO {
     private Long updateBy;
 
     private Long tenantId;
+
+    private ProcessConfigRPCDTO dto;
+
 }

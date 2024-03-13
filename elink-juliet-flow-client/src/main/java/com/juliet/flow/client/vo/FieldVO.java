@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 public class FieldVO {
 
-    private Long id;
+    private String id;
 
     private String code;
 

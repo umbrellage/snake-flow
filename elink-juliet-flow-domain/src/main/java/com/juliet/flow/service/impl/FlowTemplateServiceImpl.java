@@ -1,24 +1,26 @@
 package com.juliet.flow.service.impl;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
+import com.alibaba.fastjson2.JSON;
 import com.juliet.api.development.domain.entity.SysUser;
+import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.dto.*;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.domain.dto.FlowTemplateAddDTO;
+import com.juliet.flow.client.dto.FlowTemplateAddDTO;
 import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ import java.util.stream.Collectors;
  * @author xujianjie
  * @date 2023-05-09
  */
+@Slf4j
 @Service
 public class FlowTemplateServiceImpl implements FlowTemplateService {
 
@@ -38,12 +41,12 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
 
     @Transactional(rollbackFor = Exception.class)
     @Override
-    public void add(FlowTemplateAddDTO flowTemplateAddDTO) {
+    public Long add(FlowTemplateAddDTO flowTemplateAddDTO) {
         SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
         flowTemplateAddDTO.setCreateBy(sysUser.getUserId());
         flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
         flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
-        flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
+        return flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Override
@@ -60,6 +63,15 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     }
 
     @Override
+    public String updateTimeByCode(String code) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(code);
+        if (flowTemplate.getUpdateTime() == null) {
+            return "0";
+        }
+        return String.valueOf(flowTemplate.getUpdateTime().getTime());
+    }
+
+    @Override
     public void publish(Long flowTemplateId) {
         flowRepository.updateFlowTemplateStatusById(FlowTemplateStatusEnum.ENABLE, flowTemplateId);
     }
@@ -67,6 +79,16 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     @Override
     public void disable(Long flowTemplateId) {
         flowRepository.updateFlowTemplateStatusById(FlowTemplateStatusEnum.DISABLE, flowTemplateId);
+    }
+
+    @Override
+    public List<NodeVO> nodeList(Long id) {
+        FlowTemplate flowTemplate = flowRepository.queryTemplateById(id);
+        Optional.ofNullable(flowTemplate).orElseThrow(() -> new ServiceException("流程模版不存在"));
+        return flowTemplate.getNodes()
+            .stream()
+            .map(e -> e.toNodeVo(null))
+            .collect(Collectors.toList());
     }
 
     private FlowTemplate toFlowTemplate(FlowTemplateAddDTO dto) {
@@ -78,6 +100,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
                 .collect(Collectors.toList()));
         flowTemplate.setName(dto.getName());
         flowTemplate.setCode(dto.getCode());
+        flowTemplate.setDto(dto.getDto());
         flowTemplate.setStatus(FlowTemplateStatusEnum.IN_PROGRESS);
         flowTemplate.setTenantId(dto.getTenantId());
         flowTemplate.setCreateBy(dto.getCreateBy());
@@ -89,10 +112,14 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         if (nodeDTO == null) {
             return null;
         }
+        log.info("nodeDTO:{}", JSON.toJSONString(nodeDTO));
         Node node = new Node();
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
         node.setTitle(nodeDTO.getTitle());
         node.setName(nodeDTO.getName());
+        node.setRuleList(nodeDTO.getAssignmentRuleList());
+        node.setAccessRuleList(nodeDTO.getAccessRuleList());
+        node.setExternalNodeId(nodeDTO.getExternalNodeId());
         node.setPreName(nodeDTO.getPreName());
         node.setNextName(nodeDTO.getNextName());
         node.setStatus(NodeStatusEnum.byCode(nodeDTO.getStatus()));
@@ -104,6 +131,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setSupervisorAssignment(nodeDTO.getSupervisorAssignment());
         node.setSelfAndSupervisorAssignment(nodeDTO.getSelfAndSupervisorAssignment());
         node.setAssignRule(RuleFactory.getAssignRule(nodeDTO.getAssignRuleName()));
+        
         node.setTenantId(StringUtil.isBlank(nodeDTO.getTenantId()) ? flowTenantId : Long.valueOf(nodeDTO.getTenantId()));
         if (nodeDTO.getTodoNotify() == null) {
             nodeDTO.setTodoNotify(TodoNotifyEnum.NOTIFY.getCode());

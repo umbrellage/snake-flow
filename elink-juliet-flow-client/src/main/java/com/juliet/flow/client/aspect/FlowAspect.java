@@ -4,7 +4,6 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.github.pagehelper.util.StringUtil;
-import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.FlowContext;
 import com.juliet.flow.client.JulietFlowClient;
@@ -14,19 +13,13 @@ import com.juliet.flow.client.callback.UserInfoCallback;
 import com.juliet.flow.client.callback.impl.DefaultControllerResponseCallbackImpl;
 import com.juliet.flow.client.common.FlowMode;
 import com.juliet.flow.client.dto.BpmDTO;
-import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
-import com.juliet.flow.client.dto.TaskDTO;
-import com.juliet.flow.client.vo.NodeVO;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.juliet.flow.client.vo.FlowVO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.compress.utils.Lists;
-import org.apache.poi.ss.formula.functions.T;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.Signature;
@@ -90,6 +83,8 @@ public class FlowAspect {
         HttpServletRequest request = sra.getRequest();
 
         String julietFlowCode = getJulietFlowCode(request);
+//        String julietFlowCode = processConfigCallback.getProcessConfigId(request);
+
         Long julietFlowId = getJulietFlowId(request);
         Long julietNodeId = getJulietNodeId(request);
 
@@ -111,6 +106,7 @@ public class FlowAspect {
             }
             bpmInit = true;
             BpmDTO bpmDTO = toBpmDTO(julietFlowCode, userId, tenantId);
+            log.info("bpmDTO:{}", JSON.toJSONString(bpmDTO));
             if (julietFlowInterceptor.flowMode() == FlowMode.AUTO) {
                 julietFlowId = function(julietFlowClient::initBmp, bpmDTO);
             }

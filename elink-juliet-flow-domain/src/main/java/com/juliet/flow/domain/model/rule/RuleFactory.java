@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model.rule;
 
+import com.juliet.flow.domain.model.FlowAutomateRule;
 import com.juliet.flow.domain.model.NotifyRule;
 import com.juliet.flow.domain.model.BaseAssignRule;
 import com.juliet.flow.domain.model.BaseRule;
@@ -24,6 +25,8 @@ public class RuleFactory {
 
     private static List<NotifyRule> activeRules;
 
+    private static List<FlowAutomateRule> flowAutomateRules;
+
     @Autowired
     private void setAssignRules(List<BaseAssignRule> rules) {
         RuleFactory.assignRules = rules;
@@ -38,6 +41,10 @@ public class RuleFactory {
     private void setActiveRule(List<NotifyRule> rules) {
         RuleFactory.activeRules = rules;
     }
+    @Autowired
+    public void setFlowAutomateRules(List<FlowAutomateRule> flowAutomateRules) {
+        RuleFactory.flowAutomateRules = flowAutomateRules;
+    }
 
     public static NotifyRule activeRule(String name) {
         if (name == null) {
@@ -50,6 +57,23 @@ public class RuleFactory {
         }
         for (NotifyRule rule : activeRules) {
             if (name.equals(rule.notifyRuleName())) {
+                return rule;
+            }
+        }
+        return null;
+    }
+
+    public static FlowAutomateRule flowAutomateRule(String name) {
+        if (name == null) {
+            log.error("activeRule, name is null!");
+            return null;
+        }
+        if (CollectionUtils.isEmpty(flowAutomateRules)) {
+            log.warn("can not find system active rule!");
+            return null;
+        }
+        for (FlowAutomateRule rule : flowAutomateRules) {
+            if (name.equals(rule.flowAutomateRuleName())) {
                 return rule;
             }
         }

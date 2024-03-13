@@ -16,4 +16,6 @@ public class FlowIdListDTO {
 
     private List<Long> flowIdList;
 
+    private Boolean excludeFields;
+
 }

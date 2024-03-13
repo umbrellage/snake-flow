@@ -13,10 +13,16 @@ public abstract class NotifyRule {
 
     public abstract String notifyRuleName();
 
+    /**
+     * 需要通知的节点（可办转待办）
+     * @param flow
+     * @param param
+     * @return
+     */
     public abstract List<Long> notifyNodeIds(Flow flow, Map<String, Object> param);
 
     /**
-     * 没有规则默认喂true
+     * 没有规则默认为true
      * @param flow
      * @return
      */

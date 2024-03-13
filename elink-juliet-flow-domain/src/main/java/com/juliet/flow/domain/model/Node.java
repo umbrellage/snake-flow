@@ -3,7 +3,10 @@ package com.juliet.flow.domain.model;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.dto.AccessRuleDTO;
+import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
@@ -40,6 +43,7 @@ public class Node extends BaseModel {
 
     private Long id;
 
+    private String externalNodeId;
     private Long flowId;
 
     private Long mainFlowId;
@@ -77,6 +81,10 @@ public class Node extends BaseModel {
     private BaseRule submitRule;
 
     private NotifyRule activeRule;
+
+    private FlowAutomateRule flowAutomateRule;
+
+    private String flowAutomateRuleName;
 
     /**
      * 主管分配
@@ -116,6 +124,10 @@ public class Node extends BaseModel {
      * 修改其他节点待办配置
      */
     private String modifyOtherTodoName;
+
+    private List<AssignmentRuleDTO> ruleList;
+
+    private List<AccessRuleDTO> accessRuleList;
 
 
     public boolean ifLeaderAdjust(Long userId) {
@@ -161,7 +173,10 @@ public class Node extends BaseModel {
 
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
-            processedBy = assignRule.getAssignUserId(params, flow);
+            Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
+            if (assignProcessedBy != null) {
+                processedBy = assignProcessedBy;
+            }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null) {
                 Supplier supplier = new Supplier();
@@ -176,7 +191,7 @@ public class Node extends BaseModel {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
-        ret.setFlowId(flowId);
+        ret.setFlowId(flowId == null ? flow.getId(): flowId);
         ret.setTodoNotify(todoNotify);
         if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
             ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
@@ -411,6 +426,7 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
+        data.setExternalNodeId(externalNodeId);
         data.setTitle(title);
         data.setFlowId(flowId);
         data.setPreName(preName);
@@ -495,22 +511,14 @@ public class Node extends BaseModel {
         node.setCreateBy(this.getCreateBy());
         node.setUpdateBy(0L);
         node.setCreateTime(new Date());
-        node.setUpdateTime(new Date());
+        node.setUpdateTime(getUpdateTime());
         node.setTenantId(this.getTenantId());
         node.setTodoNotify(todoNotify);
+        node.setProcessedTime(processedTime);
         node.modifyOtherTodoName = modifyOtherTodoName;
+        node.accessRuleList = accessRuleList;
+        node.ruleList = ruleList;
         return node;
-    }
-
-    public NotifyDTO delete(Flow flow) {
-        NotifyDTO data = new NotifyDTO();
-        data.setNodeId(id);
-        data.setCode(flow.getTemplateCode());
-        data.setTodoNotify(todoNotify);
-        data.setType(NotifyTypeEnum.DELETE);
-        data.setTenantId(flow.getTenantId());
-        data.setFlowId(flowId);
-        return data;
     }
 
 

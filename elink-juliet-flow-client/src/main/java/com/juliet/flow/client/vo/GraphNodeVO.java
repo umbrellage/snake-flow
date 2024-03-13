@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import java.util.List;
 import lombok.Data;
 
 /**
@@ -67,6 +68,12 @@ public class GraphNodeVO {
         private Long processBy;
 
         private String operateTime;
+
+        private List<PostVO> bindPost;
+
+        private String processByPostId;
+
+        private String processByPostName;
     }
 
     @Data

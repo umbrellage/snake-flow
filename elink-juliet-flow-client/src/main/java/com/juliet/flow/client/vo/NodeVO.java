@@ -23,6 +23,8 @@ public class NodeVO {
 
     private Long id;
 
+    private String externalNodeId;
+
     private Long tenantId;
 
     /**

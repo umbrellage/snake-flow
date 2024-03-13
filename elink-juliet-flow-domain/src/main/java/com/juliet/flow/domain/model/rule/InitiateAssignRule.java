@@ -21,7 +21,7 @@ public class InitiateAssignRule extends BaseAssignRule {
     }
 
     @Override
-    public Long getAssignUserId(Map<String, Object> params, Flow flow) {
+    public Long getAssignUserId(Map<String, Object> params, Flow flow, Long nodeId) {
         if (flow == null) {
             return null;
         }

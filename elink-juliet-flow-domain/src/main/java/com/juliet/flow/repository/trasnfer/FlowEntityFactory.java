@@ -1,7 +1,11 @@
 package com.juliet.flow.repository.trasnfer;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.utils.StringUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
+import com.juliet.flow.client.dto.AccessRuleDTO;
+import com.juliet.flow.client.dto.AssignmentRuleDTO;
+import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
@@ -95,6 +99,7 @@ public class FlowEntityFactory {
 //                node.setId(IdGenerator.getId());
 //            }
 //        }
+        flowTemplateEntity.setProcessConfig(JSON.toJSONString(flowTemplate.getDto()));
         flowTemplateEntity.setCreateBy(flowTemplate.getCreateBy());
         flowTemplateEntity.setUpdateBy(flowTemplate.getUpdateBy());
         flowTemplateEntity.setCode(flowTemplate.getCode());
@@ -264,6 +269,9 @@ public class FlowEntityFactory {
         }
         nodeEntity.setId(node.getId());
         nodeEntity.setTitle(node.getTitle());
+        nodeEntity.setExternalNodeId(node.getExternalNodeId());
+        nodeEntity.setRuleList(JSON.toJSONString(node.getRuleList()));
+        nodeEntity.setAccessRuleList(JSON.toJSONString(node.getAccessRuleList()));
         nodeEntity.setName(node.getName());
         nodeEntity.setPreName(node.getPreName());
         nodeEntity.setNextName(node.getNextName());
@@ -290,6 +298,7 @@ public class FlowEntityFactory {
         nodeEntity.setCreateTime(node.getCreateTime() == null ? now : node.getCreateTime());
         nodeEntity.setUpdateTime(node.getProcessedTime() == null ? now : JulietTimeMemo.toDate(node.getProcessedTime()));
         nodeEntity.setModifyOtherTodoName(node.getModifyOtherTodoName());
+        nodeEntity.setFlowAutomateRuleName(node.getFlowAutomateRuleName());
         nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
 
         return nodeEntity;
@@ -304,6 +313,8 @@ public class FlowEntityFactory {
         flowTemplate.setTenantId(flowTemplateEntity.getTenantId());
         flowTemplate.setCreateBy(flowTemplateEntity.getCreateBy());
         flowTemplate.setUpdateBy(flowTemplateEntity.getUpdateBy());
+        flowTemplate.setUpdateTime(flowTemplateEntity.getUpdateTime());
+        flowTemplate.setCreateTime(flowTemplateEntity.getCreateTime());
         return flowTemplate;
     }
 
@@ -325,6 +336,9 @@ public class FlowEntityFactory {
         node.setFlowId(nodeEntity.getFlowId());
         node.setTitle(nodeEntity.getTitle());
         node.setName(nodeEntity.getName());
+        node.setExternalNodeId(nodeEntity.getExternalNodeId());
+        node.setRuleList(JSON.parseArray(nodeEntity.getRuleList(), AssignmentRuleDTO.class));
+        node.setAccessRuleList(JSON.parseArray(nodeEntity.getAccessRuleList(), AccessRuleDTO.class));
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
 
@@ -350,7 +364,9 @@ public class FlowEntityFactory {
         node.setUpdateTime(nodeEntity.getUpdateTime());
         node.setActiveRule(RuleFactory.activeRule(nodeEntity.getModifyOtherTodoName()));
         node.setTodoNotify(TodoNotifyEnum.of(nodeEntity.getTodoNotify()));
+        node.setFlowAutomateRuleName(nodeEntity.getFlowAutomateRuleName());
         node.setModifyOtherTodoName(nodeEntity.getModifyOtherTodoName());
+        node.setFlowAutomateRule(RuleFactory.flowAutomateRule(nodeEntity.getFlowAutomateRuleName()));
         return node;
     }
 

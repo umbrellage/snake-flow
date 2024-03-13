@@ -34,6 +34,7 @@ import com.juliet.flow.domain.model.FlowTemplate;
 import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NodeQuery;
+import com.juliet.flow.domain.query.AssembleFlowCondition;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowExecuteService;
@@ -236,9 +237,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             log.error("流程ID列表为空");
             return Collections.emptyList();
         }
-        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList());
+        AssembleFlowCondition condition = new AssembleFlowCondition();
+        condition.setExcludeFields(dto.getExcludeFields());
+        List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList(), condition);
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
-        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
+        Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList, condition)
             .stream().map(flow -> flow.flowVO(Collections.emptyList()))
             .collect(Collectors.groupingBy(FlowVO::getParentId));
         return mainFlowList.stream()
@@ -324,6 +327,51 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .forEach(e -> flowRepository.update(e));
     }
 
+    @Transactional(rollbackFor = Exception.class)
+    @Override
+    public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
+//        Flow flow = flowRepository.queryById(flowId);
+//        List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
+//        List<Long> nodeIdList = flowAutomateNodeList.stream()
+//            .map(Node::getId)
+//            .collect(Collectors.toList());
+//        flow.getNodes()
+//            .stream()
+//            .filter(e -> nodeIdList.contains(e.getId()))
+//            .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
+//        flowRepository.update(flow);
+//        flowAutomateNodeList.forEach(node -> {
+//            NodeFieldDTO fieldDTO = new NodeFieldDTO();
+//            fieldDTO.setFlowId(flowId);
+//            fieldDTO.setNodeId(node.getId());
+//            fieldDTO.setData(automateParam);
+//            forward(fieldDTO);
+//        });
+
+        Flow flow = flowRepository.queryById(flowId);
+        do {
+            List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
+            List<Long> nodeIdList = flowAutomateNodeList.stream()
+                .map(Node::getId)
+                .collect(Collectors.toList());
+            flow.getNodes()
+                .stream()
+                .filter(e -> nodeIdList.contains(e.getId()))
+                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
+            flowRepository.update(flow);
+            flowAutomateNodeList.forEach(node -> {
+                NodeFieldDTO fieldDTO = new NodeFieldDTO();
+                fieldDTO.setFlowId(flowId);
+                fieldDTO.setNodeId(node.getId());
+                fieldDTO.setData(automateParam);
+                forward(fieldDTO);
+            });
+            flow = flowRepository.queryById(flowId);
+        } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
+    }
+
+
+
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
         Long redoNodeId = null;
@@ -347,7 +395,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node executeNode = newFlow.findNode(node.getName());
         newFlow.modifyNodeStatus(executeNode);
         newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getParam());
-        flowRepository.add(newFlow);
+        Long newFlowId= flowRepository.add(newFlow);
+        newFlow = flowRepository.queryById(newFlowId);
 
         List<History> historyList = newFlow.forwardHistory(executeNode.getId(), redo.getUserId());
         historyRepository.add(historyList);
@@ -657,11 +706,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 throw new ServiceException("有流程将经过当前节点，不可变更");
             }
         }
+        log.info("mamba flow:{}", JSON.toJSONString(flow));
         Flow subFlow = flow.subFlow();
+        log.info("mamba new subFlow:{}", JSON.toJSONString(subFlow));
         subFlow.modifyNodeStatus(node);
         Node subNode = subFlow.findNode(node.getName());
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
+
         flowRepository.add(subFlow);
         calibrateFlowList.stream()
             .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
@@ -784,6 +836,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     private void callback(List<NotifyDTO> list) {
+        list.stream()
+            .filter(e -> StringUtils.isBlank(e.getCode()))
+            .findAny()
+            .ifPresent(e -> {
+                throw new ServiceException("终于找到你了，模版code为空，代码有bug，请检查");
+            });
         if (CollectionUtils.isNotEmpty(list)) {
             CompletableFuture.runAsync(() ->
                 msgNotifyCallbacks.forEach(callback -> {

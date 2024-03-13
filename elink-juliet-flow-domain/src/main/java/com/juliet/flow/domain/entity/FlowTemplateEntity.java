@@ -23,4 +23,6 @@ public class FlowTemplateEntity extends BaseEntity {
 
     @TableField(value = "flow_template_status")
     private Integer status;
+    @TableField(value = "process_config")
+    private String processConfig;
 }

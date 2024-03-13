@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <parent>
         <groupId>com.juliet</groupId>
@@ -111,8 +111,7 @@
                         <manifest>
                             <!-- 项目启动类 -->
                             <mainClass>com.juliet.flow.ElinkJulietFlowApplication</mainClass>
-                            -->
-                        </manifest>
+                            --> </manifest>
                     </archive>
                     <!-- 项目启动jar包排除目录 -->
                     <excludes>
@@ -245,7 +244,7 @@
                 <profileActive>zly-dev</profileActive>
             </properties>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
         <profile>
@@ -254,7 +253,16 @@
                 <profileActive>zly-test</profileActive>
             </properties>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>zly-test2</id>
+            <properties>
+                <profileActive>zly-test2</profileActive>
+            </properties>
+            <activation>
+                <activeByDefault>false</activeByDefault>
             </activation>
         </profile>
         <profile>

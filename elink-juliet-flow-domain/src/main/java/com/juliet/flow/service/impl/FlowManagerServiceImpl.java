@@ -10,6 +10,7 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
+import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.domain.model.Flow;
@@ -18,6 +19,7 @@ import com.juliet.flow.domain.model.History;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
+import com.juliet.flow.domain.model.Post;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
@@ -64,12 +66,18 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         // todo 判断flow是否存在
         GraphVO vo = null;
         String json = null;
-        String jsonFilePath = findJsonFile(flowTemplate);
-        try {
-            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
-        } catch (IOException e) {
-            log.error("read {} fail!", jsonFilePath, e);
+
+        if (flowTemplate.getDto() == null) {
+            String jsonFilePath = findJsonFile(flowTemplate);
+            try {
+                json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
+            } catch (IOException e) {
+                log.error("read {} fail!", jsonFilePath, e);
+            }
+        } else {
+            json = JSON.toJSONString(flowTemplate.getDto());
         }
+
         List<History> historyList = historyRepository.queryByFlowId(id);
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
 //        fillDefaultRequire(vo);
@@ -87,12 +95,20 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
-            graphNodeVO.getProperties().setCurrentProcessUserId(String.valueOf(getCurrentProcessBy(graphNodeVO, flow)));
+            graphNodeVO.getProperties().setCurrentProcessUserId(getCurrentProcessBy(graphNodeVO, flow) != null ? String.valueOf(getCurrentProcessBy(graphNodeVO, flow)) : null);
             Long nodeId = getNodeIdByName(graphNodeVO, flow);
             if (nodeId != null) {
                 graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
                 LocalDateTime time = nodeMap.get(nodeId).processedTime();
                 Long processBy = nodeMap.get(nodeId).getProcessedBy();
+                List<Post> postList = nodeMap.get(nodeId).getBindPosts();
+                if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(postList)) {
+                    List<PostVO> postVOList = postList.stream()
+                        .filter(Objects::nonNull)
+                        .map(Post::toPost)
+                        .collect(Collectors.toList());
+                    graphNodeVO.getProperties().setBindPost(postVOList);
+                }
                 graphNodeVO.getProperties().setProcessBy(processBy);
                 if (time != null) {
                     graphNodeVO.getProperties().setOperateTime(JulietTimeMemo.format(time, DateUtils.YYYY_MM_DD_HH_MM_SS));
@@ -116,11 +132,15 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
         GraphVO vo = null;
         String json = null;
-        String jsonFilePath = findJsonFile(flowTemplate);
-        try {
-            json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
-        } catch (IOException e) {
-            log.error("read {} fail!", jsonFilePath, e);
+        if (flowTemplate.getDto() == null) {
+            String jsonFilePath = findJsonFile(flowTemplate);
+            try {
+                json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
+            } catch (IOException e) {
+                log.error("read {} fail!", jsonFilePath, e);
+            }
+        } else {
+            json = JSON.toJSONString(flowTemplate.getDto());
         }
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
         return vo;

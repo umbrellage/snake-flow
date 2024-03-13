@@ -22,6 +22,8 @@ public class NodeEntity extends BaseEntity {
 
     @TableId
     private Long id;
+    @TableField(value = "external_node_id")
+    private String externalNodeId;
 
     private String title;
 
@@ -86,6 +88,15 @@ public class NodeEntity extends BaseEntity {
     private Integer todoNotify;
 
     private String modifyOtherTodoName;
+
+    private String ruleList;
+
+    private String accessRuleList;
+
+    /**
+     * 规则自动流转的规则名称
+     */
+    private String flowAutomateRuleName;
 
     /**
      * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法, 并考虑历史数据

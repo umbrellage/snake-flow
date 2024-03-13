@@ -51,9 +51,11 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 
     @Override
     public void message(List<NotifyDTO> list) {
+        log.info("mq message:{}", JSON.toJSONString(list));
         try {
             for (NotifyDTO notifyDTO : list) {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);
+                log.info("transfer data:{}", JSON.toJSONString(dto));
                 rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
             }
         } catch (Exception e) {

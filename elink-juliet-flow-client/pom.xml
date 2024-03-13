@@ -11,7 +11,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>elink-juliet-flow-client</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
 
     <properties>
         <spring-cloud-alibaba.version>2021.0.1.0</spring-cloud-alibaba.version>
@@ -59,6 +59,10 @@
         <artifactId>spring-test</artifactId>
         <version>5.2.12.RELEASE</version>
       </dependency>
+        <dependency>
+            <artifactId>snake-utils</artifactId>
+            <groupId>cn.snake.kobe</groupId>
+        </dependency>
     </dependencies>
 
     <build>

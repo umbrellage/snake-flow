@@ -13,9 +13,12 @@ import lombok.Getter;
 public enum TodoNotifyEnum {
 
     /**
-     *
+     * 待办
      */
     NOTIFY(1),
+    /**
+     * 可办
+     */
     NO_NOTIFY(0),
 
     ;

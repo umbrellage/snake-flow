@@ -1,5 +1,6 @@
 package com.juliet.flow.controller;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
@@ -30,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -41,6 +43,7 @@ import java.util.stream.Collectors;
  * @author xujianjie
  * @date 2023-05-06
  */
+@Slf4j
 @Api(tags = "流程管理")
 @RequestMapping("/juliet/flow/execute")
 @RestController
@@ -70,8 +73,10 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+    @ApiOperation("通过表单字段查询节点，并执行")
     @Override
     public AjaxResult<List<HistoricTaskInstance>> forwardV2(NodeFieldDTO dto) {
+        log.info("mamba param:{}", JSON.toJSONString(dto));
         List<HistoricTaskInstance> instanceList = flowExecuteService.forward(dto);
         return AjaxResult.success(instanceList);
     }
@@ -200,6 +205,12 @@ public class FlowExecuteController implements JulietFlowClient {
     @Override
     public AjaxResult<Void> triggerTodo(Long flowId, Map<String, Object> triggerParam) {
         flowExecuteService.triggerTodo(flowId, triggerParam);
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<Void> flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        flowExecuteService.flowAutomate(flowId, automateParam);
         return AjaxResult.success();
     }
 

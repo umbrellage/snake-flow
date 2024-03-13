@@ -394,6 +394,7 @@ public class Flow extends BaseModel {
         List<Node> nodeList = nodes.stream()
             .map(Node::copyNode)
             .collect(Collectors.toList());
+        flow.setTemplateCode(templateCode);
         flow.setNodes(nodeList);
         flow.setStatus(FlowStatusEnum.ABNORMAL);
         flow.setTenantId(tenantId);
@@ -502,7 +503,7 @@ public class Flow extends BaseModel {
             if (node.getAccessRule() != null) {
                 param.put(FlowConstant.INNER_FLOW, this);
                 param.put(FlowConstant.CURRENT_NODE, node);
-                boolean flag = node.getAccessRule().accessRule(param);
+                boolean flag = node.getAccessRule().accessRule(param, node.getId());
                 // 如果规则不匹配，递归修改后面节点的状态为忽略
                 if (!flag) {
                     ignoreEqualAfterNode(node);
@@ -738,5 +739,13 @@ public class Flow extends BaseModel {
             }
         });
         setStatus(FlowStatusEnum.END);
+    }
+
+    public List<Node> canFlowAutomate(Map<String, Object> automateParam) {
+        return getNodes().stream()
+            .filter(e -> e.getFlowAutomateRule() != null)
+            .filter(e -> e.getFlowAutomateRule().flowAutomate(this, automateParam))
+            .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .collect(Collectors.toList());
     }
 }

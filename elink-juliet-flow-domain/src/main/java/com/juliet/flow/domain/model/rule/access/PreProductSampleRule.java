@@ -19,7 +19,7 @@ public class PreProductSampleRule extends BaseRule {
     }
 
     @Override
-    public boolean accessRule(Map<String, Object> params) {
+    public boolean accessRule(Map<String, Object> params, Long nodeId) {
         Boolean value = (Boolean) params.get("isEnd");
         return value == null || !value;
     }
