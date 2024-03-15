@@ -450,7 +450,7 @@ public class Node extends BaseModel {
 
         if (flow != null) {
             data.setCode(flow.getTemplateCode());
-            data.setMainFlowId(flow.getParentId() == 0 ? flow.getId() : flow.getParentId());
+            data.setMainFlowId(flow.getParentId() == null || flow.getParentId() == 0 ? flow.getId() : flow.getParentId());
             List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);
         }
