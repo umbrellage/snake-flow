@@ -235,6 +235,7 @@ public class FlowRepositoryImpl implements FlowRepository {
                 .filter(Objects::nonNull).distinct()
                 .collect(Collectors.toList());
         Map<Long, String> codeMap = flowTemplateDao.selectBatchIds(templateIdList).stream()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode, (v1, v2) -> v1));
         return flowEntities.stream()
                 .map(FlowEntityFactory::toFlow)

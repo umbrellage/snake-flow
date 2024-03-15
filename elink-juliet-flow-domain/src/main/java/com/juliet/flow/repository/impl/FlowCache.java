@@ -42,7 +42,7 @@ public class FlowCache {
         }
         String key = buildFlowCacheKey(flow.getId());
         cache.put(key, flow);
-//        redisService.<Flow>setCacheObject(buildFlowCacheKey(flow.getId()), flow, 10L, TimeUnit.MINUTES);
+        redisService.<Flow>setCacheObject(buildFlowCacheKey(flow.getId()), flow, 10L, TimeUnit.MINUTES);
     }
     public void setFlowList(List<Flow> flowList) {
         for (Flow flow : flowList) {
