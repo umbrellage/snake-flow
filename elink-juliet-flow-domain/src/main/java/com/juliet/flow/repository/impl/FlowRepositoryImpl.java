@@ -234,13 +234,18 @@ public class FlowRepositoryImpl implements FlowRepository {
                 .map(FlowEntity::getFlowTemplateId)
                 .filter(Objects::nonNull).distinct()
                 .collect(Collectors.toList());
-        Map<Long, String> codeMap = flowTemplateDao.selectBatchIds(templateIdList).stream()
-                .filter(Objects::nonNull)
-                .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode, (v1, v2) -> v1));
+        Map<Long, String> codeMap = new HashMap<>();
+        if (CollectionUtils.isNotEmpty(templateIdList)) {
+            codeMap = flowTemplateDao.selectBatchIds(templateIdList).stream()
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode, (v1, v2) -> v1));
+        }
+        Map<Long, String> finalCodeMap = codeMap;
         return flowEntities.stream()
                 .map(FlowEntityFactory::toFlow)
+                .filter(flow -> finalCodeMap.containsKey(flow.getId()))
                 .peek(flow -> {
-                    flow.setTemplateCode(codeMap.get(flow.getFlowTemplateId()));
+                    flow.setTemplateCode(finalCodeMap.get(flow.getFlowTemplateId()));
                     flow.setNodes(nodeMap.get(flow.getId()));
                 })
                 .collect(Collectors.toList());
