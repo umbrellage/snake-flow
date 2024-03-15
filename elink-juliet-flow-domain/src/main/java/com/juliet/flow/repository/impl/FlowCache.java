@@ -1,5 +1,7 @@
 package com.juliet.flow.repository.impl;
 
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.juliet.common.redis.service.RedisService;
 import com.juliet.flow.domain.entity.FlowEntity;
 import com.juliet.flow.domain.entity.NodeEntity;
@@ -25,6 +27,12 @@ public class FlowCache {
 
     private static final String FLOW_NODE_CACHE_PREFIX = "flow_node_id_";
 
+    private static Cache<String, Flow> cache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .concurrencyLevel(Runtime.getRuntime().availableProcessors())
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .build();
+
     @Autowired
     private RedisService redisService;
 
@@ -32,7 +40,9 @@ public class FlowCache {
         if (flow == null || flow.getId() == null) {
             return;
         }
-        redisService.<Flow>setCacheObject(buildFlowCacheKey(flow.getId()), flow, 10L, TimeUnit.MINUTES);
+        String key = buildFlowCacheKey(flow.getId());
+        cache.put(key, flow);
+//        redisService.<Flow>setCacheObject(buildFlowCacheKey(flow.getId()), flow, 10L, TimeUnit.MINUTES);
     }
     public void setFlowList(List<Flow> flowList) {
         for (Flow flow : flowList) {
@@ -41,7 +51,8 @@ public class FlowCache {
     }
 
     public Flow getFlow(Long id) {
-        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
+        return cache.getIfPresent(buildFlowCacheKey(id));
+//        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
     }
 
     public FlowCacheData getFlowList(List<Long> idList) {

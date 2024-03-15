@@ -519,7 +519,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     public List<NodeVO> todoNodeList(UserDTO dto, TodoNotifyEnum notify) {
         StopWatch watch = new StopWatch("待办或者可办代码执行时间监测");
-        watch.start("数据库待办节点查询");
         List<Node> userIdNodeList = new ArrayList<>();
         List<Node> supervisorIdNodeList = new ArrayList<>();
         List<Node> postIdNodeList = new ArrayList<>();
@@ -542,17 +541,25 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .submit(() -> flowRepository.listNode(dto.supplierId(), dto.supplierType()));
         }
 
+        watch.start("查我的待办");
         userIdNodeList = ThreadPoolFactory.get(userIdNodeFuture);
+        watch.stop();
+        watch.start("查我的分配");
         supervisorIdNodeList = ThreadPoolFactory.get(supervisorIdNodeFuture);
+        watch.stop();
         if (postIdNodeListFuture != null) {
+            watch.start("查我的岗位可认领");
             postIdNodeList = ThreadPoolFactory.get(postIdNodeListFuture).stream()
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy().longValue() == 0L)
                 .collect(Collectors.toList());
+            watch.stop();
         }
         if (supplierNodeFuture != null) {
+            watch.start("查供应商");
             supplierNodeList = ThreadPoolFactory.get(supplierNodeFuture).stream()
                 .filter(node -> node.getProcessedBy() == null || node.getProcessedBy() == 0L)
                 .collect(Collectors.toList());
+            watch.stop();
         }
 
         List<Long> flowIdList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
@@ -563,7 +570,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (CollectionUtils.isEmpty(flowIdList)) {
             return Collections.emptyList();
         }
-        watch.stop();
 
         watch.start("流程查询");
         Map<Long, Flow> flowMap = flowRepository.queryOnlyFlowByIdList(flowIdList).stream()
@@ -577,7 +583,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<NodeVO> result = nodeVOList.stream().collect(collectingAndThen(toCollection(() ->
             new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
         watch.stop();
-        log.debug("data {}", watch.prettyPrint());
+        log.info("data {}", watch.prettyPrint());
         return result;
     }
 
