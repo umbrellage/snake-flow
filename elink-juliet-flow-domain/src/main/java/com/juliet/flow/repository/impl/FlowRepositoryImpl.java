@@ -243,7 +243,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         Map<Long, String> finalCodeMap = codeMap;
         return flowEntities.stream()
                 .map(FlowEntityFactory::toFlow)
-                .filter(flow -> finalCodeMap.containsKey(flow.getId()))
+                .filter(flow -> finalCodeMap.containsKey(flow.getFlowTemplateId()))
                 .peek(flow -> {
                     flow.setTemplateCode(finalCodeMap.get(flow.getFlowTemplateId()));
                     flow.setNodes(nodeMap.get(flow.getId()));
