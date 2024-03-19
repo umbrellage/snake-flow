@@ -20,6 +20,13 @@ public class ThreadPoolFactory {
             new ThreadFactory("elink", "flow-main"),
             new ElinkRejectedExecutionHandler());
 
+    public static final ExecutorService THREAD_POOL_CACHE = new ThreadPoolExecutor(10,
+            100,
+            1,
+            TimeUnit.MINUTES, new LinkedBlockingQueue<>(1000),
+            new ThreadFactory("elink", "flow-cache"),
+            new ElinkRejectedExecutionHandler());
+
 
     static class ElinkRejectedExecutionHandler implements RejectedExecutionHandler {
         @Override

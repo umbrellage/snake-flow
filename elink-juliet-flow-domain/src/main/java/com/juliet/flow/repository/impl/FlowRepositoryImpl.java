@@ -67,8 +67,16 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowDao.insert(entity);
         flow.setId(entity.getId());
         addNodes(flow.getNodes(), entity.getId(), 0L);
-        flowCache.setFlow(flow);
+        flowCache.removeFlow(entity.getId());
+        ThreadPoolFactory.THREAD_POOL_CACHE.submit(() -> cacheFlow(entity.getId()));
         return entity.getId();
+    }
+
+    private void cacheFlow(Long flowId) {
+        Flow flow = queryByIdFromDb(flowId);
+        if (flow != null) {
+            flowCache.setFlow(flow);
+        }
     }
 
     private void addNodes(List<Node> nodes, Long flowId, Long flowTemplateId) {
@@ -162,6 +170,18 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public Flow queryById(Long id) {
+        Flow cacheFlow = flowCache.getFlow(id);
+        if (cacheFlow != null) {
+            return cacheFlow;
+        }
+        Flow flow = queryByIdFromDb(id);
+        if (flow != null) {
+            flowCache.setFlow(flow);
+        }
+        return flow;
+    }
+
+    public Flow queryByIdFromDb(Long id) {
         FlowEntity flowEntity = flowDao.selectById(id);
         if (flowEntity == null) {
             return null;

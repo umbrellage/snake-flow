@@ -55,6 +55,10 @@ public class FlowCache {
 //        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
     }
 
+    public void removeFlow(Long id) {
+        cache.invalidate(buildFlowCacheKey(id));
+    }
+
     public FlowCacheData getFlowList(List<Long> idList) {
         FlowCacheData flowCacheData = new FlowCacheData();
         List<Long> missKeyList = new ArrayList<>();
