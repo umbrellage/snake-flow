@@ -65,7 +65,7 @@ public class RuleFactory {
 
     public static FlowAutomateRule flowAutomateRule(String name) {
         if (name == null) {
-            log.error("activeRule, name is null!");
+            log.error("flowAutomateRule, name is null!");
             return null;
         }
         if (CollectionUtils.isEmpty(flowAutomateRules)) {
