@@ -398,7 +398,7 @@ public class FlowEntityFactory {
     }
 
     public static void fillNodeForm(List<Node> nodes, List<FormEntity> formEntities) {
-        if (CollectionUtils.isEmpty(nodes)) {
+        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(formEntities)) {
             return;
         }
         for (Node node : nodes) {
@@ -424,7 +424,7 @@ public class FlowEntityFactory {
     }
 
     public static void fillNodePost(List<Node> nodes, List<PostEntity> postEntities) {
-        if (CollectionUtils.isEmpty(nodes)) {
+        if (CollectionUtils.isEmpty(nodes) || CollectionUtils.isEmpty(postEntities)) {
             return;
         }
         for (Node node : nodes) {

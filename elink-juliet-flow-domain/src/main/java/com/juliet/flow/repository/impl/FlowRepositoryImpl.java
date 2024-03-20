@@ -182,37 +182,32 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     public Flow queryByIdFromDb(Long id) {
-        FlowEntity flowEntity = flowDao.selectById(id);
-        if (flowEntity == null) {
+        List<Flow> flowList = queryByIdListFromDb(Collections.singletonList(id), new AssembleFlowCondition());
+        if (CollectionUtils.isEmpty(flowList)) {
             return null;
         }
-        FlowTemplateEntity template = flowTemplateDao.selectById(flowEntity.getFlowTemplateId());
-        Flow flow = FlowEntityFactory.toFlow(flowEntity);
-        flow.setTemplateCode(template.getCode());
-        List<Node> nodes = getNodes(flowEntity.getId());
-        flow.setNodes(nodes);
-        return flow;
+        return flowList.get(0);
     }
 
-    @Override
-    public Flow queryLatestByParentId(Long id) {
-        List<Flow> flows = listFlowByParentId(id);
-        if (CollectionUtils.isEmpty(flows)) {
-            return null;
-        }
-        Flow latestFlow = null;
-        for (Flow flow : flows) {
-            if (latestFlow == null) {
-                latestFlow = flow;
-                continue;
-            }
-            // 获取创建时间最晚的
-            if (flow.getCreateTime().after(latestFlow.getCreateTime())) {
-                latestFlow = flow;
-            }
-        }
-        return latestFlow;
-    }
+//    @Override
+//    public Flow queryLatestByParentId(Long id) {
+//        List<Flow> flows = listFlowByParentId(id);
+//        if (CollectionUtils.isEmpty(flows)) {
+//            return null;
+//        }
+//        Flow latestFlow = null;
+//        for (Flow flow : flows) {
+//            if (latestFlow == null) {
+//                latestFlow = flow;
+//                continue;
+//            }
+//            // 获取创建时间最晚的
+//            if (flow.getCreateTime().after(latestFlow.getCreateTime())) {
+//                latestFlow = flow;
+//            }
+//        }
+//        return latestFlow;
+//    }
 
     @Override
     public List<Flow> queryByIdList(List<Long> idList) {
@@ -223,61 +218,14 @@ public class FlowRepositoryImpl implements FlowRepository {
     public List<Flow> queryByIdList(List<Long> idList, AssembleFlowCondition condition) {
         List<FlowEntity> flowList = flowDao.selectList(
                 Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-        return assembleFlow(flowList, condition);
+        List<Flow> flows = assembleFlow(flowList, condition);
+        return flows;
     }
 
-    @Override
-    public List<Flow> queryOnlyFlowByIdList(List<Long> idList) {
-        if (CollectionUtils.isEmpty(idList)) {
-            return Collections.emptyList();
-        }
-        FlowCache.FlowCacheData flowCacheData = flowCache.getFlowList(idList);
-        List<Flow> flowList = flowCacheData.getFlowList();
-        if (CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
-            List<Flow> flowListFromDb = queryOnlyFlowByIdListFromDb(flowCacheData.getMissKeyList());
-            if (CollectionUtils.isNotEmpty(flowListFromDb)) {
-                flowList.addAll(flowListFromDb);
-                flowCache.setFlowList(flowListFromDb);
-            }
-        }
-        return flowList;
-    }
-
-    private List<Flow> queryOnlyFlowByIdListFromDb(List<Long> idList) {
-        if (CollectionUtils.isEmpty(idList)) {
-            return Collections.emptyList();
-        }
-        List<FlowEntity> flowEntities = flowDao.selectList(
-                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-        Map<Long, List<Node>> nodeMap = nodeList(idList).stream().collect(Collectors.groupingBy(Node::getFlowId));
-        List<Long> templateIdList = flowEntities.stream()
-                .map(FlowEntity::getFlowTemplateId)
-                .filter(Objects::nonNull).distinct()
-                .collect(Collectors.toList());
-        Map<Long, String> codeMap = new HashMap<>();
-        if (CollectionUtils.isNotEmpty(templateIdList)) {
-            codeMap = flowTemplateDao.selectBatchIds(templateIdList).stream()
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode, (v1, v2) -> v1));
-        }
-        Map<Long, String> finalCodeMap = codeMap;
-        return flowEntities.stream()
-                .map(FlowEntityFactory::toFlow)
-                .filter(flow -> finalCodeMap.containsKey(flow.getFlowTemplateId()))
-                .peek(flow -> {
-                    flow.setTemplateCode(finalCodeMap.get(flow.getFlowTemplateId()));
-                    flow.setNodes(nodeMap.get(flow.getId()));
-                })
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<Flow> listFlowByIdOrParentId(List<Long> idList) {
+    private List<Flow> queryByIdListFromDb(List<Long> idList, AssembleFlowCondition condition) {
         List<FlowEntity> flowList = flowDao.selectList(
-                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList)
-                        .or()
-                        .in(FlowEntity::getParentId, idList));
-        return assembleFlow(flowList, new AssembleFlowCondition());
+                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
+        return assembleFlow(flowList, condition);
     }
 
     @Override
@@ -451,15 +399,6 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     /**
-     * 获取某个流程的开始节点
-     */
-    private List<Node> getNodes(Long flowId) {
-        List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
-                .eq(NodeEntity::getFlowId, flowId));
-        return assembleNode(nodeEntities);
-    }
-
-    /**
      * 组装Node
      */
     private List<Node> assembleNode(List<NodeEntity> nodeEntities) {
@@ -486,13 +425,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         return nodes;
     }
 
-    private List<Node> nodeList(List<Long> flowIdList) {
-        List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
-                .in(NodeEntity::getFlowId, flowIdList));
-        return FlowEntityFactory.toNodes(nodeEntityList);
-
-    }
-
     public List<Flow> assembleFlow(List<FlowEntity> flowList, AssembleFlowCondition condition) {
         if (CollectionUtils.isEmpty(flowList)) {
             return Collections.emptyList();
@@ -505,29 +437,37 @@ public class FlowRepositoryImpl implements FlowRepository {
                 .collect(Collectors.groupingBy(NodeEntity::getFlowId));
         List<Long> nodeIdList = nodeEntityList.stream().map(NodeEntity::getId).collect(Collectors.toList());
 
-        Future<List<PostEntity>> futurePostEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
-                () -> postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
-                        .in(PostEntity::getNodeId, nodeIdList)));
-
-        Future<List<SupplierEntity>> futureSupplierEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
-                () -> supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
-                        .in(SupplierEntity::getNodeId, nodeIdList)));
-
-        List<FormEntity> formEntities = formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
-                .in(FormEntity::getNodeId, nodeIdList));
-        List<Long> formIdList = formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList());
-
-//        List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
-//            .in(FieldEntity::getFormId, formIdList));
-        List<FieldEntity> fieldEntities;
-        if (!Objects.equals(condition.getExcludeFields(), true)) {
-            fieldEntities = parallelBatchQueryFieldEntities(formIdList);
-        } else {
-            fieldEntities = new ArrayList<>();
+        Future<List<PostEntity>> futurePostEntities = null;
+        if (!Boolean.TRUE.equals(condition.getExcludePost())) {
+            futurePostEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
+                    () -> postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
+                            .in(PostEntity::getNodeId, nodeIdList)));
         }
+
+        Future<List<SupplierEntity>> futureSupplierEntities = null;
+        if (!Boolean.TRUE.equals(condition.getExcludePost())) {
+            futureSupplierEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
+                    () -> supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
+                            .in(SupplierEntity::getNodeId, nodeIdList)));
+        }
+
+        Future<List<FormEntity>> futureFormEntities = null;
+        if (!Boolean.TRUE.equals(condition.getExcludeForm())) {
+            futureFormEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
+                    () -> formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
+                            .in(FormEntity::getNodeId, nodeIdList)));
+        }
+
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
         List<SupplierEntity> supplierEntities = ThreadPoolFactory.get(futureSupplierEntities);
-
+        List<FormEntity> formEntities = ThreadPoolFactory.get(futureFormEntities);
+        List<FieldEntity> fieldEntities;
+        if (CollectionUtils.isNotEmpty(formEntities) && !Boolean.TRUE.equals(condition.getExcludeFields())) {
+            List<Long> formIdList = formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList());
+            fieldEntities = parallelBatchQueryFieldEntities(formIdList);
+        } else {
+            fieldEntities = null;
+        }
         List<Long> flowTemplateIds = flowList.stream().map(FlowEntity::getFlowTemplateId).collect(Collectors.toList());
         List<FlowTemplateEntity> flowTemplateEntities = flowTemplateDao.selectBatchIds(flowTemplateIds);
         Map<Long, String> flowTemplateCodeMap = flowTemplateEntities.stream()

@@ -29,20 +29,16 @@ public interface FlowRepository {
 
     Flow queryById(Long id);
 
-    /**
-     * 获取最新的异常流程
-     * @param id 主流程id
-     * @return
-     */
-    Flow queryLatestByParentId(Long id);
+//    /**
+//     * 获取最新的异常流程
+//     * @param id 主流程id
+//     * @return
+//     */
+//    Flow queryLatestByParentId(Long id);
 
     List<Flow> queryByIdList(List<Long> idList);
 
     List<Flow> queryByIdList(List<Long> idList,  AssembleFlowCondition condition);
-
-    List<Flow> queryOnlyFlowByIdList(List<Long> idList);
-
-    List<Flow> listFlowByIdOrParentId(List<Long> idList);
 
     List<Flow> listFlowByParentId(Long id);
 
