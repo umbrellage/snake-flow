@@ -187,6 +187,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         StopWatch sw = new StopWatch("flow single query in db!");
         sw.start("start!");
         FlowEntity flowEntity = flowDao.selectById(id);
+        if (flowEntity == null) {
+            return null;
+        }
         List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
                 .eq(NodeEntity::getFlowId, id));
         List<Node> nodes = assembleNode(nodeEntities);
