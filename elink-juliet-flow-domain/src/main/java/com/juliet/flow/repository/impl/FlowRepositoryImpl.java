@@ -68,7 +68,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         flow.setId(entity.getId());
         addNodes(flow.getNodes(), entity.getId(), 0L);
         flowCache.removeFlow(entity.getId());
-        ThreadPoolFactory.THREAD_POOL_CACHE.submit(() -> cacheFlow(entity.getId()));
+//        ThreadPoolFactory.THREAD_POOL_CACHE.submit(() -> cacheFlow(entity.getId()));
         return entity.getId();
     }
 
