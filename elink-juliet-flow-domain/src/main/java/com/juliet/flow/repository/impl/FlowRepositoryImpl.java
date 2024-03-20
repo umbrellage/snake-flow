@@ -182,11 +182,20 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     public Flow queryByIdFromDb(Long id) {
-        List<Flow> flowList = queryByIdListFromDb(Collections.singletonList(id), new AssembleFlowCondition());
-        if (CollectionUtils.isEmpty(flowList)) {
-            return null;
-        }
-        return flowList.get(0);
+//        List<Flow> flowList = queryByIdListFromDb(Collections.singletonList(id), new AssembleFlowCondition());
+//        if (CollectionUtils.isEmpty(flowList)) {
+//            return null;
+//        }
+//        return flowList.get(0);
+        FlowEntity flowEntity = flowDao.selectById(id);
+        List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
+                .eq(NodeEntity::getFlowId, id));
+        List<Node> nodes = assembleNode(nodeEntities);
+        Flow flow = FlowEntityFactory.toFlow(flowEntity);
+        FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectById(flowEntity.getFlowTemplateId());
+        flow.setNodes(nodes);
+        flow.setTemplateCode(flowTemplateEntity.getCode());
+        return flow;
     }
 
 //    @Override
