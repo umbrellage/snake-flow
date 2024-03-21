@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.*;
 import java.util.concurrent.Future;
@@ -68,7 +69,8 @@ public class FlowRepositoryImpl implements FlowRepository {
         flow.setId(entity.getId());
         addNodes(flow.getNodes(), entity.getId(), 0L);
         flowCache.removeFlow(entity.getId());
-//        ThreadPoolFactory.THREAD_POOL_CACHE.submit(() -> cacheFlow(entity.getId()));
+        Flow flowInDb = queryByIdFromDb(entity.getId());
+        flowCache.setFlow(flowInDb);
         return entity.getId();
     }
 
@@ -182,12 +184,12 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     public Flow queryByIdFromDb(Long id) {
-//        List<Flow> flowList = queryByIdListFromDb(Collections.singletonList(id), new AssembleFlowCondition());
-//        if (CollectionUtils.isEmpty(flowList)) {
-//            return null;
-//        }
-//        return flowList.get(0);
+        StopWatch sw = new StopWatch("flow single query in db!");
+        sw.start("start!");
         FlowEntity flowEntity = flowDao.selectById(id);
+        if (flowEntity == null) {
+            return null;
+        }
         List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
                 .eq(NodeEntity::getFlowId, id));
         List<Node> nodes = assembleNode(nodeEntities);
@@ -195,28 +197,10 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectById(flowEntity.getFlowTemplateId());
         flow.setNodes(nodes);
         flow.setTemplateCode(flowTemplateEntity.getCode());
+        sw.stop();
+        log.info(sw.prettyPrint());
         return flow;
     }
-
-//    @Override
-//    public Flow queryLatestByParentId(Long id) {
-//        List<Flow> flows = listFlowByParentId(id);
-//        if (CollectionUtils.isEmpty(flows)) {
-//            return null;
-//        }
-//        Flow latestFlow = null;
-//        for (Flow flow : flows) {
-//            if (latestFlow == null) {
-//                latestFlow = flow;
-//                continue;
-//            }
-//            // 获取创建时间最晚的
-//            if (flow.getCreateTime().after(latestFlow.getCreateTime())) {
-//                latestFlow = flow;
-//            }
-//        }
-//        return latestFlow;
-//    }
 
     @Override
     public List<Flow> queryByIdList(List<Long> idList) {
