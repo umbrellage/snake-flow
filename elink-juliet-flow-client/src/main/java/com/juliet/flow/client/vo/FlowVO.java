@@ -61,12 +61,8 @@ public class FlowVO {
 
     private List<String> flowCustomerStatus;*/
 
-    /**
-     * @param userId
-     * @param postIdList
-     * @return 1. 可办
-     */
-    public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList) {
+    public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
+
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         nodes.forEach(nodeVO -> {
@@ -88,6 +84,19 @@ public class FlowVO {
             if (samePostId && nodeVO.getStatus() == 2) {
                 executor.setCanEdit(true);
             }
+            // 3.属于该供应商的节点，节点未被认领
+            List<Long> supplierIdList = new ArrayList<>();
+            if (CollectionUtils.isNotEmpty(nodeVO.getBindSuppliers())) {
+                supplierIdList = nodeVO.getBindSuppliers().stream()
+                    .map(SupplierVO::getSupplierId)
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            }
+            boolean isSupplier = supplierIdList.contains(supplierId);
+            if (isSupplier && nodeVO.getStatus() == 2 && supplierId != null) {
+                executor.setCanEdit(true);
+            }
+
             // 未来可办
             // 1. 节点操作人为该用户，但未被激活
             if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 1)) {
@@ -126,6 +135,14 @@ public class FlowVO {
             );
         executor.setCanChange(canChange);
         return executor;
+    }
+    /**
+     * @param userId
+     * @param postIdList
+     * @return 1. 可办
+     */
+    public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList) {
+       return userExecutorInfo(userId, postIdList, null);
     }
 
     public boolean adjustOperator(Long userId) {

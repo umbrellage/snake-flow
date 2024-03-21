@@ -68,6 +68,8 @@ public class NodeVO {
 
     private List<PostVO> bindPosts;
 
+    private List<SupplierVO> bindSuppliers;
+
     /**
      * 主管ID列表
      */

@@ -11,6 +11,7 @@ import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
+import com.juliet.flow.client.vo.SupplierVO;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
@@ -33,6 +34,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 /**
  * @author xujianjie
@@ -444,6 +446,16 @@ public class Node extends BaseModel {
                     .map(Post::toPost)
                     .collect(Collectors.toList());
             data.setBindPosts(postVOList);
+        }
+        if (CollectionUtils.isNotEmpty(bindSuppliers)) {
+            List<SupplierVO> supplierVOList = bindSuppliers.stream()
+                .map(e -> {
+                    SupplierVO supplierVO = new SupplierVO();
+                    BeanUtils.copyProperties(e, supplierVO);
+                    return supplierVO;
+                })
+                .collect(Collectors.toList());
+            data.setBindSuppliers(supplierVOList);
         }
         data.setSupervisorIds(supervisorIds);
         data.setProcessedTime(processedTime);
