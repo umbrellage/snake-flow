@@ -31,7 +31,7 @@ public class SupplierAssignRule extends BaseAssignRule {
         if (supplierId != null) {
             SupplierDTO dto = new SupplierDTO();
             dto.setSupplierId(String.valueOf(supplierId));
-            dto.setSupplierType(null);
+            dto.setSupplierType("");
             return dto;
         }
 
