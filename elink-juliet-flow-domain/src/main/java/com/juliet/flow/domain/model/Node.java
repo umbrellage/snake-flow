@@ -181,6 +181,8 @@ public class Node extends BaseModel {
             }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null) {
+                // todo 清空post,因为现在没有做供应商的岗位配置所以在供应商分配清楚岗位不然品牌方会收到待办
+                bindPosts = Collections.emptyList();
                 Supplier supplier = new Supplier();
                 supplier.setSupplierId(Long.valueOf(supplierDTO.getSupplierId()));
                 supplier.setSupplierType(supplierDTO.getSupplierType());
