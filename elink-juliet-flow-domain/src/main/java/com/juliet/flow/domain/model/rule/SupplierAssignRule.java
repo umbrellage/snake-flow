@@ -30,7 +30,7 @@ public class SupplierAssignRule extends BaseAssignRule {
         String supplierId = String.valueOf(params.get("supplierId"));
         if (supplierId != null) {
             SupplierDTO dto = new SupplierDTO();
-            dto.setSupplierId(String.valueOf(supplierId));
+            dto.setSupplierId(supplierId);
             dto.setSupplierType("");
             return dto;
         }
