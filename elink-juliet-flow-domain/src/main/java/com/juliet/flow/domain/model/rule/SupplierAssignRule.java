@@ -28,10 +28,11 @@ public class SupplierAssignRule extends BaseAssignRule {
     @Override
     public SupplierDTO getAssignSupplier(Map<String, Object> params) {
         String supplierId = String.valueOf(params.get("supplierId"));
+        String supplierType = String.valueOf(params.get("supplierType"));
         if (supplierId != null) {
             SupplierDTO dto = new SupplierDTO();
             dto.setSupplierId(supplierId);
-            dto.setSupplierType("");
+            dto.setSupplierType(supplierType);
             return dto;
         }
 
