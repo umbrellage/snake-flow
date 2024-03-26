@@ -1,9 +1,11 @@
 package com.juliet.flow.domain.model.rule;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.domain.model.BaseAssignRule;
 import com.juliet.flow.domain.model.Flow;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Component;
  * @author Geweilang
  * @date 2023/8/7
  */
+@Slf4j
 @Component
 public class SupplierAssignRule extends BaseAssignRule {
 
@@ -33,6 +36,7 @@ public class SupplierAssignRule extends BaseAssignRule {
             SupplierDTO dto = new SupplierDTO();
             dto.setSupplierId(supplierId);
             dto.setSupplierType(supplierType);
+            log.info("supplierDTO:{}", JSON.toJSONString(dto));
             return dto;
         }
 
