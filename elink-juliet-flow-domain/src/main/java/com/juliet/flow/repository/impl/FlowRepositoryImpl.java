@@ -18,6 +18,7 @@ import com.juliet.flow.repository.trasnfer.FlowEntityFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -209,9 +210,21 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> queryByIdList(List<Long> idList, AssembleFlowCondition condition) {
-        List<FlowEntity> flowList = flowDao.selectList(
-                Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-        List<Flow> flows = assembleFlow(flowList, condition);
+        List<Flow> flows = new ArrayList<>();
+        if (CollectionUtils.isEmpty(idList)) {
+            return flows;
+        }
+        FlowCache.FlowCacheData flowCacheData = flowCache.getFlowList(idList);
+        if (!CollectionUtils.isEmpty(flowCacheData.getFlowList())) {
+            flows.addAll(flowCacheData.getFlowList());
+        }
+        if (!CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
+            List<Flow> flowsInDb =  queryByIdListFromDb(flowCacheData.getMissKeyList(), new AssembleFlowCondition());
+            if (CollectionUtils.isNotEmpty(flowsInDb)) {
+                flows.addAll(flowsInDb);
+                flowCache.setFlowList(flowsInDb);
+            }
+        }
         return flows;
     }
 
