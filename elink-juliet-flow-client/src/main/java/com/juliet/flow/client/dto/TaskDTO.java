@@ -18,5 +18,6 @@ public class TaskDTO {
     private Long nodeId;
     private Long userId;
     private Long localUser;
+    private Long supplierId;
     private List<Long> postIdList;
 }

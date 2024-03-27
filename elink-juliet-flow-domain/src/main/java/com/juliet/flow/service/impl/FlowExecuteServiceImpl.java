@@ -199,6 +199,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         } else {
             node = flow.findTodoNode(dto.getUserId());
         }
+        if (node == null){
+            node = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList(), dto.getSupplierId());
+        }
         if (node != null) {
             return node.toNodeVo(flow);
         }
@@ -208,12 +211,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .findAny()
             .orElse(null);
         if (node == null) {
-            Node canDoNode = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList());
+            Node canDoNode = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList(),
+                dto.getSupplierId());
             if (canDoNode != null) {
                 return canDoNode.toNodeVo(flow);
             }
             Node subCandoNode = findSubFlowList(flow.getId()).stream()
-                .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList()))
+                .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList(), dto.getSupplierId()))
                 .filter(Objects::nonNull)
                 .findAny()
                 .orElse(null);

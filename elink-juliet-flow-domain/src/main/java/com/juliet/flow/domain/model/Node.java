@@ -394,7 +394,7 @@ public class Node extends BaseModel {
     /**
      * 判断是否某个用户可办
      */
-    public boolean isUserCando(Long userId, List<Long> postIds) {
+    public boolean isUserCando(Long userId, List<Long> postIds, Long supplierId) {
         if (todoNotify != TodoNotifyEnum.NO_NOTIFY) {
             return false;
         }
@@ -402,9 +402,18 @@ public class Node extends BaseModel {
             return userId != null && userId.equals(processedBy);
         }
         if (status == NodeStatusEnum.TO_BE_CLAIMED) {
-            return isPostMatch(postIds);
+            return isPostMatch(postIds) || isSupplierMatch(supplierId);
         }
         return false;
+    }
+
+    public boolean isSupplierMatch(Long supplierId) {
+
+        if (CollectionUtils.isEmpty(bindSuppliers)) {
+            return false;
+        }
+        return bindSuppliers.stream().anyMatch(e -> Objects.equals(e.getSupplierId(), supplierId));
+
     }
 
     /**

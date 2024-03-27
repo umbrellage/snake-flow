@@ -722,9 +722,9 @@ public class Flow extends BaseModel {
 
     }
 
-    public Node findCanDoAndCanExecuteNodeAny(Long userId, List<Long> postIdList) {
+    public Node findCanDoAndCanExecuteNodeAny(Long userId, List<Long> postIdList, Long supplierId) {
         return nodes.stream()
-            .filter(node -> node.isUserCando(userId, postIdList))
+            .filter(node -> node.isUserCando(userId, postIdList, supplierId))
             .findAny()
             .orElse(null);
     }
