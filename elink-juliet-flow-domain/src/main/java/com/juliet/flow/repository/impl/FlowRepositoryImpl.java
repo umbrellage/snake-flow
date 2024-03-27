@@ -393,6 +393,17 @@ public class FlowRepositoryImpl implements FlowRepository {
             fieldDao.delete(Wrappers.<FieldEntity>lambdaQuery()
                     .in(FieldEntity::getFormId, formIds));
         }
+        List<Long> supplierDataIdList = nodes.stream()
+            .map(Node::getBindSuppliers)
+            .filter(CollectionUtils::isEmpty)
+            .flatMap(Collection::stream)
+            .map(Supplier::getId)
+            .collect(Collectors.toList());
+        if (CollectionUtils.isNotEmpty(supplierDataIdList)){
+            supplierDao.delete(Wrappers.<SupplierEntity>lambdaUpdate().in(SupplierEntity::getId, supplierDataIdList));
+        }
+
+
     }
 
     /**
