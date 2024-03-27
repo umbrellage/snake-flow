@@ -444,6 +444,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         List<PostEntity> postEntities = postDao.selectList(Wrappers.<PostEntity>lambdaQuery()
                 .in(PostEntity::getNodeId, nodeIds));
         FlowEntityFactory.fillNodePost(nodes, postEntities);
+        List<SupplierEntity> supplierEntities = supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
+                .in(SupplierEntity::getNodeId, nodeIds));
+        FlowEntityFactory.fillNodeSupplier(nodes, supplierEntities);
         return nodes;
     }
 
