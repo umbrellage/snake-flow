@@ -124,6 +124,9 @@ public class FlowRepositoryImpl implements FlowRepository {
         flowDao.updateById(flowEntity);
         deleteNodes(flow.getNodes());
         addNodes(flow.getNodes(), flow.getId(), 0L);
+        flowCache.removeFlow(flowEntity.getId());
+        Flow flowInDb = queryByIdFromDb(flowEntity.getId());
+        flowCache.setFlow(flowInDb);
     }
 
     @Override
@@ -395,7 +398,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
         List<Long> supplierDataIdList = nodes.stream()
             .map(Node::getBindSuppliers)
-            .filter(CollectionUtils::isEmpty)
+            .filter(CollectionUtils::isNotEmpty)
             .flatMap(Collection::stream)
             .map(Supplier::getId)
             .collect(Collectors.toList());
