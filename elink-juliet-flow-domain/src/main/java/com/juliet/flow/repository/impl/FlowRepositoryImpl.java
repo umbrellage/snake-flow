@@ -218,7 +218,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (!CollectionUtils.isEmpty(flowCacheData.getFlowList())) {
             flows.addAll(flowCacheData.getFlowList());
         }
-        if (!CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
+        if (CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
             List<Flow> flowsInDb =  queryByIdListFromDb(flowCacheData.getMissKeyList(), new AssembleFlowCondition());
             if (CollectionUtils.isNotEmpty(flowsInDb)) {
                 flows.addAll(flowsInDb);
