@@ -30,7 +30,7 @@ public class FlowCache {
     private static Cache<String, Flow> cache = CacheBuilder.newBuilder()
             .maximumSize(1000)
             .concurrencyLevel(Runtime.getRuntime().availableProcessors())
-            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .expireAfterWrite(10, TimeUnit.DAYS)
             .build();
 
     @Autowired
