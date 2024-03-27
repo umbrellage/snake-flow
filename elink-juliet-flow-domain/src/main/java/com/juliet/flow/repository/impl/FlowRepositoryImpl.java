@@ -400,7 +400,9 @@ public class FlowRepositoryImpl implements FlowRepository {
             .map(Node::getBindSuppliers)
             .filter(CollectionUtils::isNotEmpty)
             .flatMap(Collection::stream)
+            .filter(Objects::nonNull)
             .map(Supplier::getId)
+            .filter(Objects::nonNull)
             .collect(Collectors.toList());
         if (CollectionUtils.isNotEmpty(supplierDataIdList)){
             supplierDao.delete(Wrappers.<SupplierEntity>lambdaUpdate().in(SupplierEntity::getId, supplierDataIdList));
