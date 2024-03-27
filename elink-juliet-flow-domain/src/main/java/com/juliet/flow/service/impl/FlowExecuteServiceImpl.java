@@ -573,9 +573,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
         watch.start("流程查询");
         Map<Long, Flow> flowMap = flowRepository.queryByIdList(flowIdList, AssembleFlowCondition.builder()
-                        .excludePost(true)
-                        .excludeForm(true)
-                        .excludeFields(true)
+                        .excludePost(false)
+                        .excludeForm(false)
+                        .excludeFields(false)
                         .build()).stream()
             .collect(Collectors.toMap(Flow::getId, Function.identity(), (v1, v2) -> v1));
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)

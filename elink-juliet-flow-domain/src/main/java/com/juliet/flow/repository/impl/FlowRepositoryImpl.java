@@ -467,7 +467,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
 
         Future<List<SupplierEntity>> futureSupplierEntities = null;
-        if (!Boolean.TRUE.equals(condition.getExcludePost())) {
+        if (!Boolean.TRUE.equals(condition.getExcludeSupplier())) {
             futureSupplierEntities = ThreadPoolFactory.THREAD_POOL_TODO_MAIN.submit(
                     () -> supplierDao.selectList(Wrappers.<SupplierEntity>lambdaQuery()
                             .in(SupplierEntity::getNodeId, nodeIdList)));
