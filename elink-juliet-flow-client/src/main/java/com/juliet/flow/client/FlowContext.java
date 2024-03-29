@@ -165,6 +165,19 @@ public class FlowContext {
         }
     }
 
+    public static void tryForward() {
+        NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+        if (nodeFieldDTO.getFlowId() == null){
+            throw new ServiceException("flowId不能为空");
+        }
+        if (nodeFieldDTO.getNodeId() == null) {
+            throw new ServiceException("nodeId不能为空");
+        }
+        if (nodeFieldDTO.getUserId() == null) {
+            throw new ServiceException("userId不能为空");
+        }
+    }
+
     public static Long submitOnlyFlow() {
         try {
             BpmDTO bpmDTO = BPM_DTO_CACHE.get();
