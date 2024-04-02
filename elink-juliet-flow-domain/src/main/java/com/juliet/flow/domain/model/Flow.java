@@ -751,6 +751,7 @@ public class Flow extends BaseModel {
 
     public Node findNodeBySupplierId(Long supplierId) {
         return nodes.stream()
+            .filter(e -> e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
             .filter(e -> CollectionUtils.isNotEmpty(e.getBindSuppliers()))
             .filter(e -> e.getBindSuppliers().stream()
                 .map(Supplier::getSupplierId)
