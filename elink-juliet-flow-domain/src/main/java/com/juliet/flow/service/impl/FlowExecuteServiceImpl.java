@@ -199,6 +199,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         } else {
             node = flow.findTodoNode(dto.getUserId());
         }
+        if (node == null && dto.getSupplierId() != null) {
+            node = flow.findNodeBySupplierId(dto.getSupplierId());
+        }
         if (node == null){
             node = flow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList(), dto.getSupplierId());
         }

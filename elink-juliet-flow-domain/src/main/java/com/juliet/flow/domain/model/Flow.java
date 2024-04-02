@@ -748,4 +748,16 @@ public class Flow extends BaseModel {
             .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
             .collect(Collectors.toList());
     }
+
+    public Node findNodeBySupplierId(Long supplierId) {
+        return nodes.stream()
+            .filter(e -> CollectionUtils.isNotEmpty(e.getBindSuppliers()))
+            .filter(e -> e.getBindSuppliers().stream()
+                .map(Supplier::getSupplierId)
+                .anyMatch(k -> Objects.equals(k, supplierId)))
+            .findAny()
+            .orElse(null);
+
+
+    }
 }
