@@ -65,10 +65,13 @@ public class FlowVO {
 
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
-        List<NodeVO> allNodeList = subFlowList.stream()
-            .map(FlowVO::getNodes)
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
+        List<NodeVO> allNodeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            allNodeList= subFlowList.stream()
+                .map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        }
 
         allNodeList.addAll(nodes);
         allNodeList.forEach(nodeVO -> {
