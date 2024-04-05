@@ -237,17 +237,23 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     public List<FlowVO> flowList(FlowIdListDTO dto) {
+        StopWatch sw = new StopWatch();
         if (CollectionUtils.isEmpty(dto.getFlowIdList())) {
             log.error("流程ID列表为空");
             return Collections.emptyList();
         }
+        sw.start("flowRepository.queryByIdList");
         AssembleFlowCondition condition = new AssembleFlowCondition();
         condition.setExcludeFields(dto.getExcludeFields());
         List<Flow> mainFlowList = flowRepository.queryByIdList(dto.getFlowIdList(), condition);
+        sw.stop();
+        sw.start("flowRepository.listFlowByParentId");
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
         Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList, condition)
             .stream().map(flow -> flow.flowVO(Collections.emptyList()))
             .collect(Collectors.groupingBy(FlowVO::getParentId));
+        sw.stop();
+        log.info(sw.prettyPrint());
         return mainFlowList.stream()
             .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
