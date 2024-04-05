@@ -33,6 +33,12 @@ public class FlowCache {
             .expireAfterWrite(10, TimeUnit.DAYS)
             .build();
 
+    private static Cache<String, Flow> parentFlowCache = CacheBuilder.newBuilder()
+            .maximumSize(1000)
+            .concurrencyLevel(Runtime.getRuntime().availableProcessors())
+            .expireAfterWrite(10, TimeUnit.DAYS)
+            .build();
+
     @Autowired
     private RedisService redisService;
 
