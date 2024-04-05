@@ -53,7 +53,7 @@ public class FlowVO {
      */
     private List<Long> theLastProcessedBy;
 
-    private List<FlowVO> subFlowList;
+    private List<FlowVO> subFlowList = new ArrayList<>();
 
 /*    public List<String> getFlowCustomerStatus() {
         return this.flowCustomerStatus();
@@ -65,7 +65,16 @@ public class FlowVO {
 
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
-        nodes.forEach(nodeVO -> {
+        List<NodeVO> allNodeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            allNodeList= subFlowList.stream()
+                .map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
+        }
+
+        allNodeList.addAll(nodes);
+        allNodeList.forEach(nodeVO -> {
             // 可编辑：
             // 1. 当前用户所属节点已经激活为可编辑
             if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 3)) {
@@ -145,6 +154,11 @@ public class FlowVO {
        return userExecutorInfo(userId, postIdList, null);
     }
 
+    /**
+     * 可分配
+     * @param userId
+     * @return
+     */
     public boolean adjustOperator(Long userId) {
         return nodes.stream()
             .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
