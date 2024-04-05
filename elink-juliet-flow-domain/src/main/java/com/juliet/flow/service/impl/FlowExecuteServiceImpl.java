@@ -253,7 +253,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .stream().map(flow -> flow.flowVO(Collections.emptyList()))
             .collect(Collectors.groupingBy(FlowVO::getParentId));
         sw.stop();
-        log.info(sw.prettyPrint());
+        log.info("flowList_perf:{}", sw.prettyPrint());
         return mainFlowList.stream()
             .map(flow -> flow.flowVO(subFlowMap.get(flow.getId())))
             .collect(Collectors.toList());
