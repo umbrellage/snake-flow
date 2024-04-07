@@ -48,11 +48,11 @@ public class RuleFactory {
 
     public static NotifyRule activeRule(String name) {
         if (name == null) {
-            log.error("activeRule, name is null!");
+            log.debug("activeRule, name is null!");
             return null;
         }
         if (CollectionUtils.isEmpty(activeRules)) {
-            log.warn("can not find system active rule!");
+            log.debug("can not find system active rule!");
             return null;
         }
         for (NotifyRule rule : activeRules) {
@@ -65,11 +65,11 @@ public class RuleFactory {
 
     public static FlowAutomateRule flowAutomateRule(String name) {
         if (name == null) {
-            log.error("flowAutomateRule, name is null!");
+            log.debug("flowAutomateRule, name is null!");
             return null;
         }
         if (CollectionUtils.isEmpty(flowAutomateRules)) {
-            log.warn("can not find system active rule!");
+            log.debug("can not find system active rule!");
             return null;
         }
         for (FlowAutomateRule rule : flowAutomateRules) {
