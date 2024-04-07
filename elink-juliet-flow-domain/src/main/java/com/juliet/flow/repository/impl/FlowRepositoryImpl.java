@@ -61,7 +61,6 @@ public class FlowRepositoryImpl implements FlowRepository {
     @Autowired
     private FlowCache flowCache;
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long add(Flow flow) {
         FlowEntityFactory.cleanFlowId(flow);
@@ -117,7 +116,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         return entity.getId();
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(Flow flow) {
         FlowEntity flowEntity = FlowEntityFactory.toFlowEntity(flow);
@@ -374,7 +372,6 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void deleteFlow(Long id) {
         flowDao.deleteById(id);
         flowDao.delete(Wrappers.<FlowEntity>lambdaQuery().eq(FlowEntity::getParentId, id));

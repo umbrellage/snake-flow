@@ -372,6 +372,16 @@ public class Node extends BaseModel {
         return (status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED) && todoNotify == TodoNotifyEnum.NOTIFY;
     }
 
+    /**
+     * 判断节点是否是待办的
+     *
+     * @return
+     */
+    public boolean needCallbackMsg() {
+        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
+    }
+
+
 
     /**
      * 通过岗位判断当前用户是否可以操作
