@@ -254,6 +254,7 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> listFlowByParentId(Collection<Long> idList, AssembleFlowCondition condition) {
+        List<Flow> flowList = new ArrayList<>();
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();
         }
@@ -262,7 +263,19 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
-        return assembleFlow(flowEntities, condition);
+        List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
+        FlowCache.FlowCacheData flowCacheData = flowCache.getFlowList(flowIdList);
+        if (CollectionUtils.isNotEmpty(flowCacheData.getFlowList())) {
+            flowList.addAll(flowCacheData.getFlowList());
+        }
+        if (CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
+            List<Flow> flowListInDb = assembleFlow(flowEntities.stream()
+                            .filter(flowEntity -> flowCacheData.getMissKeyList().contains(flowEntity.getId())).collect(Collectors.toList()),
+                    condition);
+            flowCache.setFlowList(flowListInDb);
+            flowList.addAll(flowListInDb);
+        }
+        return flowList;
     }
 
     @Override
