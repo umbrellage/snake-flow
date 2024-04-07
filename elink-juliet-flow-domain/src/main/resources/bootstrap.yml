@@ -37,3 +37,10 @@ feign:
         loggerLevel: FULL
   hystrix:
     enable: false
+  compression:
+    request:
+        enabled: true
+        mime-types: text/xml,application/xml,application/json
+        min-request-size: 1024
+    response:
+        enabled: true
