@@ -128,7 +128,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public HistoricTaskInstance startFlowV2(BpmDTO dto) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
@@ -155,7 +155,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .findAny()
             .orElse(null);
     }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public Long startOnlyFlow(BpmDTO dto) {
         FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
@@ -307,7 +307,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 return Collections.emptyList();
         }
     }
-
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void invalid(InvalidDTO dto) {
         Flow flow = flowRepository.queryById(Long.valueOf(dto.getFlowId()));
@@ -343,24 +343,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
-//        Flow flow = flowRepository.queryById(flowId);
-//        List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
-//        List<Long> nodeIdList = flowAutomateNodeList.stream()
-//            .map(Node::getId)
-//            .collect(Collectors.toList());
-//        flow.getNodes()
-//            .stream()
-//            .filter(e -> nodeIdList.contains(e.getId()))
-//            .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
-//        flowRepository.update(flow);
-//        flowAutomateNodeList.forEach(node -> {
-//            NodeFieldDTO fieldDTO = new NodeFieldDTO();
-//            fieldDTO.setFlowId(flowId);
-//            fieldDTO.setNodeId(node.getId());
-//            fieldDTO.setData(automateParam);
-//            forward(fieldDTO);
-//        });
-
         Flow flow = flowRepository.queryById(flowId);
         do {
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
