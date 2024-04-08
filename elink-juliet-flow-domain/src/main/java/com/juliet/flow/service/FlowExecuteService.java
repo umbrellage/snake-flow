@@ -2,6 +2,7 @@ package com.juliet.flow.service;
 
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
@@ -65,4 +66,8 @@ public interface FlowExecuteService {
     void earlyEndFlow(Long flowId);
 
     void flowAutomate(Long flowId, Map<String, Object> automateParam);
+
+    void recoverFlow(FlowIdDTO flowId);
+
+    void endFlowRollback(FlowIdDTO flowId, Integer level);
 }

@@ -234,6 +234,16 @@ public class Flow extends BaseModel {
         throw new ServiceException("节点为空");
     }
 
+    public Node endNode() {
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            return nodes.stream()
+                .filter(node -> node.getType().equals(NodeTypeEnum.END))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("找不到结束节点"));
+        }
+        throw new ServiceException("节点为空");
+    }
+
     /**
      * 前置节点是否已经处理
      *

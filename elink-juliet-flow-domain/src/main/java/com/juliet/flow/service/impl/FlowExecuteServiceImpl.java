@@ -3,12 +3,15 @@ package com.juliet.flow.service.impl;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toCollection;
 
+import cn.snake.kobe.sql.SnakeSqlUtils;
 import com.alibaba.fastjson2.JSON;
 import com.google.common.collect.Lists;
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.exception.base.BaseException;
 import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.common.thread.ThreadPoolFactory;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
@@ -28,6 +31,7 @@ import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.NodeStatusEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
+import com.juliet.flow.common.utils.JulietSqlUtil;
 import com.juliet.flow.domain.dto.TaskForwardDTO;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -45,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -365,6 +370,48 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
     }
 
+    @Override
+    public void recoverFlow(FlowIdDTO flowId) {
+        if (flowId.getFlowId() == null) {
+            return;
+        }
+        Flow flow = JulietSqlUtil.findById(flowId.getFlowId(), flowRepository::queryById, "not found flow");
+        if (flow.getStatus() != FlowStatusEnum.INVALID) {
+            throw new ServiceException("流程状态有误");
+        }
+        flow.setStatus(FlowStatusEnum.IN_PROGRESS);
+        flowRepository.update(flow);
+    }
+
+    @Override
+    public void endFlowRollback(FlowIdDTO flowId, Integer level) {
+        Flow flow = JulietSqlUtil.findById(flowId.getFlowId(), flowRepository::queryById, "not found flow");
+        Node endNode = flow.endNode();
+        List<Node> nodeList = new ArrayList<>();
+        nodeList.add(endNode);
+        for (int i = 0; i < level; i++) {
+            nodeList = nodeList.stream()
+                .map(Node::preNameList)
+                .flatMap(Collection::stream)
+                .distinct()
+                .map(flow::findNode)
+                .collect(Collectors.toList());
+        }
+
+        List<Long> rollbackNodeIdList = nodeList.stream()
+            .map(Node::getId)
+            .collect(Collectors.toList());
+
+        flow.getNodes()
+            .stream()
+            .filter(node -> rollbackNodeIdList.contains(node.getId()))
+            .forEach(node -> {
+                if (node.getStatus() == NodeStatusEnum.PROCESSED) {
+                    node.setStatus(NodeStatusEnum.ACTIVE);
+                }
+            });
+        flowRepository.update(flow);
+    }
 
 
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
