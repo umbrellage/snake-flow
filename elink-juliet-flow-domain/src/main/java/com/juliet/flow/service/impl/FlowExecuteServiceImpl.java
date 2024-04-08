@@ -315,10 +315,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void invalid(InvalidDTO dto) {
-        Flow flow = flowRepository.queryById(Long.valueOf(dto.getFlowId()));
+        Flow flow = JulietSqlUtil.findById(Long.valueOf(dto.getFlowId()), flowRepository::queryById, "flow not found");
+        flow.setStatus(FlowStatusEnum.INVALID);
+        flowRepository.update(flow);
         NotifyDTO notifyDTO = flow.invalidFlow();
-        flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
         callback(Collections.singletonList(notifyDTO));
+
+//        Flow flow = flowRepository.queryById(Long.valueOf(dto.getFlowId()));
+//        NotifyDTO notifyDTO = flow.invalidFlow();
+//        flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
+//        callback(Collections.singletonList(notifyDTO));
     }
 
     @Override
