@@ -628,6 +628,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .collect(Collectors.toMap(Flow::getId, Function.identity(), (v1, v2) -> v1));
         List<NodeVO> nodeVOList = Stream.of(userIdNodeList, postIdNodeList, supervisorIdNodeList, supplierNodeList)
             .flatMap(Collection::stream)
+            .filter(node -> flowMap.get(node.getFlowId()).getStatus() != FlowStatusEnum.INVALID)
             .filter(node -> node.getTodoNotify() == notify)
             .map(node -> node.toNodeVo(flowMap.get(node.getFlowId())))
             .collect(Collectors.toList());
