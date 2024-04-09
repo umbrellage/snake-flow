@@ -220,6 +220,19 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+    @Override
+    public AjaxResult<Void> recoverFlow(FlowIdDTO flowId) {
+
+        flowExecuteService.recoverFlow(flowId);
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<Void> endFlowRollback(FlowIdDTO flowId, Integer level) {
+        flowExecuteService.endFlowRollback(flowId, level);
+        return AjaxResult.success();
+    }
+
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
         FlowOpenResultDTO dto = new FlowOpenResultDTO();
         if (node.getForm() != null && !CollectionUtils.isEmpty(node.getForm().getFields())) {

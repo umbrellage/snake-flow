@@ -195,4 +195,12 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/earlyEnd")
     AjaxResult<Void> earlyEndFlow(@RequestParam Long flowId);
 
+
+    @ApiOperation("恢复流程")
+    @PostMapping("/bpm/recoverFlow")
+    AjaxResult<Void> recoverFlow(@RequestBody FlowIdDTO flowId);
+
+    @ApiOperation("流程结束后回退多级")
+    @PostMapping("/bpm/endFlowRollback")
+    AjaxResult<Void> endFlowRollback(@RequestBody FlowIdDTO flowId, @RequestParam Integer level);
 }
