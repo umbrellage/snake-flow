@@ -24,6 +24,8 @@ public class NotifyDTO {
      */
     private List<Long> supervisorIds;
     private String nodeName;
+    private String nodeTitle;
+    private Integer nodeStatus;
     private Long userId;
     private List<String> postIdList;
     private NotifyTypeEnum type;
