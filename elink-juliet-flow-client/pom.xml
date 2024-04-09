@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-l
+
     <artifactId>elink-juliet-flow-client</artifactId>
     <version>1.0.5-SNAPSHOT</version>
 
