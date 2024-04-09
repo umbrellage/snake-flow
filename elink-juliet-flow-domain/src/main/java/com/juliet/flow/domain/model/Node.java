@@ -195,6 +195,7 @@ public class Node extends BaseModel {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
+        ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId == null ? flow.getId(): flowId);
         ret.setTodoNotify(todoNotify);
         if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
@@ -222,6 +223,7 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setTodoNotify(todoNotify);
         ret.setNodeName(name);
+        ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.COMPLETE);
@@ -235,11 +237,13 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setTodoNotify(todoNotify);
         ret.setNodeName(name);
+        ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.DELETE);
         ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
+
         return ret;
     }
 
@@ -247,6 +251,7 @@ public class Node extends BaseModel {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
+        ret.setNodeVO(toNodeVo(flow));
         ret.setTodoNotify(todoNotify);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);

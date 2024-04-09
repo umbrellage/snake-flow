@@ -2,6 +2,7 @@ package com.juliet.flow.client.dto;
 
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
+import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import java.util.List;
 import lombok.Data;
@@ -24,6 +25,7 @@ public class NotifyDTO {
      */
     private List<Long> supervisorIds;
     private String nodeName;
+    private NodeVO nodeVO;
     private Long userId;
     private List<String> postIdList;
     private NotifyTypeEnum type;
