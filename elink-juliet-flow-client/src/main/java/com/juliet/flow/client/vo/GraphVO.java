@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import lombok.Data;
@@ -18,6 +19,12 @@ public class GraphVO {
     private List<GraphNodeVO> nodes;
 
     private List<GraphEdgeVO> edges;
+
+    @JsonProperty("X")
+    private Double x;
+    @JsonProperty("Y")
+    private Double y;
+    private Double zoom;
 
     public boolean canAlter() {
         if (CollectionUtils.isEmpty(nodes)) {
