@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.annotations.ApiModelProperty;
 import java.util.List;
 import lombok.Data;
@@ -16,6 +17,11 @@ public class ProcessConfigRPCDTO {
     @ApiModelProperty("流程节点")
     private List<ProcessNode> nodes;
     private List<Edge> edges;
+    @JsonProperty("X")
+    private Double x;
+    @JsonProperty("Y")
+    private Double y;
+    private Double zoom;
 
     @Data
     public static class ProcessNode {
