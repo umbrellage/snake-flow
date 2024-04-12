@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.DesignationOperator;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
@@ -144,6 +145,12 @@ public class FlowExecuteController implements JulietFlowClient {
     @ApiOperation("执行一个节点任务")
     @Override
     public AjaxResult<List<HistoricTaskInstance>> task(TaskDTO dto) {
+        return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<Void> designationOperator(DesignationOperator dto) {
+        flowExecuteService.designationOperator(dto);
         return AjaxResult.success();
     }
 

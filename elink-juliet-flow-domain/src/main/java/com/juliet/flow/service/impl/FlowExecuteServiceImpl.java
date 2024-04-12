@@ -394,6 +394,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowRepository.update(flow);
     }
 
+    @Override
+    public void designationOperator(DesignationOperator dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return;
+        }
+        flow.getNodes().forEach(node -> {
+            if (dto.getNodeIdList().contains(node.getId())) {
+                node.setProcessedBy(dto.getOperator());
+            }
+        });
+
+        flowRepository.update(flow);
+    }
+
 
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;

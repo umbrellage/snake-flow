@@ -124,6 +124,12 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/task")
     AjaxResult<List<HistoricTaskInstance>> task(@RequestBody TaskDTO dto);
 
+    /**
+     * 给指定节点指定或提前指定操作人
+     * @return
+     */
+    @PostMapping("/bpm/designationOperator")
+    AjaxResult<Void> designationOperator(@RequestBody DesignationOperator dto);
 
     /**
      * 获取所有的待办

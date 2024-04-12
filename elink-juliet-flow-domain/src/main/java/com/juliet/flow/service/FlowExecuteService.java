@@ -2,6 +2,7 @@ package com.juliet.flow.service;
 
 import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
+import com.juliet.flow.client.dto.DesignationOperator;
 import com.juliet.flow.client.dto.FlowIdDTO;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.FlowOpenDTO;
@@ -70,4 +71,6 @@ public interface FlowExecuteService {
     void recoverFlow(FlowIdDTO flowId);
 
     void endFlowRollback(FlowIdDTO flowId, Integer level);
+
+    void designationOperator(DesignationOperator dto);
 }
