@@ -413,7 +413,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             .stream()
             .filter(node -> rollbackNodeIdList.contains(node.getId()))
             .forEach(node -> {
-                if (node.getStatus() == NodeStatusEnum.PROCESSED) {
+                if (node.getProcessedBy() == null || node.getProcessedBy() == 0) {
+                    node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                } else {
                     node.setStatus(NodeStatusEnum.ACTIVE);
                 }
             });
