@@ -402,6 +402,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .distinct()
                 .map(flow::findNode)
                 .collect(Collectors.toList());
+            nodeList.forEach(node -> node.setStatus(NodeStatusEnum.NOT_ACTIVE));
         }
 
         List<Long> rollbackNodeIdList = nodeList.stream()
