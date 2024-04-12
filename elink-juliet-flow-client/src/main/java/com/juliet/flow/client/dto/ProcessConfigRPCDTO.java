@@ -17,9 +17,7 @@ public class ProcessConfigRPCDTO {
     @ApiModelProperty("流程节点")
     private List<ProcessNode> nodes;
     private List<Edge> edges;
-    @JsonProperty("X")
     private Double x;
-    @JsonProperty("Y")
     private Double y;
     private Double zoom;
 

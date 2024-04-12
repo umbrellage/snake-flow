@@ -20,9 +20,7 @@ public class GraphVO {
 
     private List<GraphEdgeVO> edges;
 
-    @JsonProperty("X")
     private Double x;
-    @JsonProperty("Y")
     private Double y;
     private Double zoom;
 
