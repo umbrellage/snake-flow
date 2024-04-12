@@ -396,6 +396,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     public void designationOperator(DesignationOperator dto) {
+        if (CollectionUtils.isEmpty(dto.getNodeIdList())) {
+            return;
+        }
         Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
             return;
