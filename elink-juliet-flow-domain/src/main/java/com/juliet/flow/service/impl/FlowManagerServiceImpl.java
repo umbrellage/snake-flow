@@ -264,6 +264,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean isFinished(List<Node> nodes, GraphNodeVO graphNodeVO) {
         for (Node node : nodes) {
+            if (Objects.equals(graphNodeVO.getType(), "startNode")) {
+                return true;
+            }
             if (isNodeMatched(node, graphNodeVO)) {
                 return node.getStatus() == NodeStatusEnum.PROCESSED;
             }
