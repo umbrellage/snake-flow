@@ -391,6 +391,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                         node.setStatus(NodeStatusEnum.ACTIVE);
                     }
                 });
+        flow.setStatus(FlowStatusEnum.IN_PROGRESS);
         flowRepository.update(flow);
     }
 
