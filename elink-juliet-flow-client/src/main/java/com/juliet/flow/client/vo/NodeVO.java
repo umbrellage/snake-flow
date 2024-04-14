@@ -1,6 +1,8 @@
 package com.juliet.flow.client.vo;
 
 import com.juliet.flow.client.common.OperateTypeEnum;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,7 +21,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class NodeVO {
+public class NodeVO implements Serializable {
 
     private Long id;
 

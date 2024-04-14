@@ -2,6 +2,8 @@ package com.juliet.flow.client.vo;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.OperateTypeEnum;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Getter
 @Setter
-public class FlowVO {
+public class FlowVO implements Serializable {
 
     private Long id;
 

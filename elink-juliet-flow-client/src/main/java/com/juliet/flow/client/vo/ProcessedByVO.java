@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.flow.client.config.DateTime2String;
 import com.juliet.flow.client.config.String2DateTimeDes;
+
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
 import lombok.Getter;
@@ -18,7 +20,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class ProcessedByVO {
+public class ProcessedByVO implements Serializable {
 
     private Long nodeId;
     /**

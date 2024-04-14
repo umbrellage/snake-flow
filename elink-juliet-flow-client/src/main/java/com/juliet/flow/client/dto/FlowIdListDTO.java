@@ -1,8 +1,10 @@
 package com.juliet.flow.client.dto;
 
-import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * FlowIdListDTO
@@ -12,7 +14,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FlowIdListDTO {
+public class FlowIdListDTO implements Serializable {
 
     private List<Long> flowIdList;
 
