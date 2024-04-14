@@ -3,6 +3,8 @@ package com.juliet.flow.client.vo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 /**
  * FieldVo
  *
@@ -11,7 +13,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class FieldVO {
+public class FieldVO implements Serializable {
 
     private String id;
 
