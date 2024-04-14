@@ -3,6 +3,7 @@ package com.juliet.flow;
 import com.alibaba.cloud.nacos.registry.NacosAutoServiceRegistration;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +20,7 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.juliet")
 @MapperScan("com.juliet.flow.dao")
 @RequiredArgsConstructor
+@EnableDubbo
 @Slf4j
 public class ElinkJulietFlowApplication {
 

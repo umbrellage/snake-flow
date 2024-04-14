@@ -7,4 +7,6 @@ spring:
       config:
         # 配置中心地址
         server-addr: 172.16.1.151:8848
-
+dubbo:
+  registry:
+    address: nacos://172.16.1.151:8848

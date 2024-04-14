@@ -30,6 +30,18 @@ logging:
   level:
     feign.Logger: debug
 
+dubbo:
+  applicaion:
+    name: elink-juliet-flow-dubbo
+  protocol:
+    name: dubbo
+    port: -1
+    compression: gzip
+  registry:
+    id: nacos-registry
+    parameters:
+      namespace: ${spring.profiles.active}
+
 feign:
   client:
     config:

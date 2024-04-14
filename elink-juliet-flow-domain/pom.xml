@@ -74,6 +74,10 @@
             <groupId>com.juliet.common.mq</groupId>
             <artifactId>elink-common-mq</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
 
@@ -202,43 +206,6 @@
     <!-- 1:dev:开发环境(默认) 2:test 3:uat 用户验收测试 4.prod:生产环境-->
     <profiles>
         <profile>
-            <id>dev</id>
-            <properties>
-                <profileActive>dev</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>test</id>
-            <properties>
-                <profileActive>test</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>uat</id>
-            <properties>
-                <profileActive>uat</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>prod</id>
-            <properties>
-                <profileActive>prod</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-
-        <profile>
             <id>zly-dev</id>
             <properties>
                 <profileActive>zly-dev</profileActive>
@@ -283,52 +250,6 @@
                 <activeByDefault>false</activeByDefault>
             </activation>
         </profile>
-        <profile>
-            <id>yfl-dev</id>
-            <properties>
-                <profileActive>yfl-dev</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>yfl-test</id>
-            <properties>
-                <profileActive>yfl-test</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>yfl-uat</id>
-            <properties>
-                <profileActive>yfl-uat</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>yfl-prod</id>
-            <properties>
-                <profileActive>yfl-prod</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-        <profile>
-            <id>srm-dev</id>
-            <properties>
-                <profileActive>srm-dev</profileActive>
-            </properties>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-        </profile>
-
     </profiles>
 
 
