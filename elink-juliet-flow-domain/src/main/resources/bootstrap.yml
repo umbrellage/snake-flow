@@ -36,6 +36,7 @@ dubbo:
   protocol:
     name: dubbo
     port: -1
+    payload: 52428800
     compression: gzip
   registry:
     id: nacos-registry
