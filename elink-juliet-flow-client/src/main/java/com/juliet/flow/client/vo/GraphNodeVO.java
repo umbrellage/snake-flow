@@ -19,6 +19,9 @@ public class GraphNodeVO {
      */
     private String type;
 
+    // 1,品牌节点，2， 供应商节点
+    private Integer nodeCategory;
+
     private Integer x;
 
     private Integer y;

@@ -24,6 +24,8 @@ public class ProcessConfigRPCDTO {
     @Data
     public static class ProcessNode {
         private String id;
+        // 1,品牌节点，2， 供应商节点
+        private Integer nodeCategory;
         private String type;
         private Integer x;
         private Integer y;
