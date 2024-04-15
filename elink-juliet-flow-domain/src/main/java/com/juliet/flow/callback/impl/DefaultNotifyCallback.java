@@ -12,6 +12,7 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,12 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     @Autowired
     private CallbackClient callbackClient;
 
+    @Autowired
+    private RocketMQTemplate rocketMQTemplate;
+
+    @Value("${rocketmq.producer.topic}")
+    private String flowNotifyTopic;
+
     @Override
     public void notify(List<NotifyDTO> list) {
         log.info("notify param:{}", JSON.toJSONString(list));
@@ -57,6 +64,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);
                 log.info("transfer data:{}", JSON.toJSONString(dto));
                 rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
+                rocketMQTemplate.syncSend(flowNotifyTopic, notifyDTO);
             }
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
