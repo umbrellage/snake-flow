@@ -20,4 +20,6 @@ public class SupplierEntity extends BaseEntity {
     private String supplierType;
 
     private Long supplierId;
+
+    private String supplierName;
 }

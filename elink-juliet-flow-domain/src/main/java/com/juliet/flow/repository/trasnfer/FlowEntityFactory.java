@@ -239,6 +239,7 @@ public class FlowEntityFactory {
         entity.setId(supplier.getId());
         entity.setSupplierType(supplier.getSupplierType());
         entity.setSupplierId(supplier.getSupplierId());
+        entity.setSupplierName(supplier.getSupplierName());
         entity.setNodeId(nodeId);
         entity.setTenantId(tenantId);
         entity.setDelFlag(0);
@@ -469,6 +470,7 @@ public class FlowEntityFactory {
         supplier.setId(supplierEntity.getId());
         supplier.setSupplierType(supplierEntity.getSupplierType());
         supplier.setSupplierId(supplierEntity.getSupplierId());
+        supplier.setSupplierName(supplierEntity.getSupplierName());
         supplier.setCreateBy(supplierEntity.getCreateBy());
         supplier.setUpdateBy(supplierEntity.getUpdateBy());
         supplier.setTenantId(supplierEntity.getTenantId());

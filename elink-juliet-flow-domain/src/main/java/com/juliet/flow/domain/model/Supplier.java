@@ -17,10 +17,13 @@ public class Supplier extends BaseModel {
 
     private Long supplierId;
 
+    private String supplierName;
+
     public Supplier deepCopy() {
         Supplier ret = new Supplier();
         ret.setId(IdGenerator.getId());
         ret.setSupplierId(supplierId);
+        ret.setSupplierName(supplierName);
         ret.setSupplierType(supplierType);
         ret.setTenantId(getTenantId());
         ret.setCreateBy(getCreateBy());
