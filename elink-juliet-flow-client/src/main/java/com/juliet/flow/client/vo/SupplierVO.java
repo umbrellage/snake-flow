@@ -17,4 +17,6 @@ public class SupplierVO implements Serializable {
 
     private Long supplierId;
 
+    private String supplierName;
+
 }
