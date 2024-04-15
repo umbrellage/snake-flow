@@ -64,7 +64,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
                 NotifyMessageDTO dto = toMessageDTO(notifyDTO);
                 log.info("transfer data:{}", JSON.toJSONString(dto));
                 rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
-                rocketMQTemplate.syncSend(flowNotifyTopic, notifyDTO);
+                rocketMQTemplate.syncSend(flowNotifyTopic, dto);
             }
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
