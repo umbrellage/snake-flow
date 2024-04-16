@@ -63,6 +63,10 @@
             <artifactId>snake-utils</artifactId>
             <groupId>cn.snake.kobe</groupId>
         </dependency>
+        <dependency>
+            <groupId>org.apache.rocketmq</groupId>
+            <artifactId>rocketmq-spring-boot-starter</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
