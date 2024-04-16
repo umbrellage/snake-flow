@@ -149,7 +149,7 @@
     },
     {
       "id": "a804ccf3-65c1-4cbc-a602-de9aeadf81ca",
-      "type": "flowEnd",
+      "type": "flowNode",
       "x": 1720,
       "y": 270,
       "properties": {
