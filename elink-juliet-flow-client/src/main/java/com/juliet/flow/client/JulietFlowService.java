@@ -2,6 +2,7 @@ package com.juliet.flow.client;
 
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
+import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.vo.FlowVO;
 
@@ -15,5 +16,5 @@ public interface JulietFlowService {
 
     List<FlowVO> flowList(FlowIdListDTO dto);
 
-    List<HistoricTaskInstance> execute(TaskExecute dto);
+    List<HistoricTaskInstance> rollback(RollbackDTO dto);
 }
