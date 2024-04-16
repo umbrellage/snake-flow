@@ -407,6 +407,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flow.getNodes().forEach(node -> {
             if (dto.getNodeIdList().contains(node.getId())) {
                 node.setProcessedBy(dto.getOperator());
+                if (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+                    node.setStatus(NodeStatusEnum.ACTIVE);
+                }
             }
         });
 

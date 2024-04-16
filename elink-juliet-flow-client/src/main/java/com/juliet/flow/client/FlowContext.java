@@ -6,6 +6,7 @@ import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.client.dto.BpmDTO;
 
 import com.juliet.flow.client.dto.RedoDTO;
+import com.juliet.flow.client.dto.RollbackDTO;
 import java.util.List;
 import java.util.function.Function;
 
@@ -176,6 +177,20 @@ public class FlowContext {
         if (nodeFieldDTO.getUserId() == null) {
             throw new ServiceException("userId不能为空");
         }
+    }
+
+    public static void rollbackStart(String reason) {
+        NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+        if (nodeFieldDTO.getNodeId() == null || nodeFieldDTO.getFlowId() == null || nodeFieldDTO.getUserId() == null) {
+            throw new ServiceException("参数不正确");
+        }
+        RollbackDTO dto = new RollbackDTO();
+        dto.setUserId(nodeFieldDTO.getUserId());
+        dto.setReason(reason);
+        dto.setFlowId(String.valueOf(nodeFieldDTO.getFlowId()));
+        dto.setNodeId(String.valueOf(nodeFieldDTO.getNodeId()));
+        dto.setRollbackType(0);
+        julietFlowClient.rollback(dto);
     }
 
     public static Long submitOnlyFlow() {
