@@ -13,6 +13,7 @@ import com.juliet.flow.client.dto.InvalidDTO;
 import com.juliet.flow.client.dto.NodeFieldDTO;
 import com.juliet.flow.client.dto.RedoDTO;
 import com.juliet.flow.client.dto.RejectDTO;
+import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskDTO;
 import com.juliet.flow.client.dto.UserDTO;
 import com.juliet.flow.client.vo.FlowVO;
@@ -238,6 +239,12 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<Void> endFlowRollback(FlowIdDTO flowId, Integer level) {
         flowExecuteService.endFlowRollback(flowId, level);
         return AjaxResult.success();
+    }
+
+    @Override
+    public AjaxResult<List<HistoricTaskInstance>> rollback(RollbackDTO dto) {
+        List<HistoricTaskInstance> history = flowExecuteService.execute(dto);
+        return AjaxResult.success(history);
     }
 
     private static FlowOpenResultDTO toFlowOpenResultDTO(Node node) {
