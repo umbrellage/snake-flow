@@ -2,6 +2,8 @@ package com.juliet.flow.dubbo;
 
 import com.juliet.flow.client.JulietFlowService;
 import com.juliet.flow.client.dto.FlowIdListDTO;
+import com.juliet.flow.client.dto.HistoricTaskInstance;
+import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.service.FlowExecuteService;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -24,5 +26,10 @@ public class JulietFlowServiceImpl implements JulietFlowService {
     @Override
     public List<FlowVO> flowList(FlowIdListDTO dto) {
         return flowExecuteService.flowList(dto);
+    }
+
+    @Override
+    public List<HistoricTaskInstance> execute(TaskExecute dto) {
+        return flowExecuteService.execute(dto);
     }
 }
