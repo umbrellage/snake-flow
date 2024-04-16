@@ -21,7 +21,7 @@
 
     <insert id="insertBatch"  parameterType="com.juliet.flow.domain.entity.SupplierEntity">
         INSERT INTO <include refid="tableName" /> (
-        id, node_id, supplier_type, supplier_id, supplier_name tenant_id, del_flag, create_time, update_time, create_by, update_by
+        id, node_id, supplier_type, supplier_id, supplier_name, tenant_id, del_flag, create_time, update_time, create_by, update_by
         )
         values
         <foreach collection="supplierEntities" item="entity" separator=",">
