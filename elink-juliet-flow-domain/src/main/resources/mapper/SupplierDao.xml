@@ -25,7 +25,7 @@
         )
         values
         <foreach collection="supplierEntities" item="entity" separator=",">
-            (#{entity.id}, #{entity.nodeId}, #{entity.supplierType}, #{entity.supplierName}, #{entity.supplierId}, #{entity.tenantId}, 0, #{entity.createTime}, #{entity.updateTime}, #{entity.createBy},#{entity.updateBy})
+            (#{entity.id}, #{entity.nodeId}, #{entity.supplierType}, #{entity.supplierId},#{entity.supplierName}, #{entity.tenantId}, 0, #{entity.createTime}, #{entity.updateTime}, #{entity.createBy},#{entity.updateBy})
         </foreach>
     </insert>
 
