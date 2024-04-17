@@ -47,7 +47,7 @@ public class FlowVO implements Serializable {
     private Integer subFlowCount;
 
     /**
-     * IN_PROGRESS(1, "进行中"), ABNORMAL(2, "异常中"), END(3, "已结束"),
+     * IN_PROGRESS(1, "进行中"), ABNORMAL(2, "异常中"), END(3, "已结束"),4,已作废
      */
     private Integer status;
     /**
