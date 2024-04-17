@@ -482,6 +482,8 @@ public class Node extends BaseModel {
         data.setPreName(preName);
         data.setNextName(nextName);
         data.setSelfAndSupervisorAssignment(selfAndSupervisorAssignment);
+        data.setFlowInnerAssignment(flowInnerAssignment);
+        data.setDistributeNode(distributeNode);
         data.setSupervisorAssignment(supervisorAssignment);
         if (status != null) {
             data.setStatus(status.getCode());
@@ -531,6 +533,7 @@ public class Node extends BaseModel {
         node.id = IdGenerator.getId();
         node.title = title;
         node.customStatus = customStatus;
+        node.externalNodeId = externalNodeId;
         node.name = name;
         node.preName = preName;
         node.nextName = nextName;

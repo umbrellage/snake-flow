@@ -276,6 +276,7 @@ public class FlowEntityFactory {
         nodeEntity.setName(node.getName());
         nodeEntity.setPreName(node.getPreName());
         nodeEntity.setNextName(node.getNextName());
+        nodeEntity.setExternalNodeId(node.getExternalNodeId());
         nodeEntity.setTenantId(node.getTenantId());
         nodeEntity.setFlowId(flowId);
         nodeEntity.setFlowTemplateId(flowTemplateId);
@@ -344,7 +345,7 @@ public class FlowEntityFactory {
         node.setAccessRuleList(JSON.parseArray(nodeEntity.getAccessRuleList(), AccessRuleDTO.class));
         node.setPreName(nodeEntity.getPreName());
         node.setNextName(nodeEntity.getNextName());
-
+        node.setExternalNodeId(nodeEntity.getExternalNodeId());
         node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment() == 1);
         node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment() == 1);
         node.setRuleAssignment(nodeEntity.getRuleAssignment() == 1);

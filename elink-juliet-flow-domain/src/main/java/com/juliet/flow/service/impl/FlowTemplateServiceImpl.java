@@ -131,6 +131,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setFlowInnerAssignment(nodeDTO.getFlowInnerAssignment());
         node.setDistributeNode(nodeDTO.getDistributeNode());
         node.setSupervisorAssignment(nodeDTO.getSupervisorAssignment());
+        node.setExternalNodeId(nodeDTO.getExternalNodeId());
         node.setSelfAndSupervisorAssignment(nodeDTO.getSelfAndSupervisorAssignment());
         node.setAssignRule(RuleFactory.getAssignRule(nodeDTO.getAssignRuleName()));
         

@@ -2,6 +2,7 @@ package com.juliet.flow.client.vo;
 
 import com.juliet.flow.client.common.OperateTypeEnum;
 
+import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -62,6 +63,12 @@ public class NodeVO implements Serializable {
      * 认领+调整
      */
     private Boolean selfAndSupervisorAssignment;
+
+    @ApiModelProperty("是否分配给流程内的节点操作人")
+    private Boolean flowInnerAssignment;
+
+    @ApiModelProperty("从分配的节点里获取操作人")
+    private String distributeNode;
 
     /**
      * 表单
