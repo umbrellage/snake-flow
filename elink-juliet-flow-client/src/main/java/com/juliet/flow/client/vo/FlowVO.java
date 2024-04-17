@@ -181,6 +181,7 @@ public class FlowVO implements Serializable {
         return status == 3;
     }
 
+    @Deprecated
     public List<String> flowCustomerStatus() {
         if (end()) {
             return Collections.singletonList(nodes.get(nodes.size() - 1).getCustomStatus());
