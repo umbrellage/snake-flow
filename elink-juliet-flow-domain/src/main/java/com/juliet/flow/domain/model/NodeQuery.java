@@ -18,9 +18,9 @@ import org.apache.commons.compress.utils.Lists;
 @Data
 public class NodeQuery {
 
-    private final static int DEFAULT_PAGE_SIZE = 1000;
+    private final static int DEFAULT_PAGE_SIZE = 10000;
 
-    private final static int MAX_PAGE_SIZE = 1000;
+    private final static int MAX_PAGE_SIZE = 10000;
 
     private Long userId;
 

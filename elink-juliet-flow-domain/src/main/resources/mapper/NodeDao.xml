@@ -63,6 +63,7 @@
                 </foreach>
             </if>
         </where>
+        ORDER BY t1.create_time
         limit #{query.offset}, #{query.pageSize}
     </select>
 
