@@ -1,5 +1,6 @@
 package com.juliet.flow.client.dto;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotNull;
@@ -54,6 +55,12 @@ public class NodeDTO {
      * 规则分配
      */
     private Boolean ruleAssignment;
+
+    @ApiModelProperty("是否分配给流程内的节点操作人")
+    private Boolean flowInnerAssignment;
+
+    @ApiModelProperty("从分配的节点里获取操作人")
+    private String distributeNode;
 
     /**
      * 分配规则

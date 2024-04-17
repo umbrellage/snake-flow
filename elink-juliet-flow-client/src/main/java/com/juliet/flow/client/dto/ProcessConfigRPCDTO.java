@@ -36,6 +36,8 @@ public class ProcessConfigRPCDTO {
     public static class Properties {
         private String text;
         private String name;
+        @ApiModelProperty("从分配的节点里获取操作人")
+        private String distributeNode;
         @ApiModelProperty("分配模式")
         private List<Integer> distributeType;
         @ApiModelProperty("指定人员")

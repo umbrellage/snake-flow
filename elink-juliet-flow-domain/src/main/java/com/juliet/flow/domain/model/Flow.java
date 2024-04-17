@@ -525,7 +525,10 @@ public class Flow extends BaseModel {
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                // 规则分配
                 node.regularDistribution(param, this);
+                // 分配给流程内部节点的操作人
+                node.regularFlowInnerOperator(this);
                 if (node.nodeTodo()) {
                     node.setStatus(NodeStatusEnum.ACTIVE);
                 } else {

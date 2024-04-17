@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.juliet.flow.domain.model.Node;
+import io.swagger.annotations.ApiModelProperty;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -62,6 +63,12 @@ public class NodeEntity extends BaseEntity {
      * 规则分配
      */
     private Integer ruleAssignment;
+
+    @ApiModelProperty("是否分配给流程内的节点操作人")
+    private Integer flowInnerAssignment;
+
+    @ApiModelProperty("从分配的节点里获取操作人")
+    private String distributeNode;
 
     /**
      * 分配规则

@@ -286,6 +286,8 @@ public class FlowEntityFactory {
         nodeEntity.setSupervisorAssignment(node.getSupervisorAssignment() != null && node.getSupervisorAssignment() ? 1 : 0);
         nodeEntity.setSelfAndSupervisorAssignment(node.getSelfAndSupervisorAssignment() != null && node.getSelfAndSupervisorAssignment() ? 1 : 0);
         nodeEntity.setRuleAssignment(node.getRuleAssignment() != null && node.getRuleAssignment() ? 1 : 0);
+        nodeEntity.setFlowInnerAssignment(node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() ? 1 : 0);
+        nodeEntity.setDistributeNode(node.getDistributeNode());
         nodeEntity.setSupervisorIds(node.supervisorIds());
 
         nodeEntity.setType(node.getType().getCode());
@@ -346,6 +348,8 @@ public class FlowEntityFactory {
         node.setSupervisorAssignment(nodeEntity.getSupervisorAssignment() == 1);
         node.setSelfAndSupervisorAssignment(nodeEntity.getSelfAndSupervisorAssignment() == 1);
         node.setRuleAssignment(nodeEntity.getRuleAssignment() == 1);
+        node.setFlowInnerAssignment(nodeEntity.getFlowInnerAssignment() == 1);
+        node.setDistributeNode(nodeEntity.getDistributeNode());
         node.setAccessRule(RuleFactory.getAccessRule(nodeEntity.getAccessRuleName()));
         node.setAssignRule(RuleFactory.getAssignRule(nodeEntity.getAssignRuleName()));
         if (StringUtils.isNotBlank(nodeEntity.getSupervisorIds())) {

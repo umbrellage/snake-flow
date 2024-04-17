@@ -18,6 +18,7 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
 
+import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -113,6 +114,12 @@ public class Node extends BaseModel {
      */
     private List<Long> supervisorIds;
 
+    @ApiModelProperty("是否分配给流程内的节点操作人")
+    private Boolean flowInnerAssignment;
+
+    @ApiModelProperty("从分配的节点里获取操作人")
+    private String distributeNode;
+
     /**
      * 处理人
      */
@@ -190,6 +197,20 @@ public class Node extends BaseModel {
                 bindSuppliers = Collections.singletonList(supplier);
             }
         }
+    }
+
+    public void regularFlowInnerOperator(Flow flow) {
+        if (StringUtils.isBlank(distributeNode)) {
+            return;
+        }
+        if (flowInnerAssignment == null || !flowInnerAssignment) {
+            return;
+        }
+        flow.getNodes().stream()
+            .filter(node -> StringUtils.equals(node.getExternalNodeId(), distributeNode) ||
+                StringUtils.equals(node.getName(), distributeNode))
+            .findAny()
+            .ifPresent(node -> this.processedBy = node.getProcessedBy());
     }
 
     public NotifyDTO toNotifyNormal(Flow flow) {
@@ -545,6 +566,8 @@ public class Node extends BaseModel {
         node.supervisorIds = supervisorIds;
         node.assignRule = assignRule;
         node.ruleAssignment = ruleAssignment;
+        node.distributeNode = distributeNode;
+        node.flowInnerAssignment = flowInnerAssignment;
         node.selfAndSupervisorAssignment = selfAndSupervisorAssignment;
         node.supervisorAssignment = supervisorAssignment;
         node.setCreateBy(this.getCreateBy());
