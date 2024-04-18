@@ -683,10 +683,10 @@ public class Flow extends BaseModel {
     }
 
     public Node rollback(RollbackDTO dto) {
-        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
-        if (canNotRollback) {
-            throw new ServiceException("该流程不支持退回操作");
-        }
+//        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
+//        if (canNotRollback) {
+//            throw new ServiceException("该流程不支持退回操作");
+//        }
         Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
