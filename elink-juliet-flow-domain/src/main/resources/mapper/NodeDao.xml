@@ -76,7 +76,7 @@
         )
         values
         <foreach collection="nodeEntities" item="entity" separator=",">
-            (#{entity.id}, #{entity.flowInnerAssignment},#{distributeNode}, #{entity.flowAutomateRuleName}, #{entity.accessRuleList}, #{entity.ruleList}, #{entity.externalNodeId}, #{entity.title},#{entity.name},#{entity.preName},#{entity.nextName},#{entity.flowId},#{entity.flowTemplateId},
+            (#{entity.id}, #{entity.flowInnerAssignment},#{entity.distributeNode}, #{entity.flowAutomateRuleName}, #{entity.accessRuleList}, #{entity.ruleList}, #{entity.externalNodeId}, #{entity.title},#{entity.name},#{entity.preName},#{entity.nextName},#{entity.flowId},#{entity.flowTemplateId},
             #{entity.accessRuleName},#{entity.submitRuleName},#{entity.assignRuleName},#{entity.supervisorAssignment},#{entity.selfAndSupervisorAssignment},#{entity.ruleAssignment},#{entity.supervisorIds},
             #{entity.type},#{entity.status},#{entity.customStatus},#{entity.processedBy},0,#{entity.tenantId},#{entity.createTime},#{entity.updateTime},#{entity.createBy},#{entity.updateBy},#{entity.todoNotify},#{entity.modifyOtherTodoName})
         </foreach>
