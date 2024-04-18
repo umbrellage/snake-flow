@@ -36,6 +36,7 @@ public class SupplierAssignRule extends BaseAssignRule {
             SupplierDTO dto = new SupplierDTO();
             dto.setSupplierId(supplierId);
             dto.setSupplierType(supplierType);
+            dto.setSupplierName(String.valueOf(params.get("supplierName")));
             log.info("supplierDTO:{}", JSON.toJSONString(dto));
             return dto;
         }
