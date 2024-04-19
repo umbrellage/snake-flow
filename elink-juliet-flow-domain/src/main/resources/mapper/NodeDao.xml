@@ -47,7 +47,7 @@
                 and t1.processed_by = #{query.userId}
             </if>
             <if test="query.supervisorId!=null">
-                and t1.supervisor_ids like CONCAT('%^',#{query.userId},'^%')
+                and t1.supervisor_ids like CONCAT('%^',#{query.supervisorId},'^%')
             </if>
             <if test="query.postIds!=null and query.postIds.size>0">
                 and t2.post_id in
