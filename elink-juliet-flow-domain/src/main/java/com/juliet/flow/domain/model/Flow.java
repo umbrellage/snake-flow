@@ -187,6 +187,16 @@ public class Flow extends BaseModel {
             .orElse(null);
     }
 
+    public Node findTodoNodeAnyMatch(List<Long> userIdList) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        return nodes.stream()
+            .filter(node -> userIdList.contains(node.getProcessedBy()) && node.isTodoNode())
+            .findAny()
+            .orElse(null);
+    }
+
 
     public Node findNode(Long nodeId) {
         if (CollectionUtils.isEmpty(nodes)) {

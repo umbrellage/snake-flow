@@ -151,33 +151,16 @@ public class FlowContext {
         julietFlowClient.flowAutomate(flowId, automateParam);
     }
 
+
+
     public static List<HistoricTaskInstance> forward() {
-        try {
-            NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
-            nodeFieldDTO.setData(LOCAL_CACHE.get());
-            AjaxResult<List<HistoricTaskInstance>> result = julietFlowClient.forwardV2(nodeFieldDTO);
-            if (result == null || result.getCode() == null || result.getCode() != 200) {
-                log.error("juliet flow forward error! response:{}", result);
-                throw new RuntimeException("juliet flow forward error!");
-            }
-            return result.getData();
-        } finally {
-            clean();
-        }
-    }
-
-
-    public static List<HistoricTaskInstance> forward(Long processedBy) {
-        if (processedBy == null || processedBy == 0L) {
-            throw new ServiceException("实际操作人不可以为空，如果实际操作人就是节点操作人的话请调用无参forward方法");
-        }
         try {
             NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
             Map<String, Object> data = LOCAL_CACHE.get();
             if (data == null) {
                 data = new HashMap<>();
             }
-            data.put("actualOperator", processedBy);
+            data.put("actualOperator", nodeFieldDTO.getUserId());
             nodeFieldDTO.setData(LOCAL_CACHE.get());
             AjaxResult<List<HistoricTaskInstance>> result = julietFlowClient.forwardV2(nodeFieldDTO);
             if (result == null || result.getCode() == null || result.getCode() != 200) {

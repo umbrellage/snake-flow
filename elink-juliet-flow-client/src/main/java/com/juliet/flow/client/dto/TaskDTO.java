@@ -20,4 +20,8 @@ public class TaskDTO {
     private Long localUser;
     private Long supplierId;
     private List<Long> postIdList;
+    /**
+     * 共享操作人
+     */
+    private List<Long> shareUserIdList;
 }
