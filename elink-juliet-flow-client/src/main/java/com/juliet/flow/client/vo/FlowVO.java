@@ -64,7 +64,11 @@ public class FlowVO implements Serializable {
     private List<String> flowCustomerStatus;*/
 
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
+        return userExecutorInfo(Collections.singletonList(userId), postIdList, supplierId);
+    }
 
+
+    public UserExecutor userExecutorInfo(List<Long> userIdList, List<Long> postIdList, Long supplierId) {
         UserExecutor executor = new UserExecutor();
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         List<NodeVO> allNodeList = new ArrayList<>();
@@ -79,7 +83,7 @@ public class FlowVO implements Serializable {
         allNodeList.forEach(nodeVO -> {
             // 可编辑：
             // 1. 当前用户所属节点已经激活为可编辑
-            if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 3)) {
+            if (userIdList.contains(nodeVO.getProcessedBy()) && (nodeVO.getStatus() == 3)) {
                 executor.setCanEdit(true);
             }
             // 2. 属于该岗位下，节点未被认领
@@ -110,22 +114,22 @@ public class FlowVO implements Serializable {
 
             // 未来可办
             // 1. 节点操作人为该用户，但未被激活
-            if (Objects.equals(nodeVO.getProcessedBy(), userId) && (nodeVO.getStatus() == 1)) {
+            if (userIdList.contains(nodeVO.getProcessedBy()) && (nodeVO.getStatus() == 1)) {
                 executor.setWillEdit(true);
             }
             // 2. 用户属于该节点的岗位下，但未激活
             if (samePostId && nodeVO.getStatus() == 1) {
                 executor.setWillEdit(true);
             }
-            if (nodeVO.getStatus() == 4 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
+            if (nodeVO.getStatus() == 4 && userIdList.contains(nodeVO.getProcessedBy())) {
                 userDoneNodeList.add(nodeVO);
             }
             // 当前可以操作
-            if (nodeVO.getStatus() == 3 && Objects.equals(nodeVO.getProcessedBy(), userId)) {
+            if (nodeVO.getStatus() == 3 && userIdList.contains(nodeVO.getProcessedBy())) {
                 executor.setCurrentOperator(true);
             }
             // 调整操作人
-            executor.setAdjustOperator(adjustOperator(userId));
+            executor.setAdjustOperator(adjustOperatorAnyMatch(userIdList));
         });
         // 说明该流程为异常流程或者不存在变更的节点，则不允许变更
 //        executor.setCanChange(nodes.stream().anyMatch(nodeVO -> nodeVO != null && nodeVO.getStatus() == 4 && nodeVO.getProcessedBy().equals(userId)));
@@ -138,7 +142,7 @@ public class FlowVO implements Serializable {
             return executor;
         }
 
-        boolean adjustOperator= subFlowList.stream().anyMatch(subFlow -> subFlow.adjustOperator(userId)) || executor.getAdjustOperator();
+        boolean adjustOperator= subFlowList.stream().anyMatch(subFlow -> subFlow.adjustOperatorAnyMatch(userIdList)) || executor.getAdjustOperator();
         executor.setAdjustOperator(adjustOperator);
         boolean canChange = userDoneNodeList.stream()
             .anyMatch(nodeVO -> subFlowList.stream()
@@ -147,6 +151,8 @@ public class FlowVO implements Serializable {
         executor.setCanChange(canChange);
         return executor;
     }
+
+
     /**
      * @param userId
      * @param postIdList
@@ -166,6 +172,13 @@ public class FlowVO implements Serializable {
             .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
             .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
             .anyMatch(nodeVO -> nodeVO.getSupervisorIds().contains(userId));
+    }
+
+    public boolean adjustOperatorAnyMatch(List<Long> userIdList) {
+        return nodes.stream()
+            .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
+            .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
+            .anyMatch(nodeVO -> Collections.disjoint(nodeVO.getSupervisorIds(), userIdList));
     }
 
     public Boolean nodeIsHandled(String nodeName) {
