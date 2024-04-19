@@ -19,6 +19,7 @@ public class GraphNodeVO {
      */
     private String type;
 
+    @Deprecated
     // 1,品牌节点，2， 供应商节点
     private Integer nodeCategory;
 
@@ -63,6 +64,9 @@ public class GraphNodeVO {
         private boolean canAdjustment;
 
         private String nodeId;
+
+        // 1,品牌节点，2， 供应商节点
+        private Integer nodeCategory;
 
         private String currentProcessUserId;
 

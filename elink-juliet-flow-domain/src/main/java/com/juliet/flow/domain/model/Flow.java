@@ -559,6 +559,16 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.PROCESSED);
                 node.setUpdateTime(new Date());
                 node.setProcessedTime(LocalDateTime.now());
+
+                /*
+                 * 流程节点的实际操作人，为什么要加这个呢，
+                 * 因为有个需求，设计师分工配置，节点操作人所在设计师分工配置的组里的所有成员都可以操作这个节点，包括编辑、变更
+                 * 这个需求真的太恶心了
+                 */
+                Object actualOperator = param.get("actualOperator");
+                if (actualOperator != null) {
+                    node.setProcessedBy((Long) actualOperator);
+                }
             }
         });
         // 修改节点消息通知状态
@@ -683,10 +693,10 @@ public class Flow extends BaseModel {
     }
 
     public Node rollback(RollbackDTO dto) {
-        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
-        if (canNotRollback) {
-            throw new ServiceException("该流程不支持退回操作");
-        }
+//        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
+//        if (canNotRollback) {
+//            throw new ServiceException("该流程不支持退回操作");
+//        }
         Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
