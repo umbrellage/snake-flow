@@ -23,5 +23,6 @@ public class TaskDTO {
     /**
      * 共享操作人
      */
+    @Deprecated
     private List<Long> shareUserIdList;
 }
