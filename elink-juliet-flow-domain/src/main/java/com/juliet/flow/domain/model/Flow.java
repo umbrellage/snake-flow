@@ -577,7 +577,7 @@ public class Flow extends BaseModel {
                  */
                 Object actualOperator = param.get("actualOperator");
                 if (actualOperator != null) {
-                    node.setProcessedBy((Long) actualOperator);
+                    node.setProcessedBy(Long.parseLong(actualOperator.toString()));
                 }
             }
         });
