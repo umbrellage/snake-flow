@@ -714,12 +714,11 @@ public class Flow extends BaseModel {
 
     /**
      * 从某个节点回退
-     * @param nodeId
+     * @param node
      * @return
      */
-    public List<Node> rollback(Long nodeId) {
+    public List<Node> rollback(Node node) {
         List<Node> rollbackNodeList = new ArrayList<>();
-        Node node = findNode(nodeId);
         if (node == null) {
             throw new ServiceException("找不到节点信息");
         }
@@ -828,9 +827,17 @@ public class Flow extends BaseModel {
 
     public List<Node> canFlowAutomate(Map<String, Object> automateParam) {
         return getNodes().stream()
-            .filter(e -> e.getFlowAutomateRule() != null)
-            .filter(e -> e.getFlowAutomateRule().flowAutomate(this, automateParam))
             .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .filter(e -> e.getFlowAutomateRule() != null)
+            .filter(e -> e.getFlowAutomateRule().flowAutomate(e,  automateParam))
+            .collect(Collectors.toList());
+    }
+
+    public List<Node> canFlowRollback(Map<String, Object> automateParam) {
+        return getNodes().stream()
+            .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .filter(e -> e.getFlowAutomateRule() != null)
+            .filter(e -> !e.getFlowAutomateRule().flowAutomate(e,  automateParam))
             .collect(Collectors.toList());
     }
 

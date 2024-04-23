@@ -13,6 +13,6 @@ public abstract class FlowAutomateRule {
     public abstract String flowAutomateRuleName();
 
 
-    public abstract boolean flowAutomate(Flow flow, Map<String, Object> automateParam);
+    public abstract boolean flowAutomate(Node node, Map<String, Object> automateParam);
 
 }

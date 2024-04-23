@@ -326,6 +326,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
         Flow flow = flowRepository.queryById(flowId);
+        // TODO: 2024/4/23
         do {
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
             List<Long> nodeIdList = flowAutomateNodeList.stream()
@@ -345,6 +346,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             });
             flow = flowRepository.queryById(flowId);
         } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
+
+        List<Node> rollbackNodeList = flow.canFlowRollback(automateParam);
+
+        for (Node rollbackNode : rollbackNodeList) {
+            flow.rollback(rollbackNode);
+        }
+
     }
 
     @Override

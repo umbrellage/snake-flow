@@ -35,6 +35,4 @@ public final class RuleUtil {
             .anyMatch(list -> list.stream().allMatch(rule -> rule.isMatch(params)));
     }
 
-
-
 }
