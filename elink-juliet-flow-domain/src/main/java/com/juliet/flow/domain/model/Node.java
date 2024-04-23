@@ -141,6 +141,10 @@ public class Node extends BaseModel {
 
     private List<AccessRuleDTO> accessRuleList;
 
+    private List<AccessRuleDTO> forwardRuleList;
+
+    private List<AccessRuleDTO> rollbackRuleList;
+
 
     public boolean ifLeaderAdjust(Long userId) {
         // userId为null或者为0说明不是主管调整处理人，放行不需要校验

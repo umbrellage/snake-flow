@@ -41,6 +41,8 @@ public class NodeDTO {
      */
     private String accessRuleName;
 
+    private String flowAutomateRuleName;
+
     /**
      * 提交规则
      */
@@ -112,5 +114,9 @@ public class NodeDTO {
     private List<AssignmentRuleDTO> assignmentRuleList;
 
     private List<AccessRuleDTO> accessRuleList;
+
+    private List<AccessRuleDTO> forwardRuleList;
+
+    private List<AccessRuleDTO> rollbackRuleList;
 
 }
