@@ -35,6 +35,8 @@ public class NodeVO implements Serializable {
      */
     private String code;
 
+    private String titleId;
+
     private String title;
 
     private String name;

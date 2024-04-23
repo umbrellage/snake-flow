@@ -19,6 +19,11 @@ public class NodeDTO {
 
     private String title;
 
+    /**
+     * 工序的Id，从档案字段来
+     */
+    private Long titleId;
+
     @NotNull
     private String name;
 

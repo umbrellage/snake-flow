@@ -11,20 +11,20 @@ import java.util.Map;
  * @date 2024-04-18
  */
 @Component
-public class FabricStockUseOutQuantityNoAuditAccessRule extends BaseRule {
+public class AccessoryStockUseOutAmountAuditAccessRule extends BaseRule {
 
     @Override
     public String getRuleName() {
-        return "fabric_stock_use_out_quantity_no_audit";
+        return "accessory_stock_use_out_amount_audit";
     }
 
     @Override
     public boolean accessRule(Map<String, Object> params, Long nodeId) {
-        Object objQuantity = params.get("quantity");
+        Object objQuantity = params.get("amount");
         if (objQuantity == null) {
-            return false;
+            return true;
         }
         BigDecimal quantity = new BigDecimal(objQuantity.toString());
-        return quantity.compareTo(new BigDecimal("100")) < 0;
+        return quantity.compareTo(new BigDecimal("1000")) >= 0;
     }
 }
