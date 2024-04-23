@@ -584,9 +584,11 @@ public class Flow extends BaseModel {
                  * 因为有个需求，设计师分工配置，节点操作人所在设计师分工配置的组里的所有成员都可以操作这个节点，包括编辑、变更
                  * 这个需求真的太恶心了
                  */
-                Object actualOperator = param.get("actualOperator");
-                if (actualOperator != null) {
-                    node.setProcessedBy(Long.parseLong(actualOperator.toString()));
+                if (param != null) {
+                    Object actualOperator = param.get("actualOperator");
+                    if (actualOperator != null) {
+                        node.setProcessedBy(Long.parseLong(actualOperator.toString()));
+                    }
                 }
             }
         });
