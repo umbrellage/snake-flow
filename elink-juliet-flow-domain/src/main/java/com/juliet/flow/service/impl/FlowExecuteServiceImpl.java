@@ -90,7 +90,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Long flowId = flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
-        dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
         if (dbFlow.isEnd()) {
             dbFlow.setStatus(FlowStatusEnum.END);
@@ -114,7 +114,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Long flowId = flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
-        dbFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
         if (dbFlow.isEnd()) {
             dbFlow.setStatus(FlowStatusEnum.END);
@@ -439,7 +439,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         newFlow.cleanParentId();
         Node executeNode = newFlow.findNode(node.getName());
         newFlow.modifyNodeStatus(executeNode);
-        newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getParam());
+        newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getUserId(), redo.getParam());
         Long newFlowId = flowRepository.add(newFlow);
         newFlow = flowRepository.queryById(newFlowId);
 
@@ -768,7 +768,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         log.info("mamba new subFlow:{}", JSON.toJSONString(subFlow));
         subFlow.modifyNodeStatus(node);
         Node subNode = subFlow.findNode(node.getName());
-        subFlow.modifyNextNodeStatus(subNode.getId(), dto.getData());
+        subFlow.modifyNextNodeStatus(subNode.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
 
         flowRepository.add(subFlow);
@@ -796,7 +796,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
-        flow.modifyNextNodeStatus(node.getId(), dto.getData());
+        flow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, flow);
         if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                 .allMatch(Flow::isEnd))) {
@@ -844,7 +844,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
             throw new ServiceException("该节点未被认领");
         }
-        errorFlow.modifyNextNodeStatus(node.getId(), dto.getData());
+        errorFlow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, errorFlow);
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
