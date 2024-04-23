@@ -329,12 +329,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         do {
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
             List<Long> nodeIdList = flowAutomateNodeList.stream()
-                    .map(Node::getId)
-                    .collect(Collectors.toList());
+                .map(Node::getId)
+                .collect(Collectors.toList());
             flow.getNodes()
-                    .stream()
-                    .filter(e -> nodeIdList.contains(e.getId()))
-                    .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
+                .stream()
+                .filter(e -> nodeIdList.contains(e.getId()))
+                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
             flowRepository.update(flow);
             flowAutomateNodeList.forEach(node -> {
                 NodeFieldDTO fieldDTO = new NodeFieldDTO();
