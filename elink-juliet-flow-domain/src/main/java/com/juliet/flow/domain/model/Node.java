@@ -47,9 +47,12 @@ public class Node extends BaseModel {
     private Long id;
 
     private String externalNodeId;
+
     private Long flowId;
 
     private Long mainFlowId;
+
+    private Long titleId;
 
     private String title;
 
@@ -477,6 +480,7 @@ public class Node extends BaseModel {
         data.setId(id);
         data.setName(name);
         data.setExternalNodeId(externalNodeId);
+        data.setTitleId(titleId == null ? null : String.valueOf(titleId));
         data.setTitle(title);
         data.setFlowId(flowId);
         data.setPreName(preName);
@@ -531,6 +535,7 @@ public class Node extends BaseModel {
     public Node copyNode() {
         Node node = new Node();
         node.id = IdGenerator.getId();
+        node.titleId = titleId;
         node.title = title;
         node.customStatus = customStatus;
         node.externalNodeId = externalNodeId;

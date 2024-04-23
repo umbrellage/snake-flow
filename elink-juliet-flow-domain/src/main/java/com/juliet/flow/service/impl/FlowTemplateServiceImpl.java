@@ -115,6 +115,7 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         log.info("nodeDTO:{}", JSON.toJSONString(nodeDTO));
         Node node = new Node();
         node.setId(nodeDTO.getId() == null ? null : Long.valueOf(nodeDTO.getId()));
+        node.setTitleId(nodeDTO.getTitleId());
         node.setTitle(nodeDTO.getTitle());
         node.setName(nodeDTO.getName());
         node.setRuleList(nodeDTO.getAssignmentRuleList());

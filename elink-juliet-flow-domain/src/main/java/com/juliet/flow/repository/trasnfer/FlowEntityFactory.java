@@ -269,6 +269,7 @@ public class FlowEntityFactory {
             node.setId(IdGenerator.getId());
         }
         nodeEntity.setId(node.getId());
+        nodeEntity.setTitleId(node.getTitleId());
         nodeEntity.setTitle(node.getTitle());
         nodeEntity.setExternalNodeId(node.getExternalNodeId());
         nodeEntity.setRuleList(JSON.toJSONString(node.getRuleList()));
@@ -338,6 +339,7 @@ public class FlowEntityFactory {
         Node node = new Node();
         node.setId(nodeEntity.getId());
         node.setFlowId(nodeEntity.getFlowId());
+        node.setTitleId(nodeEntity.getTitleId());
         node.setTitle(nodeEntity.getTitle());
         node.setName(nodeEntity.getName());
         node.setExternalNodeId(nodeEntity.getExternalNodeId());
