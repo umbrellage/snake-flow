@@ -285,6 +285,11 @@ public class Flow extends BaseModel {
                 node.getStatus() == NodeStatusEnum.IGNORE);
     }
 
+    /**
+     * 递归获取前置节点
+     * @param name
+     * @return
+     */
     public List<Node> recursionGetPreNode(String name) {
         List<Node> nodeList = new ArrayList<>();
         Node node = findNode(name);
@@ -463,6 +468,10 @@ public class Flow extends BaseModel {
             ignoreEqualAfterNode(node);
         }
     }
+
+
+
+
 
     /**
      * 通知待办列表
@@ -702,6 +711,67 @@ public class Flow extends BaseModel {
         return notifyNodeList;
     }
 
+
+    /**
+     * 从某个节点回退
+     * @param nodeId
+     * @return
+     */
+    public List<Node> rollback(Long nodeId) {
+        List<Node> rollbackNodeList = new ArrayList<>();
+        Node node = findNode(nodeId);
+        if (node == null) {
+            throw new ServiceException("找不到节点信息");
+        }
+        if (node.getType() == NodeTypeEnum.START) {
+            throw new ServiceException("开始节点无法退回");
+        }
+        List<String> preNameList = node.preNameList();
+        preNameList.forEach(preName -> {
+            Node preNode = findNode(preName);
+            rollbackNodeList.add(preNode);
+            rollbackToNode(preNode);
+        });
+        return rollbackNodeList;
+    }
+
+    /**
+     * 回退到某个节点
+     * @param node
+     */
+    public void rollbackToNode(Node node) {
+        if (node.getStatus() == NodeStatusEnum.PROCESSED) {
+            node.setStatus(NodeStatusEnum.ACTIVE);
+        }
+        List<String> nextNameList = node.nextNameList();
+        nextNameList.forEach(nextName -> {
+            Node nextNode = findNode(nextName);
+            recursionRollbackNode(nextNode);
+        });
+
+    }
+
+
+    /**
+     * 回退后递归修改流程状态
+     * @param node
+     */
+    public void recursionRollbackNode(Node node) {
+        if (node.getStatus() == NodeStatusEnum.PROCESSED ||
+            node.getStatus() == NodeStatusEnum.ACTIVE ||
+            node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+            node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+        }
+        List<String> nextNameList = node.nextNameList();
+        nextNameList.forEach(nextName -> {
+            Node nextNode = findNode(nextName);
+            recursionRollbackNode(nextNode);
+        });
+    }
+
+
+
+
     public Node rollback(RollbackDTO dto) {
 //        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
 //        if (canNotRollback) {
@@ -734,24 +804,6 @@ public class Flow extends BaseModel {
             return startNode();
         }
         return null;
-//        // 上一个节点
-//        if (dto.getRollbackType() == 0) {
-//            boolean canNotRollback = node.preNameList().stream()
-//                .map(this::findNode)
-//                .anyMatch(preNode -> preNode.nextNameList().size() > 1);
-//            if (canNotRollback) {
-//                throw new ServiceException("当退回的节点的后置节点存在多个时，不可以回退");
-//            }
-//            node.preNameList().stream()
-//                .map(this::findNode)
-//                .forEach(preNode -> {
-//                    if (preNode.getStatus() == NodeStatusEnum.PROCESSED) {
-//                        preNode.setStatus(NodeStatusEnum.ACTIVE);
-//                    }
-//                });
-//            node.setStatus(NodeStatusEnum.NOT_ACTIVE);
-//            return;
-//        }
 
     }
 
