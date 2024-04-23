@@ -210,7 +210,10 @@ public class Node extends BaseModel {
             .filter(node -> StringUtils.equals(node.getExternalNodeId(), distributeNode) ||
                 StringUtils.equals(node.getName(), distributeNode))
             .findAny()
-            .ifPresent(node -> this.processedBy = node.getProcessedBy());
+            .ifPresent(node -> {
+                this.processedBy = node.getProcessedBy();
+                this.processedTime = LocalDateTime.now();
+            });
     }
 
     public NotifyDTO toNotifyNormal(Flow flow) {
