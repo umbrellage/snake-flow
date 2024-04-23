@@ -161,8 +161,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         return node.toNodeVo(flow);
     }
 
+    @Deprecated
     @Override
     public NodeVO node(TaskDTO dto) {
+        // TODO: 2024/4/23 重写
         Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
             return null;
