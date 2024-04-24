@@ -98,6 +98,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowRepository.update(dbFlow);
         List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
         historyRepository.add(forwardHistory);
+
+        // 流程流转完执行自动流转功能
+        flowAutomate(flowId, dto.getData());
         callback(dbFlow.normalNotifyList());
         return flow.getId();
     }
@@ -122,6 +125,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowRepository.update(dbFlow);
         List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
         historyRepository.add(forwardHistory);
+
+        // 流程流转完执行自动流转功能
+        flowAutomate(flowId, dto.getData());
         callback(dbFlow.normalNotifyList());
 
         return forwardHistory.stream()
@@ -697,6 +703,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                     dto.getData());
             historicTaskInstanceList.addAll(taskInstances);
         }
+
+        // 每次流程流转后执行下自动流程流转
+        flowAutomate(dto.getFlowId(), dto.getData());
 
         return historicTaskInstanceList.stream()
                 .distinct()

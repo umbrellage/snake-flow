@@ -24,6 +24,7 @@ public interface JulietFlowClient {
     @PostMapping("/open")
     AjaxResult<NodeVO> open(@RequestBody FlowOpenDTO dto);
 
+    @Deprecated
     @PostMapping("/bpm/forward")
     AjaxResult<Void> forward(@RequestBody NodeFieldDTO dto);
 
@@ -55,6 +56,7 @@ public interface JulietFlowClient {
      * @param dto templateId 必填
      * @return 流程实例id
      */
+    @Deprecated
     @PostMapping("/init/bpm")
     AjaxResult<Long> initBmp(@RequestBody BpmDTO dto);
 

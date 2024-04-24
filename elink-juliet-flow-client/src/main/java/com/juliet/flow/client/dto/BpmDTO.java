@@ -23,4 +23,11 @@ public class BpmDTO {
     private Long tenantId;
 
     private Map<String, Object> data  = new HashMap<>();
+
+    public Map<String, Object> getData() {
+        if (data == null) {
+            return new HashMap<>();
+        }
+        return data;
+    }
 }
