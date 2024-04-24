@@ -704,9 +704,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             historicTaskInstanceList.addAll(taskInstances);
         }
 
-        // 每次流程流转后执行下自动流程流转
-        flowAutomate(dto.getFlowId(), dto.getData());
-
         return historicTaskInstanceList.stream()
                 .distinct()
                 .collect(Collectors.toList());

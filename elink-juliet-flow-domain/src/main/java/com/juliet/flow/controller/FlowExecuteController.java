@@ -72,6 +72,8 @@ public class FlowExecuteController implements JulietFlowClient {
     @Override
     public AjaxResult<Void> forward(NodeFieldDTO dto) {
         flowExecuteService.forward(dto);
+        // TODO: 2024/4/24 事务问题暂时先放这，为什么不放下一层呢，因为会有问题，先这样
+        flowExecuteService.flowAutomate(dto.getFlowId(), dto.getData());
         return AjaxResult.success();
     }
 
@@ -80,6 +82,8 @@ public class FlowExecuteController implements JulietFlowClient {
     public AjaxResult<List<HistoricTaskInstance>> forwardV2(NodeFieldDTO dto) {
         log.info("mamba param:{}", JSON.toJSONString(dto));
         List<HistoricTaskInstance> instanceList = flowExecuteService.forward(dto);
+        // TODO: 2024/4/24 事务问题暂时先放这，为什么不放下一层呢，因为会有问题，先这样
+        flowExecuteService.flowAutomate(dto.getFlowId(), dto.getData());
         return AjaxResult.success(instanceList);
     }
 
