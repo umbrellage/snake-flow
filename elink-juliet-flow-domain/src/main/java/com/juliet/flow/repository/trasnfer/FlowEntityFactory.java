@@ -304,6 +304,8 @@ public class FlowEntityFactory {
         nodeEntity.setUpdateTime(node.getProcessedTime() == null ? now : JulietTimeMemo.toDate(node.getProcessedTime()));
         nodeEntity.setModifyOtherTodoName(node.getModifyOtherTodoName());
         nodeEntity.setFlowAutomateRuleName(node.getFlowAutomateRuleName());
+        nodeEntity.setRollbackRuleList(JSON.toJSONString(node.getRollbackRuleList()));
+        nodeEntity.setForwardRuleList(JSON.toJSONString(node.getForwardRuleList()));
         nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
 
         return nodeEntity;
@@ -373,6 +375,8 @@ public class FlowEntityFactory {
         node.setActiveRule(RuleFactory.activeRule(nodeEntity.getModifyOtherTodoName()));
         node.setTodoNotify(TodoNotifyEnum.of(nodeEntity.getTodoNotify()));
         node.setFlowAutomateRuleName(nodeEntity.getFlowAutomateRuleName());
+        node.setForwardRuleList(JSON.parseArray(nodeEntity.getForwardRuleList(), AccessRuleDTO.class));
+        node.setRollbackRuleList(JSON.parseArray(nodeEntity.getRollbackRuleList(), AccessRuleDTO.class));
         node.setModifyOtherTodoName(nodeEntity.getModifyOtherTodoName());
         node.setFlowAutomateRule(RuleFactory.flowAutomateRule(nodeEntity.getFlowAutomateRuleName()));
         return node;

@@ -102,6 +102,10 @@ public class NodeEntity extends BaseEntity {
 
     private String accessRuleList;
 
+    private String forwardRuleList;
+
+    private String rollbackRuleList;
+
     /**
      * 规则自动流转的规则名称
      */

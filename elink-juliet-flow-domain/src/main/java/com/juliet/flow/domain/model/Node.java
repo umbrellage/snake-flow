@@ -594,6 +594,9 @@ public class Node extends BaseModel {
         node.setProcessedTime(processedTime);
         node.modifyOtherTodoName = modifyOtherTodoName;
         node.accessRuleList = accessRuleList;
+        node.flowAutomateRuleName = flowAutomateRuleName;
+        node.forwardRuleList = forwardRuleList;
+        node.rollbackRuleList = rollbackRuleList;
         node.ruleList = ruleList;
         return node;
     }
