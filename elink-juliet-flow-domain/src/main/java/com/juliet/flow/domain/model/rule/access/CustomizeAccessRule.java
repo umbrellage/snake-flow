@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model.rule.access;
 
 import com.juliet.flow.client.common.ConditionTypeEnum;
+import com.juliet.flow.client.common.CustomizeRuleEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.common.utils.RuleUtil;
@@ -25,7 +26,7 @@ public class CustomizeAccessRule extends BaseRule {
 
     @Override
     public String getRuleName() {
-        return "customize_access_rule";
+        return CustomizeRuleEnum.ACCESS_RULE.getCode();
     }
 
     @Override

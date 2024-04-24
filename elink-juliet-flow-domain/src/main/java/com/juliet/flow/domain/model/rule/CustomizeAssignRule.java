@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model.rule;
 
 import com.juliet.flow.client.common.ConditionTypeEnum;
+import com.juliet.flow.client.common.CustomizeRuleEnum;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.client.dto.Selection;
@@ -25,7 +26,7 @@ public class CustomizeAssignRule extends BaseAssignRule {
 
     @Override
     public String getRuleName() {
-        return "assignment_rule";
+        return CustomizeRuleEnum.CUSTOMIZE_ASSIGN.getCode();
     }
 
     @Override

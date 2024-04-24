@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model.rule.automate;
 
+import com.juliet.flow.client.common.CustomizeRuleEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.common.utils.RuleUtil;
 import com.juliet.flow.constant.FlowConstant;
@@ -21,7 +22,7 @@ public class CustomizeFlowAutomateRule extends FlowAutomateRule {
 
     @Override
     public String flowAutomateRuleName() {
-        return "customize_flow_automate";
+        return CustomizeRuleEnum.CUSTOMIZE_FLOW_AUTOMATE.getCode();
     }
 
     @Override
