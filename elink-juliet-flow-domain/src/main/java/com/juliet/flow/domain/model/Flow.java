@@ -693,12 +693,7 @@ public class Flow extends BaseModel {
 
     /**
      * 从某个节点回退
-<<<<<<< HEAD
      * @param node
-=======
-     *
-     * @param nodeId
->>>>>>> 5bb906bab4ba84ee6f73f8f406cc966214ea7654
      * @return
      */
     public List<Node> rollback(Node node) {
