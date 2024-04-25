@@ -3,6 +3,7 @@ package com.juliet.flow.client.vo;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
+import java.io.Serializable;
 import lombok.Data;
 
 import java.util.List;
@@ -14,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
  * @date 2023-06-19
  */
 @Data
-public class GraphVO {
+public class GraphVO implements Serializable {
 
     private List<GraphNodeVO> nodes;
 
