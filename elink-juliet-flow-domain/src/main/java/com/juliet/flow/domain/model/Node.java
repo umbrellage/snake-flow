@@ -20,6 +20,7 @@ import com.juliet.flow.domain.entity.NodeEntity;
 
 import io.swagger.annotations.ApiModelProperty;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -73,7 +74,7 @@ public class Node extends BaseModel {
 
     private NodeTypeEnum type;
 
-    private List<Post> bindPosts;
+    private List<Post> bindPosts = new ArrayList<>();
 
     private List<Supplier> bindSuppliers;
     /**
