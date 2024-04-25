@@ -306,10 +306,6 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean canEdit(GraphNodeVO graphNodeVO, Flow flow, Long userId, List<Long> postIdList) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
-        if (CollectionUtils.isEmpty(subList)) {
-            subList = new ArrayList<>();
-        }
-        subList.add(flow);
         Node currentNode = flow.getNodes()
             .stream()
             .filter(node -> isNodeMatched(node, graphNodeVO))
@@ -319,6 +315,12 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (currentNode == null) {
             return false;
         }
+        List<Long> bindPostIdList = currentNode.getBindPosts().stream()
+            .filter(Objects::nonNull)
+            .map(Post::getPostId)
+            .filter(Objects::nonNull)
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
         List<Node> allSubNodeList = subList.stream()
             .map(Flow::getNodes)
             .flatMap(Collection::stream)
@@ -326,18 +328,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             .collect(Collectors.toList());
         allSubNodeList.add(currentNode);
 
+
         return allSubNodeList.stream()
             .anyMatch(node -> {
-                List<Long> bindPostIdList = new ArrayList<>();
-                if (CollectionUtils.isNotEmpty(node.getBindPosts())) {
-                    bindPostIdList = node.getBindPosts().stream()
-                        .filter(Objects::nonNull)
-                        .map(Post::getPostId)
-                        .filter(Objects::nonNull)
-                        .map(Long::valueOf)
-                        .collect(Collectors.toList());
-                }
-
                 return (node.getStatus() == NodeStatusEnum.ACTIVE && Objects.equals(userId, node.getProcessedBy())) ||
                     (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && Collections.disjoint(postIdList, bindPostIdList));
             });
