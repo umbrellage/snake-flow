@@ -24,18 +24,21 @@ import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -88,13 +91,19 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     @Override
     public GraphVO getGraph(Long id, Long userId) {
-        Flow flow = flowRepository.queryById(id);
+        return getGraph(id, userId, Collections.emptyList());
+    }
+
+    @Override
+    public GraphVO getGraph(Long flowId, Long userId, List<Long> postIdList) {
+        Flow flow = flowRepository.queryById(flowId);
         Map<Long, Node> nodeMap = flow.getNodes().stream()
             .collect(Collectors.toMap(Node::getId, Function.identity()));
-        GraphVO graphVO = getGraph(id);
+        GraphVO graphVO = getGraph(flowId);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
             graphNodeVO.getProperties().setCanAdjustment(canAdjustment(graphNodeVO, flow, userId));
+            graphNodeVO.getProperties().setCanEdit(canEdit(graphNodeVO, flow, userId, postIdList));
             graphNodeVO.getProperties().setCurrentProcessUserId(getCurrentProcessBy(graphNodeVO, flow) != null ? String.valueOf(getCurrentProcessBy(graphNodeVO, flow)) : null);
             Long nodeId = getNodeIdByName(graphNodeVO, flow);
             if (nodeId != null) {
@@ -293,6 +302,41 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
         consumer.accept("未找到可操作节点");
         return false;
+    }
+
+    private boolean canEdit(GraphNodeVO graphNodeVO, Flow flow, Long userId, List<Long> postIdList) {
+        List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
+        Node currentNode = flow.getNodes()
+            .stream()
+            .filter(node -> isNodeMatched(node, graphNodeVO))
+            .findAny()
+            .orElse(null);
+
+        if (currentNode == null) {
+            return false;
+        }
+        List<Node> allSubNodeList = subList.stream()
+            .map(Flow::getNodes)
+            .flatMap(Collection::stream)
+            .filter(subNode -> StringUtils.equals(subNode.getName(), currentNode.getName()))
+            .collect(Collectors.toList());
+        allSubNodeList.add(currentNode);
+
+        return allSubNodeList.stream()
+            .anyMatch(node -> {
+                List<Long> bindPostIdList = new ArrayList<>();
+                if (CollectionUtils.isNotEmpty(node.getBindPosts())) {
+                    bindPostIdList = node.getBindPosts().stream()
+                        .filter(Objects::nonNull)
+                        .map(Post::getPostId)
+                        .filter(Objects::nonNull)
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList());
+                }
+
+                return (node.getStatus() == NodeStatusEnum.ACTIVE && Objects.equals(userId, node.getProcessedBy())) ||
+                    (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && Collections.disjoint(postIdList, bindPostIdList));
+            });
     }
 
     private boolean canAdjustment(GraphNodeVO graphNodeVO, Flow flow, Long userId) {

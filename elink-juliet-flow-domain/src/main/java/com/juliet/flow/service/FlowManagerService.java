@@ -1,6 +1,7 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.client.vo.GraphVO;
+import java.util.List;
 
 /**
  * @author xujianjie
@@ -11,6 +12,8 @@ public interface FlowManagerService {
     GraphVO getGraph(Long id);
 
     GraphVO getGraph(Long id, Long userId);
+
+    GraphVO getGraph(Long flowId, Long userId, List<Long> postIdList);
 
     GraphVO getTemplateGraph(Long templateId, String templateCode);
 }

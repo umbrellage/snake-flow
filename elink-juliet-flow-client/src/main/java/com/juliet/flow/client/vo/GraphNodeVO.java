@@ -54,7 +54,9 @@ public class GraphNodeVO {
          * 是否禁用
          */
         private Boolean disabled;
-
+        /**
+         * 可以变更
+         */
         private boolean canClick;
 
         private boolean canClickError;
@@ -64,6 +66,8 @@ public class GraphNodeVO {
         private boolean canAdjustment;
 
         private String nodeId;
+
+        private boolean canEdit;
 
         // 1,品牌节点，2， 供应商节点
         private Integer nodeCategory;

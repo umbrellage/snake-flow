@@ -418,6 +418,14 @@ public class Node extends BaseModel {
         return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
     }
 
+    /**
+     *
+     * @return
+     */
+    public boolean nodeCanEdit() {
+        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
+    }
+
 
 
     /**

@@ -6,6 +6,7 @@ import com.juliet.flow.client.dto.RollbackDTO;
 import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.vo.FlowVO;
 
+import com.juliet.flow.client.vo.GraphVO;
 import java.util.List;
 
 /**
@@ -17,4 +18,6 @@ public interface JulietFlowService {
     List<FlowVO> flowList(FlowIdListDTO dto);
 
     List<HistoricTaskInstance> rollback(RollbackDTO dto);
+
+    GraphVO graph(Long flowId, Long userId, List<Long> postIdList);
 }
