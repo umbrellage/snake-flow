@@ -809,7 +809,7 @@ public class Flow extends BaseModel {
             .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
             .filter(e -> StringUtils.isNotBlank(e.getFlowAutomateRuleName()))
             .filter(e -> e.getFlowAutomateRule() != null)
-            .filter(e -> e.getFlowAutomateRule().flowAutomate(e,  automateParam))
+            .filter(e -> e.getFlowAutomateRule().flowAutomateForward(e,  automateParam))
             .collect(Collectors.toList());
     }
 
@@ -817,7 +817,7 @@ public class Flow extends BaseModel {
         return getNodes().stream()
             .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
             .filter(e -> e.getFlowAutomateRule() != null)
-            .filter(e -> !e.getFlowAutomateRule().flowAutomate(e,  automateParam))
+            .filter(e -> !e.getFlowAutomateRule().flowAutomateRollback(e,  automateParam))
             .collect(Collectors.toList());
     }
 

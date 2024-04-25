@@ -25,9 +25,16 @@ public class CustomizeFlowAutomateRule extends FlowAutomateRule {
         return CustomizeRuleEnum.CUSTOMIZE_FLOW_AUTOMATE.getCode();
     }
 
+
     @Override
-    public boolean flowAutomate(Node node, Map<String, Object> automateParam) {
-        List<AccessRuleDTO> ruleList = node.getAccessRuleList();
+    public boolean flowAutomateRollback(Node node, Map<String, Object> automateParam) {
+        List<AccessRuleDTO> ruleList = node.getRollbackRuleList();
+        return ruleList.stream().allMatch(e -> RuleUtil.matchRule(automateParam, e.getRules()));
+    }
+
+    @Override
+    public boolean flowAutomateForward(Node node, Map<String, Object> automateParam) {
+        List<AccessRuleDTO> ruleList = node.getForwardRuleList();
         return ruleList.stream().allMatch(e -> RuleUtil.matchRule(automateParam, e.getRules()));
     }
 }
