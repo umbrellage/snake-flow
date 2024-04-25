@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import java.io.Serializable;
 import java.util.List;
 import lombok.Data;
 
@@ -8,7 +9,7 @@ import lombok.Data;
  * @date 2023-06-19
  */
 @Data
-public class GraphNodeVO {
+public class GraphNodeVO implements Serializable {
 
     private String id;
 
@@ -32,7 +33,7 @@ public class GraphNodeVO {
     private Text text;
 
     @Data
-    public static class Properties {
+    public static class Properties implements Serializable{
 
         private String text;
 
@@ -88,7 +89,7 @@ public class GraphNodeVO {
     }
 
     @Data
-    public static class Text {
+    public static class Text implements Serializable {
 
         private Integer x;
 

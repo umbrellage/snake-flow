@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import java.io.Serializable;
 import lombok.Data;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
  * @date 2023-06-19
  */
 @Data
-public class GraphEdgeVO {
+public class GraphEdgeVO implements Serializable {
 
     private String id;
 
@@ -28,14 +29,14 @@ public class GraphEdgeVO {
     private List<PointVO> pointsList;
 
     @Data
-    public static class PointVO {
+    public static class PointVO implements Serializable {
 
         private Integer x;
 
         private Integer y;
     }
     @Data
-    public static class Property {
+    public static class Property implements Serializable{
         private boolean activated;
     }
 
