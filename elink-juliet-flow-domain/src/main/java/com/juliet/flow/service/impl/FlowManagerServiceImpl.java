@@ -332,7 +332,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         return allSubNodeList.stream()
             .anyMatch(node -> {
                 return (node.getStatus() == NodeStatusEnum.ACTIVE && Objects.equals(userId, node.getProcessedBy())) ||
-                    (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && Collections.disjoint(postIdList, bindPostIdList));
+                    (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && !Collections.disjoint(postIdList, bindPostIdList));
             });
     }
 
