@@ -167,6 +167,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         return node.toNodeVo(flow);
     }
 
+    public NodeVO nodeNew(TaskDTO dto) {
+
+
+
+
+        return null;
+    }
+
     @Deprecated
     @Override
     public NodeVO node(TaskDTO dto) {

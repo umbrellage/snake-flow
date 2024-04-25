@@ -306,6 +306,10 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean canEdit(GraphNodeVO graphNodeVO, Flow flow, Long userId, List<Long> postIdList) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
+        if (CollectionUtils.isEmpty(subList)) {
+            subList = new ArrayList<>();
+        }
+        subList.add(flow);
         Node currentNode = flow.getNodes()
             .stream()
             .filter(node -> isNodeMatched(node, graphNodeVO))
