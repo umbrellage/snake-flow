@@ -3,6 +3,7 @@ package com.juliet.flow.client.dto;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.OperateTypeEnum;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import lombok.Data;
 
@@ -13,7 +14,7 @@ import lombok.Data;
  * @date 2023/8/22
  */
 @Data
-public class HistoricTaskInstance implements TaskInfo, HistoricData{
+public class HistoricTaskInstance implements TaskInfo, HistoricData, Serializable {
 
     private Long historyId;
     private Long flowId;
