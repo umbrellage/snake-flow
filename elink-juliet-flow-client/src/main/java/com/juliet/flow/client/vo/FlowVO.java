@@ -240,6 +240,23 @@ public class FlowVO implements Serializable {
     }
 
     /**
+     * 当前可认领的岗位Id
+     */
+    public List<Long> processedPostIdList() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()) &&
+                        CollectionUtils.isNotEmpty(nodeVO.getBindPosts()))
+                .map(NodeVO::getBindPosts)
+                .flatMap(Collection::stream)
+                .filter(postVO -> StringUtils.isNotBlank(postVO.getPostId()) && !"-1".equals(postVO.getPostId()))
+                .map(postVO -> Long.valueOf(postVO.getPostId()))
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    /**
      * 当前可以认领的岗位
      */
     public List<Long> tobeClaimedPost() {
@@ -268,6 +285,32 @@ public class FlowVO implements Serializable {
      */
     public List<NodeVO> canDoNodeList() {
         return nodeList(TodoNotifyEnum.NO_NOTIFY);
+    }
+
+    /**
+     * 完成/已忽略的节点
+     */
+    public List<NodeVO> doneNodeList() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
+                        Arrays.asList(NodeStatusEnum.PROCESSED.getCode(), NodeStatusEnum.IGNORE.getCode()).contains(nodeVO.getStatus()))
+                .collect(collectingAndThen(toCollection(() ->
+                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+    }
+
+    /**
+     * 不活跃的节点，不可办的节点
+     */
+    public List<NodeVO> notActiveNodeList() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
+                        Arrays.asList(NodeStatusEnum.PROCESSED.getCode(), NodeStatusEnum.IGNORE.getCode(), NodeStatusEnum.NOT_ACTIVE.getCode()).contains(nodeVO.getStatus()))
+                .collect(collectingAndThen(toCollection(() ->
+                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
     }
 
     private List<NodeVO> nodeList(TodoNotifyEnum todoNotify) {
