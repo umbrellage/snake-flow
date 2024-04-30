@@ -2,20 +2,18 @@ package com.juliet.flow.client.vo;
 
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NodeStatusEnum;
-import com.juliet.flow.client.common.OperateTypeEnum;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import java.io.Serializable;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toCollection;
 
 /**
  * FlowVO
@@ -74,10 +72,10 @@ public class FlowVO implements Serializable {
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         List<NodeVO> allNodeList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(subFlowList)) {
-            allNodeList= subFlowList.stream()
-                .map(FlowVO::getNodes)
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
+            allNodeList = subFlowList.stream()
+                    .map(FlowVO::getNodes)
+                    .flatMap(Collection::stream)
+                    .collect(Collectors.toList());
         }
 
         allNodeList.addAll(nodes);
@@ -91,10 +89,10 @@ public class FlowVO implements Serializable {
             List<Long> postIds = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(nodeVO.getBindPosts())) {
                 postIds = nodeVO.getBindPosts().stream()
-                    .map(PostVO::getPostId)
-                    .filter(Objects::nonNull)
-                    .map(Long::valueOf)
-                    .collect(Collectors.toList());
+                        .map(PostVO::getPostId)
+                        .filter(Objects::nonNull)
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList());
             }
             boolean samePostId = !Collections.disjoint(postIdList, postIds) || postIds.stream().anyMatch(postId -> postId == -1);
             if (samePostId && nodeVO.getStatus() == 2) {
@@ -104,9 +102,9 @@ public class FlowVO implements Serializable {
             List<Long> supplierIdList = new ArrayList<>();
             if (CollectionUtils.isNotEmpty(nodeVO.getBindSuppliers())) {
                 supplierIdList = nodeVO.getBindSuppliers().stream()
-                    .map(SupplierVO::getSupplierId)
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toList());
+                        .map(SupplierVO::getSupplierId)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toList());
             }
             boolean isSupplier = supplierIdList.contains(supplierId);
             if (isSupplier && nodeVO.getStatus() == 2 && supplierId != null) {
@@ -143,12 +141,12 @@ public class FlowVO implements Serializable {
             return executor;
         }
 
-        boolean adjustOperator= subFlowList.stream().anyMatch(subFlow -> subFlow.adjustOperatorAnyMatch(userIdList)) || executor.getAdjustOperator();
+        boolean adjustOperator = subFlowList.stream().anyMatch(subFlow -> subFlow.adjustOperatorAnyMatch(userIdList)) || executor.getAdjustOperator();
         executor.setAdjustOperator(adjustOperator);
         boolean canChange = userDoneNodeList.stream()
-            .anyMatch(nodeVO -> subFlowList.stream()
-                .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
-            );
+                .anyMatch(nodeVO -> subFlowList.stream()
+                        .allMatch(flowVO -> flowVO.nodeIsHandled(nodeVO.getName()))
+                );
         executor.setCanChange(canChange);
         return executor;
     }
@@ -160,33 +158,34 @@ public class FlowVO implements Serializable {
      * @return 1. 可办
      */
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList) {
-       return userExecutorInfo(userId, postIdList, null);
+        return userExecutorInfo(userId, postIdList, null);
     }
 
     /**
      * 可分配
+     *
      * @param userId
      * @return
      */
     public boolean adjustOperator(Long userId) {
         return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
-            .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
-            .anyMatch(nodeVO -> nodeVO.getSupervisorIds().contains(userId));
+                .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
+                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
+                .anyMatch(nodeVO -> nodeVO.getSupervisorIds().contains(userId));
     }
 
     public boolean adjustOperatorAnyMatch(List<Long> userIdList) {
         return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
-            .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
-            .anyMatch(nodeVO -> Collections.disjoint(nodeVO.getSupervisorIds(), userIdList));
+                .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
+                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
+                .anyMatch(nodeVO -> Collections.disjoint(nodeVO.getSupervisorIds(), userIdList));
     }
 
     public Boolean nodeIsHandled(String nodeName) {
         NodeVO node = nodes.stream()
-            .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
-            .findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
         return node.getStatus() == 4;
     }
 
@@ -203,17 +202,17 @@ public class FlowVO implements Serializable {
         if (CollectionUtils.isNotEmpty(subFlowList)) {
             subFlowList.add(this);
             return subFlowList.stream().map(FlowVO::getNodes)
-                .flatMap(Collection::stream)
+                    .flatMap(Collection::stream)
+                    .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
+                    .map(NodeVO::getCustomStatus)
+                    .distinct()
+                    .collect(Collectors.toList());
+        }
+        return nodes.stream()
                 .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
                 .map(NodeVO::getCustomStatus)
                 .distinct()
                 .collect(Collectors.toList());
-        }
-        return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
-            .map(NodeVO::getCustomStatus)
-            .distinct()
-            .collect(Collectors.toList());
     }
 
     /**
@@ -223,8 +222,8 @@ public class FlowVO implements Serializable {
      */
     public List<NodeVO> currentNode() {
         return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
-            .collect(Collectors.toList());
+                .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -257,6 +256,31 @@ public class FlowVO implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * 待办列表
+     */
+    public List<NodeVO> todoNodeList() {
+        return nodeList(TodoNotifyEnum.NOTIFY);
+    }
+
+    /**
+     * 可办列表
+     */
+    public List<NodeVO> canDoNodeList() {
+        return nodeList(TodoNotifyEnum.NO_NOTIFY);
+    }
+
+    private List<NodeVO> nodeList(TodoNotifyEnum todoNotify) {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
+                        Objects.equals(nodeVO.getTodoNotify(), todoNotify.getCode()) &&
+                        Arrays.asList(NodeStatusEnum.ACTIVE.getCode(), NodeStatusEnum.TO_BE_CLAIMED.getCode()).contains(nodeVO.getStatus()))
+                .collect(collectingAndThen(toCollection(() ->
+                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+    }
+
     private List<FlowVO> allFlowList() {
         List<FlowVO> allFlowList = new ArrayList<>();
         allFlowList.add(this);
@@ -270,8 +294,8 @@ public class FlowVO implements Serializable {
     public List<NodeSimpleVO> nodeList() {
 
         return nodes.stream()
-            .map(NodeVO::toSimple)
-            .collect(Collectors.toList());
+                .map(NodeVO::toSimple)
+                .collect(Collectors.toList());
     }
 
 }

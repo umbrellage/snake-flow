@@ -102,6 +102,12 @@ public class NodeVO implements Serializable {
      */
     private OperateTypeEnum operateType;
 
+    /**
+     * 1: 待办
+     * 0：可办
+     */
+    private Integer todoNotify;
+
     @JsonSerialize(using = DateTime2String.class)
     @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;

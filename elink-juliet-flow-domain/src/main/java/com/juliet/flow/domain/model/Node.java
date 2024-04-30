@@ -509,6 +509,7 @@ public class Node extends BaseModel {
         data.setCustomStatus(customStatus);
         Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
+        data.setTodoNotify(todoNotify == null ? null : todoNotify.getCode());
         if (CollectionUtils.isNotEmpty(bindPosts)) {
             List<PostVO> postVOList = bindPosts.stream()
                     .map(Post::toPost)
