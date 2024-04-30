@@ -1,5 +1,6 @@
 package com.juliet.flow.client;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
@@ -8,6 +9,7 @@ import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.RedoDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import com.juliet.flow.client.dto.HistoricTaskInstance;
@@ -197,7 +199,10 @@ public class FlowContext {
         dto.setFlowId(String.valueOf(nodeFieldDTO.getFlowId()));
         dto.setNodeId(String.valueOf(nodeFieldDTO.getNodeId()));
         dto.setRollbackType(0);
-        julietFlowClient.rollback(dto);
+        AjaxResult result = julietFlowClient.rollback(dto);
+        if (result == null || !Objects.equals(result.getCode(), 200)) {
+            throw new ServiceException("流程回退到开始失败!" + JSON.toJSONString(reason));
+        }
     }
 
     public static Long submitOnlyFlow() {
