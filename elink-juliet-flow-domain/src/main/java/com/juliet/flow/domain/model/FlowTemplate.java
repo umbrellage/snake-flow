@@ -4,11 +4,9 @@ import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.dto.ProcessConfigRPCDTO;
 import com.juliet.flow.common.enums.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
-import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.stream.Collectors;
 import lombok.Data;
 

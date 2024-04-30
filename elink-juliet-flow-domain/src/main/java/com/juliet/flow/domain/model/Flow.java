@@ -10,7 +10,7 @@ import com.juliet.flow.client.vo.FlowVO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.common.enums.FlowStatusEnum;
-import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.constant.FlowConstant;

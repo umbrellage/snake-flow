@@ -1,18 +1,16 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
-import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
-import com.juliet.flow.client.dto.RuleDTO;
 import com.juliet.flow.client.dto.SupplierDTO;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.client.vo.SupplierVO;
-import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;

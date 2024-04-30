@@ -1,8 +1,7 @@
 package com.juliet.flow.domain.model;
 
-import com.juliet.flow.common.enums.NodeStatusEnum;
-import java.util.Collection;
-import java.util.Collections;
+import com.juliet.flow.client.common.NodeStatusEnum;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Data;

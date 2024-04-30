@@ -1,6 +1,6 @@
 package com.juliet.flow.domain.model.rule.access;
 
-import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.constant.FlowConstant;
 import com.juliet.flow.domain.model.BaseRule;
 import com.juliet.flow.domain.model.Flow;

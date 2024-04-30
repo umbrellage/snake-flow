@@ -1,6 +1,7 @@
 package com.juliet.flow.client.vo;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.OperateTypeEnum;
 
 import java.io.Serializable;
@@ -228,23 +229,41 @@ public class FlowVO implements Serializable {
 
     /**
      * 当前操作人
-     * @return
      */
     public List<Long> processedBy() {
-        if (CollectionUtils.isNotEmpty(subFlowList)) {
-            subFlowList.add(this);
-            return subFlowList.stream().map(FlowVO::getNodes)
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
                 .filter(nodeVO -> nodeVO.getStatus() == 3)
                 .map(NodeVO::getProcessedBy)
                 .distinct()
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 当前可以认领的岗位
+     */
+    public List<Long> tobeClaimedPost() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> nodeVO.getBindPosts() != null && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
+                .map(NodeVO::getBindPosts)
+                .flatMap(Collection::stream)
+                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
+                .map(postVO -> Long.valueOf(postVO.getPostId()))
+                .filter(postId -> postId > 0)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private List<FlowVO> allFlowList() {
+        List<FlowVO> allFlowList = new ArrayList<>();
+        allFlowList.add(this);
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            allFlowList.addAll(subFlowList);
         }
-        return nodes.stream()
-            .filter(nodeVO -> nodeVO.getStatus() == 3)
-            .map(NodeVO::getProcessedBy)
-            .distinct()
-            .collect(Collectors.toList());
+        return allFlowList;
     }
 
 

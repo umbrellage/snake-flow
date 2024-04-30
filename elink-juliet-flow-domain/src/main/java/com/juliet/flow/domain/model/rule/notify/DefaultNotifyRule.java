@@ -1,8 +1,7 @@
 package com.juliet.flow.domain.model.rule.notify;
 
-import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
-import com.juliet.flow.common.enums.NodeStatusEnum;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.domain.model.NotifyRule;
