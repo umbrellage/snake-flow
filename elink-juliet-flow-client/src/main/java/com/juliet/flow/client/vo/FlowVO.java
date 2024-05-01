@@ -240,30 +240,30 @@ public class FlowVO implements Serializable {
     }
 
     /**
-     * 当前可认领的岗位Id
-     */
-    public List<Long> processedPostIdList() {
-        List<FlowVO> allFlowList = allFlowList();
-        return allFlowList.stream().map(FlowVO::getNodes)
-                .flatMap(Collection::stream)
-                .filter(nodeVO -> Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()) &&
-                        CollectionUtils.isNotEmpty(nodeVO.getBindPosts()))
-                .map(NodeVO::getBindPosts)
-                .flatMap(Collection::stream)
-                .filter(postVO -> StringUtils.isNotBlank(postVO.getPostId()) && !"-1".equals(postVO.getPostId()))
-                .map(postVO -> Long.valueOf(postVO.getPostId()))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    /**
      * 当前可以认领的岗位
      */
     public List<Long> tobeClaimedPost() {
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
-                .filter(nodeVO -> nodeVO.getBindPosts() != null && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
+                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
+                .map(NodeVO::getBindPosts)
+                .flatMap(Collection::stream)
+                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
+                .map(postVO -> Long.valueOf(postVO.getPostId()))
+                .filter(postId -> postId > 0)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 节点已经被认领的岗位
+     */
+    public List<Long> notTobeClaimedPost() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
+                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && !Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
                 .map(NodeVO::getBindPosts)
                 .flatMap(Collection::stream)
                 .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
