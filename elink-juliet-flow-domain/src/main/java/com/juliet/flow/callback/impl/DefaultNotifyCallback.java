@@ -17,6 +17,7 @@ import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 /**
  * DefaultNotifyCallback
@@ -59,13 +60,14 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
     @Override
     public void message(List<NotifyDTO> list) {
         log.info("mq message:{}", JSON.toJSONString(list));
+        if (CollectionUtils.isEmpty(list)) {
+            return;
+        }
         try {
-            for (NotifyDTO notifyDTO : list) {
-                NotifyMessageDTO dto = toMessageDTO(notifyDTO);
-                log.info("transfer data:{}", JSON.toJSONString(dto));
-                rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
-                rocketMQTemplate.syncSend(flowNotifyTopic, dto);
-            }
+            NotifyMessageDTO dto = toMessageDTO(list.get(0));
+            log.info("transfer data:{}", JSON.toJSONString(dto));
+            rabbitMqTemplate.convertAndSend(exchange, "default", JSON.toJSONString(dto));
+            rocketMQTemplate.syncSend(flowNotifyTopic, dto);
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
         }
