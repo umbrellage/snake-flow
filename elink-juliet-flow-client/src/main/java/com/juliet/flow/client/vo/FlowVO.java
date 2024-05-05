@@ -6,6 +6,7 @@ import com.juliet.flow.client.common.TodoNotifyEnum;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -240,14 +241,14 @@ public class FlowVO implements Serializable {
     }
 
     /**
-     * 当前可以认领的岗位
+     * 所有节点上的岗位
      */
-    public List<Long> tobeClaimedPost() {
+    public List<Long> allNodePostIdList() {
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
-                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
                 .map(NodeVO::getBindPosts)
+                .filter(CollectionUtils::isNotEmpty)
                 .flatMap(Collection::stream)
                 .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
                 .map(postVO -> Long.valueOf(postVO.getPostId()))
@@ -256,28 +257,57 @@ public class FlowVO implements Serializable {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 节点已经被认领的岗位
-     */
-    public List<Long> notTobeClaimedPost() {
-        List<FlowVO> allFlowList = allFlowList();
-        return allFlowList.stream().map(FlowVO::getNodes)
-                .flatMap(Collection::stream)
-                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && !Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
-                .map(NodeVO::getBindPosts)
-                .flatMap(Collection::stream)
-                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
-                .map(postVO -> Long.valueOf(postVO.getPostId()))
-                .filter(postId -> postId > 0)
-                .distinct()
-                .collect(Collectors.toList());
-    }
+//    /**
+//     * 当前可以认领的岗位
+//     */
+//    public List<Long> tobeClaimedPost() {
+//        List<FlowVO> allFlowList = allFlowList();
+//        return allFlowList.stream().map(FlowVO::getNodes)
+//                .flatMap(Collection::stream)
+//                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
+//                .map(NodeVO::getBindPosts)
+//                .flatMap(Collection::stream)
+//                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
+//                .map(postVO -> Long.valueOf(postVO.getPostId()))
+//                .filter(postId -> postId > 0)
+//                .distinct()
+//                .collect(Collectors.toList());
+//    }
+//
+//    /**
+//     * 节点已经被认领的岗位
+//     */
+//    public List<Long> notTobeClaimedPost() {
+//        List<FlowVO> allFlowList = allFlowList();
+//        return allFlowList.stream().map(FlowVO::getNodes)
+//                .flatMap(Collection::stream)
+//                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && !Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
+//                .map(NodeVO::getBindPosts)
+//                .flatMap(Collection::stream)
+//                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
+//                .map(postVO -> Long.valueOf(postVO.getPostId()))
+//                .filter(postId -> postId > 0)
+//                .distinct()
+//                .collect(Collectors.toList());
+//    }
 
     /**
      * 待办列表
      */
     public List<NodeVO> todoNodeList() {
         return nodeList(TodoNotifyEnum.NOTIFY);
+    }
+
+    /**
+     * 激活节点的列表
+     */
+    public List<NodeVO> activeNodeList() {
+        List<NodeVO> todoNodeList = nodeList(TodoNotifyEnum.NOTIFY);
+        if (CollectionUtils.isEmpty(todoNodeList)) {
+            return Lists.newArrayList();
+        }
+        return todoNodeList.stream().filter(nodeVO -> Objects.equals(nodeVO.getStatus(), NodeStatusEnum.ACTIVE.getCode()))
+                .collect(Collectors.toList());
     }
 
     /**
