@@ -417,6 +417,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 });
         flow.setStatus(FlowStatusEnum.IN_PROGRESS);
         flowRepository.update(flow);
+        callback(flow.normalNotifyList());
     }
 
     @Override
