@@ -437,10 +437,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 }
             }
         });
-
         flowRepository.update(flow);
     }
 
+    @Override
+    public void resetMsgByFlowId(Long flowId) {
+        Flow flow = JulietSqlUtil.findById(flowId, flowRepository::queryById, "找不到流程，id:" + flowId);
+        callback(flow.normalNotifyList());
+    }
 
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;

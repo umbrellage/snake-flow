@@ -73,4 +73,6 @@ public interface FlowExecuteService {
     void endFlowRollback(FlowIdDTO flowId, Integer level);
 
     void designationOperator(DesignationOperator dto);
+
+    void resetMsgByFlowId(Long flowId);
 }
