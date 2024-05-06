@@ -1,83 +1,32 @@
 package com.juliet.flow.controller;
 
-import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
-import com.juliet.flow.callback.impl.RabbitMqConfirmCallback;
-import com.juliet.flow.client.dto.NotifyDTO;
-import com.juliet.flow.domain.model.NodeQuery;
-import com.juliet.flow.repository.FlowRepository;
-import com.rabbitmq.client.Channel;
+import com.juliet.flow.repository.impl.FlowCache;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import java.io.IOException;
-import javax.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.amqp.core.AmqpTemplate;
-import org.springframework.amqp.core.Message;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author xujianjie
  * @date 2023-04-24
  */
-@Api(tags = "商品管理")
-@RequestMapping("/item")
+@Api(tags = "系统管理")
+@RequestMapping("/juliet/flow/system")
 @RestController
 @Slf4j
 public class TestController {
 
     @Autowired
-    FlowRepository flowRepository;
+    private FlowCache flowCache;
 
-    @Autowired
-    private AmqpTemplate rabbitMqTemplate;
-
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-    @Autowired
-    private RabbitMqConfirmCallback confirmCallback;
-
-    @ApiOperation("获取流程列表")
-    @PostMapping("/test")
-    public AjaxResult moduleDelete(HttpServletRequest request, @RequestBody NodeQuery query1) {
-        return AjaxResult.success(flowRepository.listNode(query1));
+    @ApiOperation("重置缓存")
+    @GetMapping("/cache/reset")
+    public AjaxResult<Void> resetCache() {
+        flowCache.reset();
+        return AjaxResult.success();
     }
-
-
-//    @ApiOperation("回调消息")
-//    @PostMapping("/send")
-//    public AjaxResult send() {
-//        NotifyDTO dto = new NotifyDTO();
-//        dto.setCode("dd");
-////        String msg = "[{\"code\":\"flow_dev_process_ty\",\"filedList\":[\"saveTemp\",\"基础信息.category\",\"submit\",\"errorEdit\"],\"flowId\":1156689548882481152,\"mainFlowId\":0,\"nodeId\":1156689548949590018,\"nodeName\":\"e\",\"postIdList\":[\"1698724444273\"],\"preprocessedBy\":[{\"nodeId\":1156689548945395712,\"processedBy\":1686845188273,\"processedTime\":\"2023-09-27 20:31:19\"}],\"supervisorIds\":[1686900881810],\"tenantId\":161,\"todoNotify\":0,\"type\":1,\"userId\":1686847445255}]";
-////        rabbitTemplate.convertAndSend("flow.process.callback", "default", msg);
-////        rabbitTemplate.convertAndSend("juliet.test.exchange", "default", JSON.toJSONString(dto));
-//
-//        log.info("data:{}", JSON.toJSONString(dto));
-//        return AjaxResult.success();
-//    }
-//
-//    @RabbitListener(queues = "juliet_test_queue")
-//    public void consumer(String data, Channel channel, Message message) {
-//        log.info("{}", data);
-//        long tag = message.getMessageProperties().getDeliveryTag();
-//        try {
-//            channel.basicAck(tag, false);
-//            channel.basicReject(tag, true);
-//        } catch (IOException e) {
-//            log.info("msg:{}", data);
-//        }
-//    }
-
 }

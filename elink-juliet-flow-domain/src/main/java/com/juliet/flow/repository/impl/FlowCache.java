@@ -82,6 +82,10 @@ public class FlowCache {
         return flowCacheData;
     }
 
+    public void reset() {
+        cache.invalidateAll();
+    }
+
     private String buildFlowCacheKey(FlowEntity flowEntity) {
         return buildFlowCacheKey((flowEntity.getId()));
     }
