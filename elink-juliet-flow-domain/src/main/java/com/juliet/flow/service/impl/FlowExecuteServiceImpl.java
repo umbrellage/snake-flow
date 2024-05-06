@@ -744,9 +744,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId,
                                                         Map<String, Object> data) {
         // 查询异常流程
-        List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
-        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-        calibrateFlowList.add(mainFlow);
+//        List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
+//        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
+//        calibrateFlowList.add(mainFlow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = mainFlow.findNode(nodeId);
         // 如果是主流程的节点
