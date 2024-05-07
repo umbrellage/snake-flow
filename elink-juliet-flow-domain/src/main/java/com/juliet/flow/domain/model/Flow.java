@@ -770,6 +770,7 @@ public class Flow extends BaseModel {
                     .collect(Collectors.toList());
             node.setStatus(NodeStatusEnum.NOT_ACTIVE);
             node.setProcessedBy(null);
+            node.setProcessedTime(null);
             return notifyNode.get(0);
         }
         // 发起节点
@@ -777,6 +778,7 @@ public class Flow extends BaseModel {
             nodes.forEach(thisNode -> {
                 thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE);
                 thisNode.setProcessedBy(null);
+                thisNode.setProcessedTime(null);
             });
             this.startNode().setStatus(NodeStatusEnum.ACTIVE);
             return startNode();
