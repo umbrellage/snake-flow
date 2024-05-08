@@ -751,10 +751,6 @@ public class Flow extends BaseModel {
 
 
     public Node rollback(RollbackDTO dto) {
-//        boolean canNotRollback = nodes.stream().anyMatch(node -> node.nextNameList().size() > 1);
-//        if (canNotRollback) {
-//            throw new ServiceException("该流程不支持退回操作");
-//        }
         Node node = findNode(Long.valueOf(dto.getNodeId()));
         if (node == null) {
             log.error("node not found:{}", dto.getNodeId());
@@ -773,11 +769,17 @@ public class Flow extends BaseModel {
                     .peek(preNode -> preNode.setStatus(NodeStatusEnum.ACTIVE))
                     .collect(Collectors.toList());
             node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+            node.setProcessedBy(null);
+            node.setProcessedTime(null);
             return notifyNode.get(0);
         }
         // 发起节点
         if (dto.getRollbackType() == 0) {
-            nodes.forEach(thisNode -> thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE));
+            nodes.forEach(thisNode -> {
+                thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE);
+                thisNode.setProcessedBy(null);
+                thisNode.setProcessedTime(null);
+            });
             this.startNode().setStatus(NodeStatusEnum.ACTIVE);
             return startNode();
         }

@@ -191,6 +191,7 @@ public class Node extends BaseModel {
             Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
             if (assignProcessedBy != null) {
                 processedBy = assignProcessedBy;
+                processedTime = LocalDateTime.now();
             }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null && supplierDTO.getSupplierId() != null) {
