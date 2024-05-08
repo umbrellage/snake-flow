@@ -1,6 +1,6 @@
 package com.juliet.flow.repository;
 
-import com.juliet.flow.common.enums.FlowStatusEnum;
+import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.FlowTemplate;
@@ -9,8 +9,6 @@ import com.juliet.flow.domain.model.NodeQuery;
 import com.juliet.flow.domain.query.AssembleFlowCondition;
 
 import java.util.Collection;
-import java.util.List;
-
 import java.util.List;
 
 /**

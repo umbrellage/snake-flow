@@ -5,7 +5,7 @@ import com.juliet.common.core.utils.StringUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
-import com.juliet.flow.common.enums.FlowStatusEnum;
+import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;

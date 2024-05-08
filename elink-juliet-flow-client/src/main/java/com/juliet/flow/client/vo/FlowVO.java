@@ -1,6 +1,7 @@
 package com.juliet.flow.client.vo;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import lombok.Getter;
@@ -295,6 +296,9 @@ public class FlowVO implements Serializable {
      * 待办列表
      */
     public List<NodeVO> todoNodeList() {
+        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode())) {
+            return Lists.newArrayList();
+        }
         return nodeList(TodoNotifyEnum.NOTIFY);
     }
 
@@ -302,6 +306,9 @@ public class FlowVO implements Serializable {
      * 激活节点的列表
      */
     public List<NodeVO> activeNodeList() {
+        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode())) {
+            return Lists.newArrayList();
+        }
         List<NodeVO> todoNodeList = nodeList(TodoNotifyEnum.NOTIFY);
         if (CollectionUtils.isEmpty(todoNodeList)) {
             return Lists.newArrayList();
@@ -334,6 +341,9 @@ public class FlowVO implements Serializable {
      * 不活跃的节点，不可办的节点
      */
     public List<NodeVO> notActiveNodeList() {
+        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode())) {
+            return allNodeList();
+        }
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
@@ -350,6 +360,14 @@ public class FlowVO implements Serializable {
                 .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
                         Objects.equals(nodeVO.getTodoNotify(), todoNotify.getCode()) &&
                         Arrays.asList(NodeStatusEnum.ACTIVE.getCode(), NodeStatusEnum.TO_BE_CLAIMED.getCode()).contains(nodeVO.getStatus()))
+                .collect(collectingAndThen(toCollection(() ->
+                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+    }
+
+    private List<NodeVO> allNodeList() {
+        List<FlowVO> allFlowList = allFlowList();
+        return allFlowList.stream().map(FlowVO::getNodes)
+                .flatMap(Collection::stream)
                 .collect(collectingAndThen(toCollection(() ->
                         new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
     }

@@ -1,4 +1,4 @@
-package com.juliet.flow.common.enums;
+package com.juliet.flow.client.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
