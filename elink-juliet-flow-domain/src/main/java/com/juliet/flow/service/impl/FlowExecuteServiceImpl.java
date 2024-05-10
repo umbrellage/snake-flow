@@ -23,6 +23,7 @@ import com.juliet.flow.service.TaskService;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -716,7 +717,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
         for (Node node : nodeList) {
             List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(),
-                    dto.getData());
+                    dto.getData(), dto.getSkipCreateSubFlow());
             historicTaskInstanceList.addAll(taskInstances);
         }
 
@@ -743,7 +744,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
      */
     @Transactional(rollbackFor = Exception.class)
     public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId,
-                                                        Map<String, Object> data) {
+                                                        Map<String, Object> data, Boolean skipCreateSubFlow) {
         // 查询异常流程
 //        List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
 //        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
@@ -763,6 +764,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
+                // 如果不需要创建异常流程那么就直接返回
+                if (skipCreateSubFlow != null && skipCreateSubFlow) {
+                    return Lists.newArrayList();
+                }
                 TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
                 return forwardMainFlowTask(forwardDTO);
             }
