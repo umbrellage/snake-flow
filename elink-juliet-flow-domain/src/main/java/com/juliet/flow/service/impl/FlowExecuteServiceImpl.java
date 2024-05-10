@@ -318,6 +318,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public void delete(InvalidDTO dto) {
+        flowRepository.deleteFlow(Long.valueOf(dto.getFlowId()));
+    }
+
+    @Override
     public void triggerTodo(Long flowId, Map<String, Object> triggerParam) {
         Flow flow = flowRepository.queryById(flowId);
         Optional.ofNullable(flow).ifPresent(data -> {
