@@ -215,6 +215,12 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<Void> delete(InvalidDTO dto) {
+        flowExecuteService.delete(dto);
+        return AjaxResult.success();
+    }
+
+    @Override
     public AjaxResult<Void> triggerTodo(Long flowId, Map<String, Object> triggerParam) {
         flowExecuteService.triggerTodo(flowId, triggerParam);
         return AjaxResult.success();

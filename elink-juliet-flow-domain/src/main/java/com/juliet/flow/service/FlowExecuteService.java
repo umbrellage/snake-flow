@@ -62,6 +62,8 @@ public interface FlowExecuteService {
 
     void invalid(InvalidDTO dto);
 
+    void delete(InvalidDTO dto);
+
     void triggerTodo(Long flowId, Map<String, Object> triggerParam);
 
     void earlyEndFlow(Long flowId);
