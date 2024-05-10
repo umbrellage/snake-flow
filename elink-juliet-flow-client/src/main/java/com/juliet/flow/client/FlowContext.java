@@ -156,8 +156,13 @@ public class FlowContext {
 
 
     public static List<HistoricTaskInstance> forward() {
+        return forward(false);
+    }
+
+    public static List<HistoricTaskInstance> forward(boolean skipCreateSubFlow) {
         try {
             NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+            nodeFieldDTO.setSkipCreateSubFlow(skipCreateSubFlow);
             Map<String, Object> data = LOCAL_CACHE.get();
             if (data == null) {
                 data = new HashMap<>();

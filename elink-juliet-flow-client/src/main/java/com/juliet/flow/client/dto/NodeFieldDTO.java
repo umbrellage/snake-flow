@@ -21,6 +21,8 @@ public class NodeFieldDTO {
     private Long nodeId;
     private Long flowId;
     private Long userId;
+    // 设置true时不要创建异常流程，如果是主流程需要仍然往后走
+    private Boolean skipCreateSubFlow;
 
     private Map<String, Object> data = new HashMap<>();
 
