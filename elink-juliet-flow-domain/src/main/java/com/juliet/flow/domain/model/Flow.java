@@ -776,9 +776,11 @@ public class Flow extends BaseModel {
         // 发起节点
         if (dto.getRollbackType() == 0) {
             nodes.forEach(thisNode -> {
-                thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE);
-                thisNode.setProcessedBy(null);
-                thisNode.setProcessedTime(null);
+                if (thisNode.getType() != NodeTypeEnum.START) {
+                    thisNode.setStatus(NodeStatusEnum.NOT_ACTIVE);
+                    thisNode.setProcessedBy(null);
+                    thisNode.setProcessedTime(null);
+                }
             });
             this.startNode().setStatus(NodeStatusEnum.ACTIVE);
             return startNode();
