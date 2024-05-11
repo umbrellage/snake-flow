@@ -763,16 +763,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             }
             // 当节点是异常节点时
             if (node.isProcessed()) {
+                // 如果不需要创建异常流程那么就直接返回
+                if (skipCreateSubFlow != null && skipCreateSubFlow) {
+                    return Lists.newArrayList();
+                }
                 TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
                 return createSubFlowTask(forwardDTO);
             }
             // 当节点是非异常节点时, 因为是主流程的节点，主流程不关心是否需要合并异常流程，这个操作让异常流程去做，因为异常流程在创建是肯定比主流程慢
             // 主流程只需要判断下是否存在异常流程为结束，如果存在，主流程在完成整个流程前等待异常流程合并至主流程
             if (!node.isProcessed()) {
-                // 如果不需要创建异常流程那么就直接返回
-                if (skipCreateSubFlow != null && skipCreateSubFlow) {
-                    return Lists.newArrayList();
-                }
                 TaskForwardDTO forwardDTO = TaskForwardDTO.valueOf(mainFlow, node, userId, data);
                 return forwardMainFlowTask(forwardDTO);
             }
