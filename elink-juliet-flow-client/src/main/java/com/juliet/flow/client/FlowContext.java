@@ -55,6 +55,13 @@ public class FlowContext {
         LOCAL_CACHE.set(local);
     }
 
+    public static Map<String, Object> entryMap() {
+        if (LOCAL_CACHE == null || LOCAL_CACHE.get() == null) {
+            return new HashMap<>();
+        }
+        return LOCAL_CACHE.get();
+    }
+
     public static void putAutoOperator(Long userId) {
         putAttachment("autoOperator", userId);
     }
