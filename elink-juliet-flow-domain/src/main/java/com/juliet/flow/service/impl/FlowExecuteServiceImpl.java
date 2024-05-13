@@ -308,9 +308,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Flow flow = JulietSqlUtil.findById(Long.valueOf(dto.getFlowId()), flowRepository::queryById, "flow not found");
         flow.setStatus(FlowStatusEnum.INVALID);
         List<Flow> flowList = flowRepository.queryMainFlowById(Collections.singletonList(flow.getId()));
-        flowRepository.update(flow);
         flowList.forEach(subFlow -> subFlow.setStatus(FlowStatusEnum.INVALID));
         flowList.forEach(flowRepository::update);
+        flowRepository.update(flow);
         List<NotifyDTO> notifyList = flowList.stream()
             .map(Flow::invalidFlow)
             .collect(Collectors.toList());
