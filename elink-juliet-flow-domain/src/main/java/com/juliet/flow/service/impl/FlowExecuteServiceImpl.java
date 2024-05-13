@@ -311,8 +311,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowRepository.update(flow);
         flowList.forEach(subFlow -> subFlow.setStatus(FlowStatusEnum.INVALID));
         flowList.forEach(flowRepository::update);
+        List<NotifyDTO> notifyList = flowList.stream()
+            .map(Flow::invalidFlow)
+            .collect(Collectors.toList());
         NotifyDTO notifyDTO = flow.invalidFlow();
-        callback(Collections.singletonList(notifyDTO));
+        notifyList.add(notifyDTO);
+        callback(notifyList);
     }
 
     @Override
