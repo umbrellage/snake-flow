@@ -341,7 +341,7 @@ public class FlowVO implements Serializable {
      * 不活跃的节点，不可办的节点
      */
     public List<NodeVO> notActiveNodeList() {
-        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode())) {
+        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode()) || Objects.equals(status, FlowStatusEnum.END.getCode())) {
             return allNodeList();
         }
         List<FlowVO> allFlowList = allFlowList();
