@@ -349,8 +349,7 @@ public class FlowVO implements Serializable {
                 .flatMap(Collection::stream)
                 .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
                         Arrays.asList(NodeStatusEnum.PROCESSED.getCode(), NodeStatusEnum.IGNORE.getCode(), NodeStatusEnum.NOT_ACTIVE.getCode()).contains(nodeVO.getStatus()))
-                .collect(collectingAndThen(toCollection(() ->
-                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     private List<NodeVO> nodeList(TodoNotifyEnum todoNotify) {
