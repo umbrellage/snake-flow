@@ -367,8 +367,7 @@ public class FlowVO implements Serializable {
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
-                .collect(collectingAndThen(toCollection(() ->
-                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     private List<FlowVO> allFlowList() {
