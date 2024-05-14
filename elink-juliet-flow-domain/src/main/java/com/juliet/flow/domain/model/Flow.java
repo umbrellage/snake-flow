@@ -805,7 +805,7 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.PROCESSED);
             }
         });
-        setStatus(FlowStatusEnum.END);
+        setStatus(FlowStatusEnum.INVALID);
     }
 
     public List<Node> canFlowAutomate(Map<String, Object> automateParam) {

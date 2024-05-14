@@ -341,7 +341,7 @@ public class FlowVO implements Serializable {
      * 不活跃的节点，不可办的节点
      */
     public List<NodeVO> notActiveNodeList() {
-        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode())) {
+        if (Objects.equals(status, FlowStatusEnum.INVALID.getCode()) || Objects.equals(status, FlowStatusEnum.END.getCode())) {
             return allNodeList();
         }
         List<FlowVO> allFlowList = allFlowList();
@@ -349,8 +349,7 @@ public class FlowVO implements Serializable {
                 .flatMap(Collection::stream)
                 .filter(nodeVO -> nodeVO != null && nodeVO.getTodoNotify() != null && nodeVO.getStatus() != null &&
                         Arrays.asList(NodeStatusEnum.PROCESSED.getCode(), NodeStatusEnum.IGNORE.getCode(), NodeStatusEnum.NOT_ACTIVE.getCode()).contains(nodeVO.getStatus()))
-                .collect(collectingAndThen(toCollection(() ->
-                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     private List<NodeVO> nodeList(TodoNotifyEnum todoNotify) {
@@ -368,8 +367,7 @@ public class FlowVO implements Serializable {
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
-                .collect(collectingAndThen(toCollection(() ->
-                        new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
+                .collect(Collectors.toList());
     }
 
     private List<FlowVO> allFlowList() {
