@@ -1,7 +1,9 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
@@ -10,31 +12,19 @@ import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.vo.ProcessedByVO;
 import com.juliet.flow.client.vo.SupplierVO;
-import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
-
 import io.swagger.annotations.ApiModelProperty;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author xujianjie
@@ -89,6 +79,7 @@ public class Node extends BaseModel {
 
     private FlowAutomateRule flowAutomateRule;
 
+    // 自动分配不为空时，是系统节点
     private String flowAutomateRuleName;
 
     /**
@@ -180,10 +171,14 @@ public class Node extends BaseModel {
     }
 
     public LocalDateTime processedTime() {
+        if (StringUtils.isNotBlank(flowAutomateRuleName) && status == NodeStatusEnum.PROCESSED) {
+            return processedTime;
+        }
         if (processedBy == null || processedBy == 0L) {
             return null;
         }
         return processedTime;
+
     }
 
     public void regularDistribution(Map<String, Object> params, Flow flow) {
@@ -214,13 +209,13 @@ public class Node extends BaseModel {
             return;
         }
         flow.getNodes().stream()
-            .filter(node -> StringUtils.equals(node.getExternalNodeId(), distributeNode) ||
-                StringUtils.equals(node.getName(), distributeNode))
-            .findAny()
-            .ifPresent(node -> {
-                this.processedBy = node.getProcessedBy();
-                this.processedTime = LocalDateTime.now();
-            });
+                .filter(node -> StringUtils.equals(node.getExternalNodeId(), distributeNode) ||
+                        StringUtils.equals(node.getName(), distributeNode))
+                .findAny()
+                .ifPresent(node -> {
+                    this.processedBy = node.getProcessedBy();
+                    this.processedTime = LocalDateTime.now();
+                });
     }
 
     public NotifyDTO toNotifyNormal(Flow flow) {
@@ -228,7 +223,7 @@ public class Node extends BaseModel {
         ret.setNodeId(id);
         ret.setNodeName(name);
         ret.setNodeVO(toNodeVo(flow));
-        ret.setFlowId(flowId == null ? flow.getId(): flowId);
+        ret.setFlowId(flowId == null ? flow.getId() : flowId);
         ret.setTodoNotify(todoNotify);
         if (form != null && CollectionUtils.isNotEmpty(form.getFields())) {
             ret.setFiledList(form.getFields().stream().map(Field::getCode).collect(Collectors.toList()));
@@ -419,13 +414,11 @@ public class Node extends BaseModel {
     }
 
     /**
-     *
      * @return
      */
     public boolean nodeCanEdit() {
         return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED;
     }
-
 
 
     /**
@@ -519,12 +512,12 @@ public class Node extends BaseModel {
         }
         if (CollectionUtils.isNotEmpty(bindSuppliers)) {
             List<SupplierVO> supplierVOList = bindSuppliers.stream()
-                .map(e -> {
-                    SupplierVO supplierVO = new SupplierVO();
-                    BeanUtils.copyProperties(e, supplierVO);
-                    return supplierVO;
-                })
-                .collect(Collectors.toList());
+                    .map(e -> {
+                        SupplierVO supplierVO = new SupplierVO();
+                        BeanUtils.copyProperties(e, supplierVO);
+                        return supplierVO;
+                    })
+                    .collect(Collectors.toList());
             data.setBindSuppliers(supplierVOList);
         }
         data.setSupervisorIds(supervisorIds);
@@ -576,13 +569,13 @@ public class Node extends BaseModel {
         node.type = type;
         if (CollectionUtils.isNotEmpty(bindPosts)) {
             node.bindPosts = bindPosts.stream()
-                .map(Post::deepCopy)
-                .collect(Collectors.toList());
+                    .map(Post::deepCopy)
+                    .collect(Collectors.toList());
         }
         if (CollectionUtils.isNotEmpty(bindSuppliers)) {
             node.bindSuppliers = bindSuppliers.stream()
-                .map(Supplier::deepCopy)
-                .collect(Collectors.toList());
+                    .map(Supplier::deepCopy)
+                    .collect(Collectors.toList());
         }
         node.accessRule = accessRule;
         node.submitRule = submitRule;
