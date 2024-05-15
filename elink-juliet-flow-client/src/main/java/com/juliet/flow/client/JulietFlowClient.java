@@ -30,6 +30,8 @@ public interface JulietFlowClient {
 
     @PostMapping("/bpm/forwardV2")
     AjaxResult<List<HistoricTaskInstance>> forwardV2(@RequestBody NodeFieldDTO dto);
+    @PostMapping("/bpm/beforehandForward")
+    AjaxResult<FlowVO> beforehandForward(@RequestBody NodeFieldDTO dto);
 
     @PostMapping("/customer/status")
     AjaxResult<List<String>> customerStatus(@RequestBody FlowOpenDTO dto);

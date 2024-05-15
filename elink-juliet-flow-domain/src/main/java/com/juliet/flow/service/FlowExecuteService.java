@@ -77,4 +77,6 @@ public interface FlowExecuteService {
     void designationOperator(DesignationOperator dto);
 
     void resetMsgByFlowId(Long flowId);
+
+    FlowVO beforehandForward(NodeFieldDTO dto);
 }

@@ -8,6 +8,7 @@ import com.juliet.flow.client.dto.BpmDTO;
 
 import com.juliet.flow.client.dto.RedoDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
+import com.juliet.flow.client.vo.FlowVO;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
@@ -185,6 +186,23 @@ public class FlowContext {
         } finally {
             clean();
         }
+    }
+
+    public static FlowVO beforehandForward(boolean skipCreateSubFlow) {
+        NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+        nodeFieldDTO.setSkipCreateSubFlow(skipCreateSubFlow);
+        Map<String, Object> data = LOCAL_CACHE.get();
+        if (data == null) {
+            data = new HashMap<>();
+        }
+        data.put("actualOperator", nodeFieldDTO.getUserId());
+        nodeFieldDTO.setData(LOCAL_CACHE.get());
+        AjaxResult<FlowVO> result = julietFlowClient.beforehandForward(nodeFieldDTO);
+        if (result == null || result.getCode() == null || result.getCode() != 200) {
+            log.error("juliet flow forward error! response:{}", result);
+            throw new RuntimeException("juliet flow forward error!");
+        }
+        return result.getData();
     }
 
     public static void tryForward() {

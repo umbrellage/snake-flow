@@ -375,6 +375,30 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             flow.rollback(rollbackNode);
         }
 
+        // TODO: 2024/5/15 这里是不是落掉了，需要保存下流程
+
+    }
+
+    public Flow tryFowAutomate(Flow flow, Map<String, Object> automateParam) {
+        do {
+            List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
+            List<Long> nodeIdList = flowAutomateNodeList.stream()
+                .map(Node::getId)
+                .collect(Collectors.toList());
+            flow.getNodes()
+                .stream()
+                .filter(e -> nodeIdList.contains(e.getId()))
+                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
+            for (Node node : flowAutomateNodeList) {
+                flow = tryForwardFlowTask(flow, node, null, automateParam);
+            }
+        } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
+
+        List<Node> rollbackNodeList = flow.canFlowRollback(automateParam);
+        for (Node rollbackNode : rollbackNodeList) {
+            flow.rollback(rollbackNode);
+        }
+        return flow;
     }
 
     @Override
@@ -452,6 +476,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Flow flow = JulietSqlUtil.findById(flowId, flowRepository::queryById, "找不到流程，id:" + flowId);
         callback(flow.normalNotifyList());
     }
+
 
     private List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
@@ -676,6 +701,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public FlowVO beforehandForward(NodeFieldDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return null;
+        }
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        return tryTask(flow, subFlowList, dto.getNodeId(), dto.getUserId(), dto.getData(), dto.getSkipCreateSubFlow());
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
         List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
@@ -749,10 +784,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     public synchronized List<HistoricTaskInstance> task(Flow mainFlow, Long nodeId, Long userId,
                                                         Map<String, Object> data, Boolean skipCreateSubFlow) {
-        // 查询异常流程
-//        List<Flow> exFlowList = flowRepository.listFlowByParentId(mainFlow.getId());
-//        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
-//        calibrateFlowList.add(mainFlow);
         // 获取要处理的节点信息，该节点可能有两种情况 1. 他是主流程的节点，2. 他是异常子流程的节点
         Node node = mainFlow.findNode(nodeId);
         // 如果是主流程的节点
@@ -784,6 +815,53 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
         return Collections.emptyList();
     }
+
+    public FlowVO tryTask(Flow mainFlow, List<Flow> subFlowList, Long nodeId, Long userId, Map<String, Object> data, Boolean skipCreateSubFlow) {
+        Node mainNode = mainFlow.findNode(nodeId);
+        if (mainNode != null) {
+            // 主流程节点，但不可以操作，返回null
+            if (!mainNode.isExecutable()) {
+                return null;
+            }
+            // 主流程节点，是正常流转的节点
+            if (!mainNode.isProcessed()) {
+                Flow result =  tryForwardFlowTask(mainFlow, mainNode, userId, data);
+                return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+            }
+            // 主流程节点，且是异常节点，但是不需要创建异常流程
+            if (mainNode.isProcessed() && skipCreateSubFlow) {
+                return null;
+            }
+            // 主流程节点，且是异常节点，但是不需要创建异常流程
+            if (mainNode.isProcessed() && !skipCreateSubFlow) {
+                Flow subFlow = mainFlow.subFlow();
+                subFlow.modifyNodeStatus(mainNode);
+                Node subNode = subFlow.findNode(mainNode.getName());
+                Flow result =  tryForwardFlowTask(subFlow, subNode, userId, data);
+                return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+            }
+        }
+
+        // 如果是子流程的节点
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            Flow flow = subFlowList.stream()
+                .filter(subFlow -> subFlow.findNode(nodeId) != null)
+                .findAny()
+                .orElse(null);
+
+            if (flow == null) {
+                return null;
+            }
+
+            Flow result = tryForwardFlowTask(flow, flow.findNode(nodeId), userId, data);
+            return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+        }
+        return null;
+
+    }
+
+
+
 
 
     @Override
@@ -827,6 +905,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         return forwardHistory.stream()
                 .map(History::toHistoricTask)
                 .collect(Collectors.toList());
+    }
+
+    public Flow tryForwardFlowTask(Flow flow, Node node, Long userId, Map<String, Object> data) {
+        flow.modifyNextNodeStatus(node.getId(), userId, data);
+        if (flow.isEnd()) {
+            flow.setStatus(FlowStatusEnum.END);
+        }
+        return flow;
     }
 
     @Override
