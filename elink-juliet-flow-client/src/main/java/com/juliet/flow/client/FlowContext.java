@@ -188,6 +188,11 @@ public class FlowContext {
         }
     }
 
+    /**
+     * 预先走流程
+     * @param skipCreateSubFlow 是否创建异常流程
+     * @return 返回执行完的流程信息，只返回当前操作的节点的流程，不会返回其他流程（其他异常流程或者主流程）
+     */
     public static FlowVO beforehandForward(boolean skipCreateSubFlow) {
         NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
         nodeFieldDTO.setSkipCreateSubFlow(skipCreateSubFlow);

@@ -347,8 +347,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
+        // TODO: 2024/5/15 异常流程需要处理吗？ 
         Flow flow = flowRepository.queryById(flowId);
-        // TODO: 2024/4/23
         do {
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
             List<Long> nodeIdList = flowAutomateNodeList.stream()
@@ -375,8 +375,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             flow.rollback(rollbackNode);
         }
 
-        // TODO: 2024/5/15 这里是不是落掉了，需要保存下流程
-
+        flowRepository.update(flow);
     }
 
     public Flow tryFowAutomate(Flow flow, Map<String, Object> automateParam) {
