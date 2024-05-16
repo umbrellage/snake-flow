@@ -601,6 +601,7 @@ public class Node extends BaseModel {
         node.forwardRuleList = forwardRuleList;
         node.rollbackRuleList = rollbackRuleList;
         node.ruleList = ruleList;
+        node.flowAutomateRule = flowAutomateRule;
         return node;
     }
 
