@@ -1,6 +1,5 @@
 package com.juliet.flow.client;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.ttl.TransmittableThreadLocal;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.web.domain.AjaxResult;
@@ -236,7 +235,7 @@ public class FlowContext {
         dto.setRollbackType(0);
         AjaxResult result = julietFlowClient.rollback(dto);
         if (result == null || !Objects.equals(result.getCode(), 200)) {
-            throw new ServiceException("流程回退到开始失败!" + JSON.toJSONString(reason));
+            throw new ServiceException("流程回退到开始失败!" + reason);
         }
     }
 
