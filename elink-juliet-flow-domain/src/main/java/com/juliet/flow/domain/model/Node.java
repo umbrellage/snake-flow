@@ -497,6 +497,7 @@ public class Node extends BaseModel {
         data.setFlowInnerAssignment(flowInnerAssignment);
         data.setDistributeNode(distributeNode);
         data.setSupervisorAssignment(supervisorAssignment);
+        data.setFlowAutomateRuleName(flowAutomateRuleName);
         if (status != null) {
             data.setStatus(status.getCode());
         }

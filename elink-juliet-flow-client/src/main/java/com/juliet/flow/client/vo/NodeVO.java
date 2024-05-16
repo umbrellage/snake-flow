@@ -56,6 +56,9 @@ public class NodeVO implements Serializable {
 
     private Long mainFlowId;
 
+    // 自动分配不为空时，是系统节点
+    private String flowAutomateRuleName;
+
     /**
      * 主管分配
      */
