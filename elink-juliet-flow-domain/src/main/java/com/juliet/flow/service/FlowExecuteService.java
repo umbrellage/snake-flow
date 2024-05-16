@@ -79,4 +79,6 @@ public interface FlowExecuteService {
     void resetMsgByFlowId(Long flowId);
 
     FlowVO beforehandForward(NodeFieldDTO dto);
+
+    FlowVO beforehandInitBpmForward(BpmDTO dto);
 }

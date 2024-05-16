@@ -710,6 +710,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public FlowVO beforehandInitBpmForward(BpmDTO dto) {
+        return null;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
         List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
