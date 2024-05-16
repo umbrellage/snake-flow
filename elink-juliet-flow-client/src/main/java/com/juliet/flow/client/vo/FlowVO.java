@@ -359,6 +359,18 @@ public class FlowVO implements Serializable {
 
 
     public boolean existOperator(NodeVO node, List<Long> userIdList) {
+        // 如果节点都没激活或者已完成或者已忽略那么直接返回true，没必要校验
+        if (node.getStatus() == 1 || node.getStatus() == 4 || node.getStatus() == 5) {
+            return true;
+        }
+        // 如果是系统流转的也不需要判断
+        if (StringUtils.isNotBlank(node.getFlowAutomateRuleName())) {
+            return true;
+        }
+        // 供应商节点也不需要判断
+        if (CollectionUtils.isNotEmpty(node.getBindSuppliers())) {
+            return true;
+        }
         boolean supervisorExist = node.getSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) && !Collections.disjoint(userIdList, node.getSupervisorIds());
         boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList);
         boolean ruleAssignmentExist = node.getProcessedBy() != null && node.getProcessedBy() != 0;
