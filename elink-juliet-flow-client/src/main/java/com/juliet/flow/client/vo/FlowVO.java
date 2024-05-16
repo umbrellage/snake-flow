@@ -374,7 +374,7 @@ public class FlowVO implements Serializable {
         boolean supervisorExist = node.getSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) && !Collections.disjoint(userIdList, node.getSupervisorIds());
         boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList);
         boolean ruleAssignmentExist = node.getProcessedBy() != null && node.getProcessedBy() != 0;
-        boolean flowInnerExist = StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
+        boolean flowInnerExist = node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() && StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
         return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
 
     }
