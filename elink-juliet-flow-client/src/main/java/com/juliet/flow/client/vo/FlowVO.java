@@ -58,11 +58,6 @@ public class FlowVO implements Serializable {
 
     private List<FlowVO> subFlowList = new ArrayList<>();
 
-/*    public List<String> getFlowCustomerStatus() {
-        return this.flowCustomerStatus();
-    }
-
-    private List<String> flowCustomerStatus;*/
 
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
         return userExecutorInfo(Collections.singletonList(userId), postIdList, supplierId);
@@ -151,6 +146,13 @@ public class FlowVO implements Serializable {
                 );
         executor.setCanChange(canChange);
         return executor;
+    }
+
+    private NodeVO findNode(String distributeNode) {
+        return nodes.stream()
+            .filter(e -> StringUtils.equals(e.getExternalNodeId(), distributeNode))
+            .findAny()
+            .orElse(null);
     }
 
 
@@ -258,39 +260,6 @@ public class FlowVO implements Serializable {
                 .collect(Collectors.toList());
     }
 
-//    /**
-//     * 当前可以认领的岗位
-//     */
-//    public List<Long> tobeClaimedPost() {
-//        List<FlowVO> allFlowList = allFlowList();
-//        return allFlowList.stream().map(FlowVO::getNodes)
-//                .flatMap(Collection::stream)
-//                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
-//                .map(NodeVO::getBindPosts)
-//                .flatMap(Collection::stream)
-//                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
-//                .map(postVO -> Long.valueOf(postVO.getPostId()))
-//                .filter(postId -> postId > 0)
-//                .distinct()
-//                .collect(Collectors.toList());
-//    }
-//
-//    /**
-//     * 节点已经被认领的岗位
-//     */
-//    public List<Long> notTobeClaimedPost() {
-//        List<FlowVO> allFlowList = allFlowList();
-//        return allFlowList.stream().map(FlowVO::getNodes)
-//                .flatMap(Collection::stream)
-//                .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getBindPosts()) && !Objects.equals(nodeVO.getStatus(), NodeStatusEnum.TO_BE_CLAIMED.getCode()))
-//                .map(NodeVO::getBindPosts)
-//                .flatMap(Collection::stream)
-//                .filter(postVO -> postVO != null && StringUtils.isNotBlank(postVO.getPostId()))
-//                .map(postVO -> Long.valueOf(postVO.getPostId()))
-//                .filter(postId -> postId > 0)
-//                .distinct()
-//                .collect(Collectors.toList());
-//    }
 
     /**
      * 待办列表
@@ -385,6 +354,17 @@ public class FlowVO implements Serializable {
         return nodes.stream()
                 .map(NodeVO::toSimple)
                 .collect(Collectors.toList());
+    }
+
+
+
+    public boolean existOperator(NodeVO node, List<Long> userIdList) {
+        boolean supervisorExist = node.getSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) && !Collections.disjoint(userIdList, node.getSupervisorIds());
+        boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList);
+        boolean ruleAssignmentExist = node.getProcessedBy() != null && node.getProcessedBy() != 0;
+        boolean flowInnerExist = StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
+        return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
+
     }
 
 }
