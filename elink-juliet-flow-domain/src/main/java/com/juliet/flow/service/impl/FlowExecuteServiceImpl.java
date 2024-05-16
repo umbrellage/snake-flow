@@ -711,7 +711,18 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     public FlowVO beforehandInitBpmForward(BpmDTO dto) {
-        return null;
+        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
+        if (flowTemplate == null) {
+            throw new ServiceException("流程模版不存在");
+        }
+        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
+        Node node = flow.startNode();
+        flow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
+        if (flow.isEnd()) {
+            flow.setStatus(FlowStatusEnum.END);
+        }
+
+        return tryFowAutomate(flow, dto.getData()).flowVO(Collections.emptyList());
     }
 
     @Override
