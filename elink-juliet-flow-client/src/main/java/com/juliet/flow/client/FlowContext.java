@@ -209,6 +209,17 @@ public class FlowContext {
         return result.getData();
     }
 
+    public static FlowVO beforehandBpmInitForward() {
+            BpmDTO bpmDTO = BPM_DTO_CACHE.get();
+            bpmDTO.setData(LOCAL_CACHE.get());
+            AjaxResult<FlowVO> initResult = julietFlowClient.beforehandInitBmp(bpmDTO);
+            if (initResult == null || initResult.getCode() == null || initResult.getCode() != 200) {
+                log.error("juliet flow init error! response:{}", initResult);
+                throw new RuntimeException("juliet flow init error!");
+            }
+        return initResult.getData();
+    }
+
     public static void tryForward() {
         NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
         if (nodeFieldDTO.getFlowId() == null){

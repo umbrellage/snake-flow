@@ -33,6 +33,9 @@ public interface JulietFlowClient {
     @PostMapping("/bpm/beforehandForward")
     AjaxResult<FlowVO> beforehandForward(@RequestBody NodeFieldDTO dto);
 
+
+
+
     @PostMapping("/customer/status")
     AjaxResult<List<String>> customerStatus(@RequestBody FlowOpenDTO dto);
 
@@ -61,6 +64,14 @@ public interface JulietFlowClient {
     @Deprecated
     @PostMapping("/init/bpm")
     AjaxResult<Long> initBmp(@RequestBody BpmDTO dto);
+
+    /**
+     *
+     * @param dto templateId 必填
+     * @return 流程实例id
+     */
+    @PostMapping("/init/beforehandInitBmp")
+    AjaxResult<FlowVO> beforehandInitBmp(@RequestBody BpmDTO dto);
 
     /**
      * 发起一个新的流程

@@ -118,6 +118,12 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    public AjaxResult<FlowVO> beforehandInitBmp(BpmDTO dto) {
+        FlowVO flowVO = flowExecuteService.beforehandInitBpmForward(dto);
+        return AjaxResult.success(flowVO);
+    }
+
+    @Override
     public AjaxResult<HistoricTaskInstance> initBmpV2(BpmDTO dto) {
         return AjaxResult.success(flowExecuteService.startFlowV2(dto));
     }
