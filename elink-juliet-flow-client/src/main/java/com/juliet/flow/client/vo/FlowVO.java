@@ -182,7 +182,7 @@ public class FlowVO implements Serializable {
         return nodes.stream()
                 .filter(nodeVO -> nodeVO.getStatus() == 2 || nodeVO.getStatus() == 3)
                 .filter(nodeVO -> CollectionUtils.isNotEmpty(nodeVO.getSupervisorIds()))
-                .anyMatch(nodeVO -> Collections.disjoint(nodeVO.getSupervisorIds(), userIdList));
+                .anyMatch(nodeVO -> !Collections.disjoint(nodeVO.getSupervisorIds(), userIdList));
     }
 
     public Boolean nodeIsHandled(String nodeName) {

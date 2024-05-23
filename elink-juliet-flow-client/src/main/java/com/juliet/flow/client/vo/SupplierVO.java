@@ -1,5 +1,6 @@
 package com.juliet.flow.client.vo;
 
+import java.util.List;
 import lombok.Data;
 
 import java.io.Serializable;
