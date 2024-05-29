@@ -487,6 +487,7 @@ public class Node extends BaseModel {
         NodeVO data = new NodeVO();
         data.setId(id);
         data.setName(name);
+        data.setNodeType(type.getCode());
         data.setExternalNodeId(externalNodeId);
         data.setTitleId(titleId == null ? null : String.valueOf(titleId));
         data.setTitle(title);

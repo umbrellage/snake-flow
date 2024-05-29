@@ -30,6 +30,8 @@ public class NodeVO implements Serializable {
 
     private Long tenantId;
 
+    private Integer nodeType;
+
     /**
      * 模版code
      */
