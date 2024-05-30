@@ -243,7 +243,7 @@ public class FlowContext {
         dto.setReason(reason);
         dto.setFlowId(String.valueOf(nodeFieldDTO.getFlowId()));
         dto.setNodeId(String.valueOf(nodeFieldDTO.getNodeId()));
-        dto.setRollbackType(0);
+        dto.setType(0);
         AjaxResult result = julietFlowClient.rollback(dto);
         if (result == null || !Objects.equals(result.getCode(), 200)) {
             throw new ServiceException("流程回退到开始失败!" + reason);
