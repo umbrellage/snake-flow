@@ -27,6 +27,8 @@ public interface FlowRepository {
 
     Flow queryById(Long id);
 
+    void refreshCache(Long flowId);
+
     List<Flow> queryByIdList(List<Long> idList);
 
     List<Flow> queryByIdList(List<Long> idList,  AssembleFlowCondition condition);

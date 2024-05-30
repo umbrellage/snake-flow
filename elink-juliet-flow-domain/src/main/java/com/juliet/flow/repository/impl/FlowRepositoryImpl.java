@@ -72,7 +72,8 @@ public class FlowRepositoryImpl implements FlowRepository {
         return entity.getId();
     }
 
-    private void cacheFlow(Long flowId) {
+    @Override
+    public void refreshCache(Long flowId) {
         Flow flow = queryByIdFromDb(flowId);
         if (flow != null) {
             flowCache.setFlow(flow);
