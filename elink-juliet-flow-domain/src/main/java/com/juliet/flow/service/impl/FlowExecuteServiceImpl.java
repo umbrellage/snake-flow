@@ -348,8 +348,51 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
-        // TODO: 2024/5/15 异常流程需要处理吗？ 
         Flow flow = flowRepository.queryById(flowId);
+        flowAutomate(flow, automateParam);
+    }
+
+//    @Transactional(rollbackFor = Exception.class)
+//    @Override
+//    public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
+//        // TODO: 2024/5/15 异常流程需要处理吗？
+//        Flow flow = flowRepository.queryById(flowId);
+//        do {
+//            List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
+//            List<Long> nodeIdList = flowAutomateNodeList.stream()
+//                .map(Node::getId)
+//                .collect(Collectors.toList());
+//            flow.getNodes()
+//                .stream()
+//                .filter(e -> nodeIdList.contains(e.getId()))
+//                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
+//            flowRepository.update(flow);
+//            flowAutomateNodeList.forEach(node -> {
+//                NodeFieldDTO fieldDTO = new NodeFieldDTO();
+//                fieldDTO.setFlowId(flowId);
+//                fieldDTO.setNodeId(node.getId());
+//                fieldDTO.setData(automateParam);
+//                forward(fieldDTO);
+//            });
+//            flow = flowRepository.queryById(flowId);
+//        } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
+//
+//        List<Node> rollbackNodeList = flow.canFlowRollback(automateParam);
+//
+//        for (Node rollbackNode : rollbackNodeList) {
+//            flow.rollback(rollbackNode);
+//        }
+//
+//        flowRepository.update(flow);
+////        List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
+////        if (CollectionUtils.isNotEmpty(flowList)) {
+////            flowList
+////        }
+//
+//    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void flowAutomate(Flow flow, Map<String, Object> automateParam) {
         do {
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
             List<Long> nodeIdList = flowAutomateNodeList.stream()
@@ -360,14 +403,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .filter(e -> nodeIdList.contains(e.getId()))
                 .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
             flowRepository.update(flow);
+            Flow finalFlow = flow;
             flowAutomateNodeList.forEach(node -> {
                 NodeFieldDTO fieldDTO = new NodeFieldDTO();
-                fieldDTO.setFlowId(flowId);
+                fieldDTO.setFlowId(finalFlow.getId());
                 fieldDTO.setNodeId(node.getId());
                 fieldDTO.setData(automateParam);
                 forward(fieldDTO);
             });
-            flow = flowRepository.queryById(flowId);
+            flow = flowRepository.queryById(flow.getId());
         } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
 
         List<Node> rollbackNodeList = flow.canFlowRollback(automateParam);
@@ -377,6 +421,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
 
         flowRepository.update(flow);
+        List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
+        if (CollectionUtils.isNotEmpty(flowList)) {
+            flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
+        }
+
     }
 
     public Flow tryFowAutomate(Flow flow, Map<String, Object> automateParam) {
