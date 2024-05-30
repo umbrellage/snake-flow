@@ -6,6 +6,7 @@ import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
 import com.juliet.flow.client.common.FlowStatusEnum;
+import com.juliet.flow.client.dto.ProcessConfigRPCDTO;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
@@ -321,6 +322,9 @@ public class FlowEntityFactory {
         flowTemplate.setUpdateBy(flowTemplateEntity.getUpdateBy());
         flowTemplate.setUpdateTime(flowTemplateEntity.getUpdateTime());
         flowTemplate.setCreateTime(flowTemplateEntity.getCreateTime());
+        if (StringUtils.isNotBlank(flowTemplateEntity.getProcessConfig())) {
+            flowTemplate.setDto(JSON.parseObject(flowTemplateEntity.getProcessConfig(), ProcessConfigRPCDTO.class));
+        }
         return flowTemplate;
     }
 

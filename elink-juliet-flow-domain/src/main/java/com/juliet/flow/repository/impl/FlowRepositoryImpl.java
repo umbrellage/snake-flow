@@ -300,7 +300,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
         FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
         flowTemplate.setNodes(getTemplateStartNodes(flowTemplateEntity.getId()));
-        flowTemplate.setDto(JSON.parseObject(flowTemplateEntity.getProcessConfig(), ProcessConfigRPCDTO.class));
         return flowTemplate;
     }
 
@@ -314,7 +313,6 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
         FlowTemplate flowTemplate = FlowEntityFactory.toFlowTemplate(flowTemplateEntity);
         flowTemplate.setNodes(getTemplateStartNodes(flowTemplateEntity.getId()));
-        flowTemplate.setDto(JSON.parseObject(flowTemplateEntity.getProcessConfig(), ProcessConfigRPCDTO.class));
         return flowTemplate;
     }
 
