@@ -529,7 +529,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
 
-    private List<HistoricTaskInstance> redo(TaskExecute dto) {
+    @Transactional(rollbackFor = Exception.class)
+    public List<HistoricTaskInstance> redo(TaskExecute dto) {
         RedoDTO redo = (RedoDTO) dto;
         Long redoNodeId = null;
         Flow flow = flowRepository.queryById(redo.getFlowId());
@@ -558,6 +559,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<History> historyList = newFlow.forwardHistory(executeNode.getId(), redo.getUserId());
         historyRepository.add(historyList);
         callback(newFlow.normalNotifyList());
+
+        // 流程流转完执行自动流转功能
+        flowAutomate(newFlow.getId(), redo.getParam());
+
         return historyList.stream()
                 .map(History::toHistoricTask)
                 .collect(Collectors.toList());
