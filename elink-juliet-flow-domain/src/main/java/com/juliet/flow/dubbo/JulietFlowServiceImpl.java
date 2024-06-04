@@ -20,7 +20,7 @@ import java.util.List;
  * @date 2024-04-14
  */
 @Service
-@DubboService(timeout = 10000)
+@DubboService(timeout = 10000, mock = "force:return+null")
 public class JulietFlowServiceImpl implements JulietFlowService {
 
     @Autowired
