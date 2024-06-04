@@ -22,7 +22,6 @@ public class RollbackDTO implements TaskExecute {
     /**
      * 0 回退到发起人节点, 1 回退到上一个节点，
      */
-    @JsonProperty("type")
-    private Integer rollbackType;
+    private Integer type;
     private String reason;
 }
