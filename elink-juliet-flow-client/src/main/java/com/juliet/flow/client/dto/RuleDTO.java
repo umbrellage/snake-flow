@@ -30,13 +30,29 @@ public class RuleDTO {
         if (CollectionUtils.isEmpty(fieldValue)) {
             return false;
         }
-        // TODO: 2024/3/6 JudgementTypeEnum 如果有其他类型，比如包含 需要修改
-        boolean result = Objects.equals(String.valueOf(value), String.valueOf(fieldValue.get(0).getValue()));
-        if (judgementType == JudgementTypeEnum.EQ) {
-            return result;
-        } else if(judgementType == JudgementTypeEnum.not_eq){
-            return !result;
+        switch (judgementType) {
+            case EQ:
+                return eq(value);
+            case not_eq:
+                return notEq(value);
+            case EQ_ANY:
+                return eqAny(value);
+            default:
+                return false;
         }
-        return false;
+    }
+
+    private boolean eq(Object value) {
+        return Objects.equals(String.valueOf(value), String.valueOf(fieldValue.get(0).getValue()));
+    }
+
+    private boolean notEq(Object value) {
+        return !eq(value);
+    }
+
+    private boolean eqAny(Object value) {
+        return fieldValue.stream()
+            .map(Selection::getValue)
+            .anyMatch(e -> Objects.equals(value, e));
     }
 }
