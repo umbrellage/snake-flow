@@ -18,7 +18,7 @@ public enum JudgementTypeEnum implements EnumWebService<Integer, String> {
 
     not_eq(1, "不等于"),
 
-//    lt(2,"小于"),
+    EQ_ANY(2,"等于任意一个"),
 //
 //    gt(3,"大于"),
     ;
