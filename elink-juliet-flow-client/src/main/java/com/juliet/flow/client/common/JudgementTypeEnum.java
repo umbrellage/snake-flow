@@ -1,5 +1,6 @@
 package com.juliet.flow.client.common;
 
+import cn.snake.kobe.enums.EnumWebService;
 import java.util.Arrays;
 import java.util.Objects;
 import lombok.Getter;
@@ -11,13 +12,13 @@ import lombok.Getter;
  * @date 2024/1/23
  */
 @Getter
-public enum JudgementTypeEnum {
+public enum JudgementTypeEnum implements EnumWebService<Integer, String> {
 
     EQ(0, "等于"),
 
     not_eq(1, "不等于"),
 
-//    lt(2,"小于"),
+    EQ_ANY(2,"等于任意一个"),
 //
 //    gt(3,"大于"),
     ;
@@ -36,5 +37,15 @@ public enum JudgementTypeEnum {
             .filter(e -> Objects.equals(e.getCode(), code))
             .findAny()
             .orElseThrow(() -> new IllegalArgumentException("未找到对应的枚举值"));
+    }
+
+    @Override
+    public Integer getEnumKey() {
+        return code;
+    }
+
+    @Override
+    public String getEnumValue() {
+        return name;
     }
 }
