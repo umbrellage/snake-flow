@@ -471,7 +471,7 @@ public class Flow extends BaseModel {
             return Collections.emptyList();
         }
         return nodes.stream()
-                .filter(Node::needCallbackMsg)
+//                .filter(Node::needCallbackMsg)
                 .map(node -> node.toNotifyNormal(this))
                 .collect(Collectors.toList());
     }
