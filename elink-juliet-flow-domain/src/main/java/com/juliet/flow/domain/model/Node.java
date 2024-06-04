@@ -171,7 +171,10 @@ public class Node extends BaseModel {
     }
 
     public LocalDateTime processedTime() {
-        if (StringUtils.isNotBlank(flowAutomateRuleName) && status == NodeStatusEnum.PROCESSED) {
+        // 系统节点
+        // 判断系统节点：StringUtils.isNotBlank(flowAutomateRuleName)
+        // 如果节点是完成的，则返回
+        if (status == NodeStatusEnum.PROCESSED) {
             return processedTime;
         }
         if (processedBy == null || processedBy == 0L) {
