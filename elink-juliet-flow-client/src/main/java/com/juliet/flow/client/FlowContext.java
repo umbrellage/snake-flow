@@ -156,6 +156,14 @@ public class FlowContext {
         }
     }
 
+    public static Long nodeId() {
+        NodeFieldDTO nodeFieldDTO = NODE_FIELD_DTO_CACHE.get();
+        if (nodeFieldDTO == null) {
+            return null;
+        }
+        return nodeFieldDTO.getNodeId();
+    }
+
     public static void flowAutomate(Long flowId, Map<String, Object> automateParam) {
         julietFlowClient.flowAutomate(flowId, automateParam);
     }
