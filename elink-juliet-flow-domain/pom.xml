@@ -246,7 +246,7 @@
                 <profileActive>zly-test3</profileActive>
             </properties>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
         </profile>
         <profile>
@@ -256,6 +256,15 @@
             </properties>
             <activation>
                 <activeByDefault>false</activeByDefault>
+            </activation>
+        </profile>
+        <profile>
+            <id>uat</id>
+            <properties>
+                <profileActive>uat</profileActive>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
             </activation>
         </profile>
         <profile>
