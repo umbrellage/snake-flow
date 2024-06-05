@@ -127,6 +127,7 @@ public class NodeVO implements Serializable {
         return ret;
     }
 
+    // 主流程+节点名称去重
     public String distinct() {
         Long id;
         if (mainFlowId != null && mainFlowId != 0) {
