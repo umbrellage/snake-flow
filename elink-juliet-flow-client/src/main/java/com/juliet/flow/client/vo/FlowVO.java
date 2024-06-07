@@ -427,5 +427,11 @@ public class FlowVO implements Serializable {
             .orElse(null);
     }
 
+    public List<NodeVO> needOperatorNodeList(Long userId) {
+        return getNodes().stream()
+            .filter(e -> Objects.equals(e.getProcessedBy(), userId))
+            .filter(e -> e.getStatus() == 3)
+            .collect(Collectors.toList());
+    }
 
 }
