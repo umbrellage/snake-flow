@@ -5,14 +5,18 @@ import com.juliet.flow.client.common.OperateTypeEnum;
 import io.swagger.annotations.ApiModelProperty;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.juliet.flow.client.config.DateTime2String;
 import com.juliet.flow.client.config.String2DateTimeDes;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * NodeVO
@@ -138,5 +142,13 @@ public class NodeVO implements Serializable {
         return id + name;
     }
 
+
+     protected List<String> nextNameList() {
+        if (StringUtils.isBlank(nextName)) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(nextName.split(","))
+            .collect(Collectors.toList());
+    }
 
 }

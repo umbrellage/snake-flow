@@ -155,6 +155,13 @@ public class FlowVO implements Serializable {
             .orElse(null);
     }
 
+    private NodeVO findNode(Long nodeId) {
+        return nodes.stream()
+            .filter(e -> Objects.equals(e.getId(), nodeId))
+            .findAny()
+            .orElse(null);
+    }
+
 
     /**
      * @param userId
@@ -378,5 +385,47 @@ public class FlowVO implements Serializable {
         return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
 
     }
+
+
+    /**
+     * 获取节点后的所有节点
+     * @param nodeId
+     * @return
+     */
+    public List<NodeVO> afterNodeList(Long nodeId) {
+        List<NodeVO> nodeList = new ArrayList<>();
+        LinkedList<NodeVO> nodePool = new LinkedList<>();
+        nodePool.add(findNode(nodeId));
+        while (CollectionUtils.isNotEmpty(nodePool)) {
+            NodeVO node = nodePool.poll();
+            List<NodeVO> nextNodeList = findNextNodeList(node);
+            if (CollectionUtils.isNotEmpty(nextNodeList)) {
+                nodeList.addAll(nextNodeList);
+                nodePool.addAll(nextNodeList);
+            }
+        }
+        return nodeList.stream()
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
+    private List<NodeVO> findNextNodeList(NodeVO nodeVO) {
+        if (nodeVO == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> nextNameList = nodeVO.nextNameList();
+        return nextNameList.stream()
+            .map(this::findByNode)
+            .collect(Collectors.toList());
+    }
+
+    private NodeVO findByNode(String nodeName) {
+        return nodes.stream()
+            .filter(e -> StringUtils.equals(e.getName(), nodeName))
+            .findAny()
+            .orElse(null);
+    }
+
 
 }
