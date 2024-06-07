@@ -53,6 +53,6 @@ public class RuleDTO {
     private boolean eqAny(Object value) {
         return fieldValue.stream()
             .map(Selection::getValue)
-            .anyMatch(e -> Objects.equals(value, e));
+            .anyMatch(e -> Objects.equals(String.valueOf(value), String.valueOf(e)));
     }
 }
