@@ -12,8 +12,16 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+//import org.apache.rocketmq.client.apis.*;
+//import org.apache.rocketmq.client.apis.message.Message;
+//import org.apache.rocketmq.client.apis.producer.Producer;
+//import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-import org.springframework.amqp.core.AmqpTemplate;
+//import org.springframework.amqp.core.AmqpTemplate;
+import org.apache.rocketmq.client.apis.*;
+import org.apache.rocketmq.client.apis.message.Message;
+import org.apache.rocketmq.client.apis.producer.Producer;
+import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,16 +53,16 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 
     @Override
     public void notify(List<NotifyDTO> list) {
-        log.info("notify param:{}", JSON.toJSONString(list));
-        try {
-            AjaxResult<Void> result = callbackClient.callback(list.stream()
-                .filter(e -> e.getType() != NotifyTypeEnum.END && e.getType() != NotifyTypeEnum.INVALID)
-                .collect(Collectors.toList())
-            );
-            log.info("callback result:{}", result);
-        } catch (Exception e) {
-            log.error("callback error!", e);
-        }
+//        log.info("notify param:{}", JSON.toJSONString(list));
+//        try {
+//            AjaxResult<Void> result = callbackClient.callback(list.stream()
+//                .filter(e -> e.getType() != NotifyTypeEnum.END && e.getType() != NotifyTypeEnum.INVALID)
+//                .collect(Collectors.toList())
+//            );
+//            log.info("callback result:{}", result);
+//        } catch (Exception e) {
+//            log.error("callback error!", e);
+//        }
     }
 
     @Override
