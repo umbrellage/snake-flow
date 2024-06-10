@@ -684,6 +684,9 @@ public class Flow extends BaseModel {
                 if (node.getStatus() == NodeStatusEnum.IGNORE) {
                     node.setStatus(NodeStatusEnum.PROCESSED);
                 }
+                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                    node.setProcessedBy(standardNode.getProcessedBy());
+                }
             }
         });
 

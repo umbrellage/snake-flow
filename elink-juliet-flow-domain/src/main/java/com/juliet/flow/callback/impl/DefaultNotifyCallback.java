@@ -1,31 +1,18 @@
 package com.juliet.flow.callback.impl;
 
 import com.alibaba.fastjson2.JSON;
-import com.juliet.common.core.web.domain.AjaxResult;
 import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.NotifyMessageDTO;
-import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
-
-import java.util.List;
-
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-//import org.apache.rocketmq.client.apis.*;
-//import org.apache.rocketmq.client.apis.message.Message;
-//import org.apache.rocketmq.client.apis.producer.Producer;
-//import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
-//import org.springframework.amqp.core.AmqpTemplate;
-import org.apache.rocketmq.client.apis.*;
-import org.apache.rocketmq.client.apis.message.Message;
-import org.apache.rocketmq.client.apis.producer.Producer;
-import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 /**
  * DefaultNotifyCallback

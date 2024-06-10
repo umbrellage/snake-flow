@@ -155,6 +155,13 @@ public class FlowVO implements Serializable {
             .orElse(null);
     }
 
+    private NodeVO findNode(Long nodeId) {
+        return nodes.stream()
+            .filter(e -> Objects.equals(e.getId(), nodeId))
+            .findAny()
+            .orElse(null);
+    }
+
 
     /**
      * @param userId
@@ -377,6 +384,54 @@ public class FlowVO implements Serializable {
         boolean flowInnerExist = node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() && StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
         return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
 
+    }
+
+
+    /**
+     * 获取节点后的所有节点
+     * @param nodeId
+     * @return
+     */
+    public List<NodeVO> afterNodeList(Long nodeId) {
+        List<NodeVO> nodeList = new ArrayList<>();
+        LinkedList<NodeVO> nodePool = new LinkedList<>();
+        nodePool.add(findNode(nodeId));
+        while (CollectionUtils.isNotEmpty(nodePool)) {
+            NodeVO node = nodePool.poll();
+            List<NodeVO> nextNodeList = findNextNodeList(node);
+            if (CollectionUtils.isNotEmpty(nextNodeList)) {
+                nodeList.addAll(nextNodeList);
+                nodePool.addAll(nextNodeList);
+            }
+        }
+        return nodeList.stream()
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
+    private List<NodeVO> findNextNodeList(NodeVO nodeVO) {
+        if (nodeVO == null) {
+            return Collections.emptyList();
+        }
+
+        List<String> nextNameList = nodeVO.nextNameList();
+        return nextNameList.stream()
+            .map(this::findByNode)
+            .collect(Collectors.toList());
+    }
+
+    private NodeVO findByNode(String nodeName) {
+        return nodes.stream()
+            .filter(e -> StringUtils.equals(e.getName(), nodeName))
+            .findAny()
+            .orElse(null);
+    }
+
+    public List<NodeVO> needOperatorNodeList(Long userId) {
+        return getNodes().stream()
+            .filter(e -> Objects.equals(e.getProcessedBy(), userId))
+            .filter(e -> e.getStatus() == 3)
+            .collect(Collectors.toList());
     }
 
 }
