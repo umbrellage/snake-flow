@@ -241,7 +241,8 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
-        return assembleFlow(flowEntities, AssembleFlowCondition.noExcludeFields());
+        List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
+        return queryByIdList(flowIdList, AssembleFlowCondition.noExcludeFields());
     }
 
     @Override
