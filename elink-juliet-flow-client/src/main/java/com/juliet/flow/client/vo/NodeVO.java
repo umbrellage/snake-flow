@@ -121,6 +121,21 @@ public class NodeVO implements Serializable {
     @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;
 
+    public Long nodeFormId() {
+        if (form == null) {
+            return null;
+        }
+        String formIdStr = StringUtils.substringAfterLast(form.getCode(), ":");
+        if (StringUtils.isBlank(formIdStr)) {
+            return null;
+        }
+        try {
+            return Long.valueOf(formIdStr);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public NodeSimpleVO toSimple() {
         NodeSimpleVO ret = new NodeSimpleVO();
         ret.setId(id);
