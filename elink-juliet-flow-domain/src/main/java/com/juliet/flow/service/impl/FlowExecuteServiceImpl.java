@@ -343,6 +343,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowList.stream()
                 .peek(Flow::earlyEndFlow)
                 .forEach(e -> flowRepository.update(e));
+        callback(flow.normalNotifyList());
     }
 
     @Transactional(rollbackFor = Exception.class)
