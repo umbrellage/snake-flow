@@ -275,11 +275,19 @@ public class FlowContext {
     }
 
     public static Long submit(String templateCode, Long userId, Long tenantId) {
-        return submit(templateCode, userId, tenantId, null, julietFlowClient::initBmp);
+        Map<String, Object> cache = LOCAL_CACHE.get();
+        if (cache == null) {
+            cache = new HashMap<>();
+        }
+        return submit(templateCode, userId, tenantId,cache, julietFlowClient::initBmp);
     }
 
     public static Long submitOnlyFlow(String templateCode, Long userId, Long tenantId) {
-        return submit(templateCode, userId, tenantId, null, julietFlowClient::initBmpOnlyFlow);
+        Map<String, Object> cache = LOCAL_CACHE.get();
+        if (cache == null) {
+            cache = new HashMap<>();
+        }
+        return submit(templateCode, userId, tenantId, cache, julietFlowClient::initBmpOnlyFlow);
     }
 
 }
