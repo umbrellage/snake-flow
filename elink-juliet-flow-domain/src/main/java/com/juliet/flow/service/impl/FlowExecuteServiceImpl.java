@@ -353,45 +353,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         flowAutomate(flow, automateParam);
     }
 
-//    @Transactional(rollbackFor = Exception.class)
-//    @Override
-//    public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
-//        // TODO: 2024/5/15 异常流程需要处理吗？
-//        Flow flow = flowRepository.queryById(flowId);
-//        do {
-//            List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
-//            List<Long> nodeIdList = flowAutomateNodeList.stream()
-//                .map(Node::getId)
-//                .collect(Collectors.toList());
-//            flow.getNodes()
-//                .stream()
-//                .filter(e -> nodeIdList.contains(e.getId()))
-//                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
-//            flowRepository.update(flow);
-//            flowAutomateNodeList.forEach(node -> {
-//                NodeFieldDTO fieldDTO = new NodeFieldDTO();
-//                fieldDTO.setFlowId(flowId);
-//                fieldDTO.setNodeId(node.getId());
-//                fieldDTO.setData(automateParam);
-//                forward(fieldDTO);
-//            });
-//            flow = flowRepository.queryById(flowId);
-//        } while (CollectionUtils.isNotEmpty(flow.canFlowAutomate(automateParam)));
-//
-//        List<Node> rollbackNodeList = flow.canFlowRollback(automateParam);
-//
-//        for (Node rollbackNode : rollbackNodeList) {
-//            flow.rollback(rollbackNode);
-//        }
-//
-//        flowRepository.update(flow);
-////        List<Flow> flowList = flowRepository.listFlowByParentId(flowId);
-////        if (CollectionUtils.isNotEmpty(flowList)) {
-////            flowList
-////        }
-//
-//    }
-
     @Transactional(rollbackFor = Exception.class)
     public void flowAutomate(Flow flow, Map<String, Object> automateParam) {
         do {
@@ -973,10 +934,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<History> forwardHistory = subFlow.forwardHistory(subNode.getId(), dto.getExecuteId());
         historyRepository.add(forwardHistory);
         // 发送消息提醒
-        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-        callback(notifyDTOList);
+//        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
+//                .flatMap(Collection::stream)
+//                .collect(Collectors.toList());
+        callback(flow.anomalyNotifyList());
+        callback(subFlow.normalNotifyList());
 
         return forwardHistory.stream()
                 .map(History::toHistoricTask)
@@ -1105,8 +1067,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (CollectionUtils.isNotEmpty(list)) {
             CompletableFuture.runAsync(() ->
                     msgNotifyCallbacks.forEach(callback -> {
-                        callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY)
-                                .collect(Collectors.toList()));
+//                        callback.notify(list.stream().filter(notify -> notify.getTodoNotify() == TodoNotifyEnum.NOTIFY)
+//                                .collect(Collectors.toList()));
                         callback.message(list);
                     })
             );
