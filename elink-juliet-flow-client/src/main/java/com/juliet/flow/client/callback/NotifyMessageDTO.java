@@ -14,4 +14,5 @@ public class NotifyMessageDTO {
     private Long flowId;
     private NotifyTypeEnum type;
     private Long tenantId;
+    private String msg;
 }
