@@ -75,6 +75,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
         dto.setType(notifyDTO.getType());
         dto.setTenantId(notifyDTO.getTenantId());
         dto.setMsg(notifyDTO.getRemark());
+        dto.setUserId(notifyDTO.getUserId());
         return dto;
     }
 }

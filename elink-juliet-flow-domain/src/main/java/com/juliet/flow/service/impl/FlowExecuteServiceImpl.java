@@ -1054,7 +1054,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 notifyDTOList.add(delete);
             }
         }
-        callback(notifyDTOList);
+        notifyDTOList.forEach(notifyDTO -> callback(Collections.singletonList(notifyDTO)));
+//        callback(notifyDTOList);
     }
 
     private void callback(List<NotifyDTO> list) {
