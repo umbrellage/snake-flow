@@ -24,11 +24,6 @@ import java.util.List;
 @Slf4j
 public class DefaultNotifyCallback implements MsgNotifyCallback {
 
-//    @Value(("${spring.rabbitmq.exchange.callback}"))
-//    private String exchange;
-
-//    @Autowired
-//    private AmqpTemplate rabbitMqTemplate;
     @Autowired
     private CallbackClient callbackClient;
 
