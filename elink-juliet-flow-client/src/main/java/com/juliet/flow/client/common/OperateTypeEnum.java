@@ -35,6 +35,10 @@ public enum OperateTypeEnum {
      * 重做
      */
     REDO(5),
+    /**
+     * 发起异常流程
+     */
+    ERROR(6),
 
     ;
 
