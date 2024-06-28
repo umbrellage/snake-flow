@@ -57,11 +57,12 @@ public class FlowCache {
     }
 
     public Flow getFlow(Long id) {
-        return cache.getIfPresent(buildFlowCacheKey(id));
-//        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
+//        return cache.getIfPresent(buildFlowCacheKey(id));
+        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
     }
 
     public void removeFlow(Long id) {
+        redisService.deleteObject(buildFlowCacheKey(id));
         cache.invalidate(buildFlowCacheKey(id));
     }
 
