@@ -202,7 +202,7 @@ public class FlowVO implements Serializable {
 
 
     public boolean end() {
-        return status == 3;
+        return status == 3 && (CollectionUtils.isEmpty(subFlowList) || subFlowList.stream().allMatch(FlowVO::end));
     }
 
     @Deprecated
