@@ -323,23 +323,6 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 给节点分配一个待办人
-     *
-     * @param nodeId
-     * @param userId
-     */
-    public void claimNode(Long nodeId, Long userId) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return;
-        }
-        Node currentNode = findNodeThrow(nodeId);
-        boolean preHandled = ifPreNodeIsHandle(currentNode.getName());
-        if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
-            currentNode.setProcessedBy(userId);
-            currentNode.setStatus(NodeStatusEnum.ACTIVE);
-        }
-    }
 
     /**
      * 给节点分配一个待办人
@@ -356,10 +339,12 @@ public class Flow extends BaseModel {
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
+            currentNode.setActiveTime(LocalDateTime.now());
             currentNode.setProcessedTime(LocalDateTime.now());
         } else {
             currentNode.setProcessedBy(userId);
             currentNode.setProcessedTime(LocalDateTime.now());
+            currentNode.setClaimTime(LocalDateTime.now());
         }
     }
 
@@ -529,6 +514,7 @@ public class Flow extends BaseModel {
             if (node.getType() == NodeTypeEnum.END) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
                 node.setProcessedTime(LocalDateTime.now());
+                node.setFinishTime(LocalDateTime.now());
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
@@ -538,8 +524,10 @@ public class Flow extends BaseModel {
                 node.regularFlowInnerOperator(this);
                 if (node.nodeTodo()) {
                     node.setStatus(NodeStatusEnum.ACTIVE);
+                    node.setActiveTime(LocalDateTime.now());
                 } else {
                     node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                    node.setActiveTime(LocalDateTime.now());
                 }
                 return;
             }
