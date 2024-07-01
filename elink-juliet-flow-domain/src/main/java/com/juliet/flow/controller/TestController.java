@@ -47,4 +47,18 @@ public class TestController {
         flowExecuteService.resetMsgByFlowId(flowId);
         return AjaxResult.success();
     }
+
+    @ApiOperation("消息重发")
+    @GetMapping("/trx/test")
+    public AjaxResult<Void> trxTest() {
+        flowExecuteService.trxTest();
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("消息重发")
+    @GetMapping("/trx/test2")
+    public AjaxResult<Void> trxTest2() {
+        flowExecuteService.trxTest2();
+        return AjaxResult.success();
+    }
 }

@@ -12,8 +12,11 @@ import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
+import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.common.utils.JulietSqlUtil;
+import com.juliet.flow.dao.SupplierDao;
 import com.juliet.flow.domain.dto.TaskForwardDTO;
+import com.juliet.flow.domain.entity.SupplierEntity;
 import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.query.AssembleFlowCondition;
 import com.juliet.flow.repository.FlowRepository;
@@ -28,6 +31,8 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
 
@@ -58,6 +63,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Autowired
     private HistoryRepository historyRepository;
+
+    @Autowired
+    private SupplierDao supplierDao;
 
     @Override
     public NodeVO queryStartNodeById(FlowOpenDTO dto) {
@@ -171,13 +179,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         return node.toNodeVo(flow);
     }
 
-    public NodeVO nodeNew(TaskDTO dto) {
-
-
-
-
-        return null;
-    }
 
     @Deprecated
     @Override
@@ -743,6 +744,46 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
 
         return tryFowAutomate(flow, dto.getData()).flowVO(Collections.emptyList());
+    }
+
+    @Override
+    public void trxTest() {
+        trxTest2();
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED, isolation = Isolation.SERIALIZABLE)
+    public void trxTest2() {
+        SupplierEntity supplier1 = new SupplierEntity();
+        supplier1.setId(IdGenerator.getId());
+        supplier1.setNodeId(11L);
+        supplier1.setSupplierType("xx");
+        supplier1.setSupplierId(12L);
+        supplier1.setSupplierName("xxxx");
+        supplier1.setDelFlag(1);
+        supplier1.setCreateTime(new Date());
+        supplier1.setUpdateTime(new Date());
+        supplier1.setCreateBy(1L);
+        supplier1.setUpdateBy(1L);
+        supplier1.setTenantId(1L);
+
+        supplierDao.insert(supplier1);
+
+        throw new ServiceException("xxxx");
+
+//        SupplierEntity supplier2 = new SupplierEntity();
+//        supplier2.setId(IdGenerator.getId());
+//        supplier2.setNodeId(11L);
+//        supplier2.setSupplierType("aa");
+//        supplier2.setSupplierId(13L);
+//        supplier2.setSupplierName("aa");
+//        supplier2.setDelFlag(1);
+//        supplier2.setCreateTime(new Date());
+//        supplier2.setUpdateTime(new Date());
+//        supplier2.setCreateBy(1L);
+//        supplier2.setUpdateBy(1L);
+//        supplier2.setTenantId(1L);
+
     }
 
     @Override
