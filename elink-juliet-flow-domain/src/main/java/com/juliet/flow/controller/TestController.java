@@ -8,6 +8,7 @@ import com.juliet.flow.repository.impl.FlowCache;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
