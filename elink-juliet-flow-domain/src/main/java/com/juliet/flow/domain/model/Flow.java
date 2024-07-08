@@ -323,23 +323,6 @@ public class Flow extends BaseModel {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 给节点分配一个待办人
-     *
-     * @param nodeId
-     * @param userId
-     */
-    public void claimNode(Long nodeId, Long userId) {
-        if (CollectionUtils.isEmpty(nodes)) {
-            return;
-        }
-        Node currentNode = findNodeThrow(nodeId);
-        boolean preHandled = ifPreNodeIsHandle(currentNode.getName());
-        if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
-            currentNode.setProcessedBy(userId);
-            currentNode.setStatus(NodeStatusEnum.ACTIVE);
-        }
-    }
 
     /**
      * 给节点分配一个待办人
@@ -356,10 +339,12 @@ public class Flow extends BaseModel {
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
+            currentNode.setClaimTime(LocalDateTime.now());
             currentNode.setProcessedTime(LocalDateTime.now());
         } else {
             currentNode.setProcessedBy(userId);
             currentNode.setProcessedTime(LocalDateTime.now());
+            currentNode.setClaimTime(LocalDateTime.now());
         }
     }
 
@@ -431,6 +416,9 @@ public class Flow extends BaseModel {
             if (nextNameList.contains(node.getName()) && node.getStatus() != NodeStatusEnum.NOT_ACTIVE) {
 
                 node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+                node.setFinishTime(null);
+                node.setClaimTime(null);
+                node.setActiveTime(null);
                 toBeProcessedNodeList.add(node);
             }
         });
@@ -439,26 +427,6 @@ public class Flow extends BaseModel {
         }
     }
 
-    /**
-     * 递归设置节点状态为忽略
-     *
-     * @param ignoreNode 需要被忽略的节点
-     */
-    public void ignoreEqualAfterNode(Node ignoreNode) {
-        ignoreNode.setStatus(NodeStatusEnum.IGNORE);
-        List<String> nextNameList = ignoreNode.nextNameList();
-        List<Node> ignoreNodeList = nextNameList.stream()
-                .map(this::findNode)
-                .filter(node -> node.preNameList().stream()
-                        .map(this::findNode)
-                        .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
-                .distinct()
-                .collect(Collectors.toList());
-
-        for (Node node : ignoreNodeList) {
-            ignoreEqualAfterNode(node);
-        }
-    }
 
 
     /**
@@ -511,6 +479,27 @@ public class Flow extends BaseModel {
                 .forEach(node -> activeNode(node, param));
     }
 
+    /**
+     * 递归设置节点状态为忽略
+     *
+     * @param ignoreNode 需要被忽略的节点
+     */
+    public void ignoreEqualAfterNode(Node ignoreNode) {
+        ignoreNode.setStatus(NodeStatusEnum.IGNORE);
+        List<String> nextNameList = ignoreNode.nextNameList();
+        List<Node> ignoreNodeList = nextNameList.stream()
+            .map(this::findNode)
+            .filter(node -> node.preNameList().stream()
+                .map(this::findNode)
+                .allMatch(preNode -> preNode.getStatus() == NodeStatusEnum.IGNORE))
+            .distinct()
+            .collect(Collectors.toList());
+
+        for (Node node : ignoreNodeList) {
+            ignoreEqualAfterNode(node);
+        }
+    }
+
     public void activeNode(Node node, Map<String, Object> param) {
         log.info("node:{}", JSON.toJSON(node));
         boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule() == null || node.getActiveRule()
@@ -529,6 +518,8 @@ public class Flow extends BaseModel {
             if (node.getType() == NodeTypeEnum.END) {
                 node.setStatus(NodeStatusEnum.PROCESSED);
                 node.setProcessedTime(LocalDateTime.now());
+                node.setFinishTime(LocalDateTime.now());
+                node.setActiveTime(LocalDateTime.now());
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
@@ -538,13 +529,24 @@ public class Flow extends BaseModel {
                 node.regularFlowInnerOperator(this);
                 if (node.nodeTodo()) {
                     node.setStatus(NodeStatusEnum.ACTIVE);
+                    node.setActiveTime(LocalDateTime.now());
+                    // 为什么已经有操作人了，还会存在认领时间为空呢，因为在新建异常流程情况下，会把一些在主流程中已处理的，
+                    // 在异常流程中并未执行到的节点的激活时间，认领时间，完成时间都设置为空
+                    if (node.getClaimTime() == null) {
+                        node.setClaimTime(LocalDateTime.now());
+                    }
                 } else {
                     node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
+                    node.setActiveTime(LocalDateTime.now());
+                    node.setClaimTime(null);
                 }
                 return;
             }
             if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                 node.setStatus(NodeStatusEnum.ACTIVE);
+                node.setActiveTime(LocalDateTime.now());
+                node.setClaimTime(LocalDateTime.now());
+                node.setFinishTime(null);
             }
         }
     }
@@ -747,6 +749,9 @@ public class Flow extends BaseModel {
                 node.getStatus() == NodeStatusEnum.ACTIVE ||
                 node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
             node.setStatus(NodeStatusEnum.NOT_ACTIVE);
+            node.setActiveTime(null);
+            node.setFinishTime(null);
+            node.setClaimTime(null);
         }
         List<String> nextNameList = node.nextNameList();
         nextNameList.forEach(nextName -> {

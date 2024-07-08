@@ -5,6 +5,7 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.NotifyMessageDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import java.util.concurrent.CyclicBarrier;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
         }
+
+        
     }
 
 

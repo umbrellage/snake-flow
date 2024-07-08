@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.juliet.flow.domain.model.Node;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.stream.Collectors;
@@ -110,6 +111,19 @@ public class NodeEntity extends BaseEntity {
      * 规则自动流转的规则名称
      */
     private String flowAutomateRuleName;
+    /**
+     * 节点激活时间
+     */
+    private LocalDateTime activeTime;
+    /**
+     * 节点认领，分配时间
+     */
+    private LocalDateTime claimTime;
+
+    private LocalDateTime finishTime;
+
+
+
 
     /**
      * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法, 并考虑历史数据

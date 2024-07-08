@@ -135,6 +135,17 @@ public class Node extends BaseModel {
 
     private List<AccessRuleDTO> rollbackRuleList;
 
+    /**
+     * 节点激活时间
+     */
+    private LocalDateTime activeTime;
+    /**
+     * 节点认领时间
+     */
+    private LocalDateTime claimTime;
+
+    private LocalDateTime finishTime;
+
 
     public boolean ifLeaderAdjust(Long userId) {
         // userId为null或者为0说明不是主管调整处理人，放行不需要校验
@@ -190,6 +201,7 @@ public class Node extends BaseModel {
             if (assignProcessedBy != null) {
                 processedBy = assignProcessedBy;
                 processedTime = LocalDateTime.now();
+                claimTime = LocalDateTime.now();
             }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null && supplierDTO.getSupplierId() != null) {
@@ -218,6 +230,7 @@ public class Node extends BaseModel {
                 .ifPresent(node -> {
                     this.processedBy = node.getProcessedBy();
                     this.processedTime = LocalDateTime.now();
+                    this.claimTime = LocalDateTime.now();
                 });
     }
 
@@ -606,6 +619,9 @@ public class Node extends BaseModel {
         node.rollbackRuleList = rollbackRuleList;
         node.ruleList = ruleList;
         node.flowAutomateRule = flowAutomateRule;
+        node.claimTime = claimTime;
+        node.finishTime = finishTime;
+        node.activeTime = activeTime;
         return node;
     }
 

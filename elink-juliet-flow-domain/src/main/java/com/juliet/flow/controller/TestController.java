@@ -8,6 +8,7 @@ import com.juliet.flow.repository.impl.FlowCache;
 import com.juliet.flow.service.FlowExecuteService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import javax.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +46,20 @@ public class TestController {
     @GetMapping("/msg/resend")
     public AjaxResult<Void> resendMsg(@RequestParam("flowId") Long flowId) {
         flowExecuteService.resetMsgByFlowId(flowId);
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("消息重发")
+    @GetMapping("/trx/test")
+    public AjaxResult<Void> trxTest() {
+        flowExecuteService.trxTest();
+        return AjaxResult.success();
+    }
+
+    @ApiOperation("消息重发")
+    @GetMapping("/trx/test2")
+    public AjaxResult<Void> trxTest2() {
+        flowExecuteService.trxTest2();
         return AjaxResult.success();
     }
 }
