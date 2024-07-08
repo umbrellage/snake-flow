@@ -619,6 +619,9 @@ public class Node extends BaseModel {
         node.rollbackRuleList = rollbackRuleList;
         node.ruleList = ruleList;
         node.flowAutomateRule = flowAutomateRule;
+        node.claimTime = claimTime;
+        node.finishTime = finishTime;
+        node.activeTime = activeTime;
         return node;
     }
 

@@ -909,7 +909,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 if (mainNode.isProcessed() && skipCreateSubFlow) {
                     return null;
                 }
-                // 主流程节点，且是异常节点，但是不需要创建异常流程
+                // 主流程节点，且是异常节点，但是需要创建异常流程
                 if (mainNode.isProcessed() && !skipCreateSubFlow) {
                     Flow subFlow = mainFlow.subFlow();
                     subFlow.modifyNodeStatus(mainNode);
