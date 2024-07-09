@@ -33,10 +33,19 @@
         <result column="create_time" property="createTime" />
         <result column="update_by" property="updateBy" />
         <result column="update_time" property="updateTime" />
+        <result column="active_time" property="activeTime" />
+        <result column="claim_time" property="claimTime" />
+        <result column="finish_time" property="finishTime" />
+
     </resultMap>
 
-    <sql id="fieldList">id, flow_inner_assignment,distribute_node, flow_automate_rule_name, forward_rule_list, rollback_rule_list, access_rule_list, rule_list, external_node_id, title_id, title, node_name, pre_name, next_name, flow_id, flow_template_id, access_rule_name, submit_rule_name, assign_rule_name, supervisor_assignment, self_and_supervisor_assignment, rule_assignment, supervisor_ids, node_type, node_status, custom_status, processed_by, del_flag, tenant_id, create_time, update_time, create_by, update_by, todo_notify, modify_other_todo_name</sql>
-    <sql id="fieldListT1">t1.id, t1.flow_inner_assignment, t1.distribute_node, t1.flow_automate_rule_name, t1.forward_rule_list, t1.rollback_rule_list, t1.access_rule_list, t1.rule_list, t1.external_node_id, t1.title_id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.access_rule_name, t1.submit_rule_name, t1.assign_rule_name, t1.supervisor_assignment, t1.self_and_supervisor_assignment, t1.rule_assignment, t1.supervisor_ids, t1.node_type, t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time, t1.todo_notify, t1.modify_other_todo_name</sql>
+    <sql id="fieldList">id, flow_inner_assignment,distribute_node, flow_automate_rule_name, forward_rule_list,
+rollback_rule_list, access_rule_list, rule_list, external_node_id, title_id, title,
+node_name, pre_name, next_name, flow_id, flow_template_id, access_rule_name, submit_rule_name,
+assign_rule_name, supervisor_assignment, self_and_supervisor_assignment, rule_assignment, supervisor_ids, node_type, node_status, custom_status, processed_by, del_flag, tenant_id,
+        create_time, update_time, create_by, update_by, todo_notify, modify_other_todo_name, active_time, claim_time, finish_time</sql>
+    <sql id="fieldListT1">t1.id, t1.flow_inner_assignment, t1.distribute_node, t1.flow_automate_rule_name, t1.forward_rule_list, t1.rollback_rule_list, t1.access_rule_list, t1.rule_list, t1.external_node_id, t1.title_id, t1.title, t1.node_name, t1.pre_name, t1.next_name, t1.flow_id, t1.flow_template_id, t1.access_rule_name, t1.submit_rule_name, t1.assign_rule_name, t1.supervisor_assignment, t1.self_and_supervisor_assignment, t1.rule_assignment, t1.supervisor_ids, t1.node_type,
+t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag, t1.create_time, t1.update_time, t1.create_by, t1.update_by, t1.rep_time, t1.todo_notify, t1.modify_other_todo_name, t1.active_time, t1.claim_time, t1.finish_time</sql>
     <sql id="tableName">jbpm_flow_node</sql>
 
     <select id="listNode" resultMap="BaseResultMap">
@@ -79,7 +88,8 @@
         <foreach collection="nodeEntities" item="entity" separator=",">
             (#{entity.id}, #{entity.flowInnerAssignment},#{entity.distributeNode}, #{entity.flowAutomateRuleName}, #{entity.forwardRuleList}, #{entity.rollbackRuleList}, #{entity.accessRuleList}, #{entity.ruleList}, #{entity.externalNodeId}, #{entity.titleId}, #{entity.title},#{entity.name},#{entity.preName},#{entity.nextName},#{entity.flowId},#{entity.flowTemplateId},
             #{entity.accessRuleName},#{entity.submitRuleName},#{entity.assignRuleName},#{entity.supervisorAssignment},#{entity.selfAndSupervisorAssignment},#{entity.ruleAssignment},#{entity.supervisorIds},
-            #{entity.type},#{entity.status},#{entity.customStatus},#{entity.processedBy},0,#{entity.tenantId},#{entity.createTime},#{entity.updateTime},#{entity.createBy},#{entity.updateBy},#{entity.todoNotify},#{entity.modifyOtherTodoName})
+            #{entity.type},#{entity.status},#{entity.customStatus},#{entity.processedBy},0,#{entity.tenantId},#{entity.createTime},#{entity.updateTime},#{entity.createBy},#{entity.updateBy},#{entity.todoNotify},#{entity.modifyOtherTodoName}
+            #{entity.activeTime},#{entity.claimTime},#{entity.finishTime})
         </foreach>
     </insert>
 
