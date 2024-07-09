@@ -5,6 +5,7 @@ import com.juliet.flow.callback.MsgNotifyCallback;
 import com.juliet.flow.client.CallbackClient;
 import com.juliet.flow.client.callback.NotifyMessageDTO;
 import com.juliet.flow.client.dto.NotifyDTO;
+import jodd.util.ThreadUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,10 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
         try {
             NotifyMessageDTO dto = toMessageDTO(list.get(0));
             log.info("transfer data:{}", JSON.toJSONString(dto));
-            rocketMQTemplate.syncSendDelayTimeMills(flowNotifyTopic, dto, 500);
+            // 延时消息关闭了？
+//            rocketMQTemplate.syncSendDelayTimeMills(flowNotifyTopic, dto, 500);
+            ThreadUtil.sleep(500L);
+            rocketMQTemplate.syncSend(flowNotifyTopic, dto);
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
         }
