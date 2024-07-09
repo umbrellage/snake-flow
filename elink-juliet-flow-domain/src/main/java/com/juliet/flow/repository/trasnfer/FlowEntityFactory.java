@@ -307,7 +307,9 @@ public class FlowEntityFactory {
         nodeEntity.setRollbackRuleList(JSON.toJSONString(node.getRollbackRuleList()));
         nodeEntity.setForwardRuleList(JSON.toJSONString(node.getForwardRuleList()));
         nodeEntity.setTodoNotify(node.getTodoNotify().getCode());
-
+        nodeEntity.setActiveTime(node.getActiveTime());
+        nodeEntity.setClaimTime(node.getClaimTime());
+        nodeEntity.setFinishTime(node.getFinishTime());
         return nodeEntity;
     }
 
@@ -382,6 +384,9 @@ public class FlowEntityFactory {
         node.setRollbackRuleList(JSON.parseArray(nodeEntity.getRollbackRuleList(), AccessRuleDTO.class));
         node.setModifyOtherTodoName(nodeEntity.getModifyOtherTodoName());
         node.setFlowAutomateRule(RuleFactory.flowAutomateRule(nodeEntity.getFlowAutomateRuleName()));
+        node.setClaimTime(nodeEntity.getClaimTime());
+        node.setActiveTime(nodeEntity.getActiveTime());
+        node.setFinishTime(nodeEntity.getFinishTime());
         return node;
     }
 

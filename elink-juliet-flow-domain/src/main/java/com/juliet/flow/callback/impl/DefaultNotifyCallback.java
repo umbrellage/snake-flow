@@ -64,6 +64,8 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
         } catch (Exception e) {
             log.error("send callback msg to mq fail!", e);
         }
+
+
     }
 
 

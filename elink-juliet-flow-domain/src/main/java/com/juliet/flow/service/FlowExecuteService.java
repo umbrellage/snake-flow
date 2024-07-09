@@ -81,4 +81,8 @@ public interface FlowExecuteService {
     FlowVO beforehandForward(NodeFieldDTO dto);
 
     FlowVO beforehandInitBpmForward(BpmDTO dto);
+
+    void trxTest();
+
+    void trxTest2();
 }
