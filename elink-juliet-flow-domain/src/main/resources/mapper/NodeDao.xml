@@ -88,7 +88,7 @@ t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag
         <foreach collection="nodeEntities" item="entity" separator=",">
             (#{entity.id}, #{entity.flowInnerAssignment},#{entity.distributeNode}, #{entity.flowAutomateRuleName}, #{entity.forwardRuleList}, #{entity.rollbackRuleList}, #{entity.accessRuleList}, #{entity.ruleList}, #{entity.externalNodeId}, #{entity.titleId}, #{entity.title},#{entity.name},#{entity.preName},#{entity.nextName},#{entity.flowId},#{entity.flowTemplateId},
             #{entity.accessRuleName},#{entity.submitRuleName},#{entity.assignRuleName},#{entity.supervisorAssignment},#{entity.selfAndSupervisorAssignment},#{entity.ruleAssignment},#{entity.supervisorIds},
-            #{entity.type},#{entity.status},#{entity.customStatus},#{entity.processedBy},0,#{entity.tenantId},#{entity.createTime},#{entity.updateTime},#{entity.createBy},#{entity.updateBy},#{entity.todoNotify},#{entity.modifyOtherTodoName}
+            #{entity.type},#{entity.status},#{entity.customStatus},#{entity.processedBy},0,#{entity.tenantId},#{entity.createTime},#{entity.updateTime},#{entity.createBy},#{entity.updateBy},#{entity.todoNotify},#{entity.modifyOtherTodoName},
             #{entity.activeTime},#{entity.claimTime},#{entity.finishTime})
         </foreach>
     </insert>
