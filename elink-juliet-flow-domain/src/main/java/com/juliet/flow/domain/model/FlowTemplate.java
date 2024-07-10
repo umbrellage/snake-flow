@@ -50,6 +50,8 @@ public class FlowTemplate extends BaseModel {
         start.setProcessedBy(userId);
         flow.setNodes(nodeList);
         flow.setTenantId(getTenantId());
+        start.setClaimTime(LocalDateTime.now());
+        start.setActiveTime(LocalDateTime.now());
         flow.setStatus(FlowStatusEnum.IN_PROGRESS);
         cleanFlowId(flow);
         return flow;
