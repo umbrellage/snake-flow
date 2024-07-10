@@ -583,6 +583,7 @@ public class Flow extends BaseModel {
                 node.setUpdateTime(new Date());
                 node.setProcessedTime(LocalDateTime.now());
                 node.setProcessedBy(userId);
+                node.setFinishTime(LocalDateTime.now());
             }
         });
         // 修改节点消息通知状态
