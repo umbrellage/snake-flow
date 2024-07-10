@@ -176,6 +176,20 @@ public class Flow extends BaseModel {
                 .orElse(null);
     }
 
+
+    /**
+     * 判断用户是否是流程内的操作人
+     * @param userId
+     * @return
+     */
+    public boolean isFlowOperator(Long userId) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return false;
+        }
+        return nodes.stream()
+            .anyMatch(node -> userId.equals(node.getProcessedBy()));
+    }
+
     public Node findTodoNodeAnyMatch(List<Long> userIdList) {
         if (CollectionUtils.isEmpty(nodes)) {
             return null;

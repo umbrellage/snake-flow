@@ -20,4 +20,12 @@ public interface JulietFlowService {
     List<HistoricTaskInstance> rollback(RollbackDTO dto);
 
     GraphVO graph(Long flowId, Long userId, List<Long> postIdList);
+
+    /**
+     * 查找出我是操作人的流程，
+     * @param flowCode
+     * @param userId
+     * @return
+     */
+    List<FlowVO> flowListByOperator(String flowCode, Long userId);
 }

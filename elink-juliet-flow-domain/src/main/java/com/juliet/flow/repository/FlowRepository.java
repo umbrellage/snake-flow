@@ -59,4 +59,12 @@ public interface FlowRepository {
 
     void deleteFlow(Long id);
 
+    /**
+     * 查出由我参与的流程
+     * @param flowCode 流程code
+     * @param userId 用户id
+     * @return
+     */
+    List<Flow> listFlow(String flowCode, Long userId);
+
 }

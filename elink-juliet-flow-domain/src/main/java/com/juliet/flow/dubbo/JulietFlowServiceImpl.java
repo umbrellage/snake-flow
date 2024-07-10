@@ -42,4 +42,9 @@ public class JulietFlowServiceImpl implements JulietFlowService {
     public GraphVO graph(Long flowId, Long userId, List<Long> postIdList) {
         return flowManagerService.getGraph(flowId, userId, postIdList);
     }
+
+    @Override
+    public List<FlowVO> flowListByOperator(String flowCode, Long userId) {
+        return flowExecuteService.flowListByOperator(flowCode, userId);
+    }
 }

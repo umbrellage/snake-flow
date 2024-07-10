@@ -9,6 +9,7 @@ import com.juliet.flow.common.StatusCode;
 import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
+import com.juliet.flow.common.utils.JulietSqlUtil;
 import com.juliet.flow.dao.*;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -381,6 +382,55 @@ public class FlowRepositoryImpl implements FlowRepository {
         if (CollectionUtils.isNotEmpty(idList)) {
             nodeDao.delete(Wrappers.<NodeEntity>lambdaQuery().in(NodeEntity::getFlowId, idList));
         }
+    }
+
+    @Override
+    public List<Flow> listFlow(String flowCode, Long userId) {
+        if (StringUtils.isBlank(flowCode) || userId == null) {
+            log.error("流程code或者用户id必须不能为空");
+            return Collections.emptyList();
+        }
+        List<FlowTemplateEntity> flowTemplateEntityList = flowTemplateDao.selectList(
+            Wrappers.<FlowTemplateEntity>lambdaQuery()
+                .eq(FlowTemplateEntity::getCode, flowCode));
+        if (CollectionUtils.isEmpty(flowTemplateEntityList)) {
+            log.error("找不到流程模版");
+            return Collections.emptyList();
+        }
+        List<Long> templateIdList = flowTemplateEntityList.stream()
+            .map(FlowTemplateEntity::getId)
+            .collect(Collectors.toList());
+
+        List<FlowEntity> flowEntityList = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+            .in(FlowEntity::getFlowTemplateId, templateIdList));
+        if (CollectionUtils.isEmpty(flowEntityList)) {
+            return Collections.emptyList();
+        }
+        List<Long> flowIdList = flowEntityList.stream()
+            .map(FlowEntity::getId)
+            .collect(Collectors.toList());
+        List<Flow> flowList = queryByIdList(flowIdList);
+        /*
+         * 这里的operatorOfUserIdList里包含了异常流程和主流程，需要过滤一下
+         * 这些数据里有异常流程不一定有主流程，为什么呢，因为变更的原因但是分支节点本来走A不走B，现在走B不走A，会进行流程校准
+         */
+        List<Flow> operatorOfUserIdList = flowList.stream()
+            .filter(flow -> flow.isFlowOperator(userId))
+            .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(operatorOfUserIdList)) {
+            return Collections.emptyList();
+        }
+
+        // 这里是要过滤出主流程id
+        List<Long> operatorOfUserIdMainFlowIdList = operatorOfUserIdList.stream()
+            .map(flow -> {
+                if (flow.hasParentFlow()) {
+                    return flow.getParentId();
+                }
+                return flow.getId();
+            })
+            .collect(Collectors.toList());
+        return queryByIdList(operatorOfUserIdMainFlowIdList);
     }
 
     private void deleteNodes(List<Node> nodes) {
