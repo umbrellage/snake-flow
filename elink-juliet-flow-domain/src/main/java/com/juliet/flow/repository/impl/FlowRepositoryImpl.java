@@ -386,7 +386,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
-    public List<Flow> listFlow(String flowCode, Long userId) {
+    public List<Flow> listFlow(String flowCode, Long userId, List<Long> postIdList) {
         if (StringUtils.isBlank(flowCode) || userId == null) {
             log.error("流程code或者用户id必须不能为空");
             return Collections.emptyList();
@@ -416,7 +416,7 @@ public class FlowRepositoryImpl implements FlowRepository {
          * 这些数据里有异常流程不一定有主流程，为什么呢，因为变更的原因但是分支节点本来走A不走B，现在走B不走A，会进行流程校准
          */
         List<Flow> operatorOfUserIdList = flowList.stream()
-            .filter(flow -> flow.isFlowOperator(userId))
+            .filter(flow -> flow.isFlowOperator(userId, postIdList))
             .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(operatorOfUserIdList)) {
             return Collections.emptyList();

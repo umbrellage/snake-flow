@@ -748,8 +748,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
-    public List<FlowVO> flowListByOperator(String flowCode, Long userId) {
-        List<Flow> mainFlowList = flowRepository.listFlow(flowCode, userId);
+    public List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList) {
+        List<Flow> mainFlowList = flowRepository.listFlow(flowCode, userId, postIdList);
         List<Long> flowIdList = mainFlowList.stream().map(Flow::getId).collect(Collectors.toList());
         Map<Long, List<FlowVO>> subFlowMap = flowRepository.listFlowByParentId(flowIdList)
             .stream().map(flow -> flow.flowVO(Collections.emptyList()))

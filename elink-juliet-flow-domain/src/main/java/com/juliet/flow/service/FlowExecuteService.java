@@ -82,7 +82,7 @@ public interface FlowExecuteService {
 
     FlowVO beforehandInitBpmForward(BpmDTO dto);
 
-    List<FlowVO> flowListByOperator(String flowCode, Long userId);
+    List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList);
 
     void trxTest();
 

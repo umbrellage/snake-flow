@@ -65,6 +65,6 @@ public interface FlowRepository {
      * @param userId 用户id
      * @return
      */
-    List<Flow> listFlow(String flowCode, Long userId);
+    List<Flow> listFlow(String flowCode, Long userId, List<Long> postIdList);
 
 }

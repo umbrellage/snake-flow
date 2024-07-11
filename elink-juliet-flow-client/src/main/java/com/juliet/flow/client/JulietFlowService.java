@@ -27,5 +27,5 @@ public interface JulietFlowService {
      * @param userId
      * @return
      */
-    List<FlowVO> flowListByOperator(String flowCode, Long userId);
+    List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList);
 }

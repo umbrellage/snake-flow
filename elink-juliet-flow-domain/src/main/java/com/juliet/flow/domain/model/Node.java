@@ -195,6 +195,14 @@ public class Node extends BaseModel {
 
     }
 
+    /**
+     * 是否存在操作人
+     * @return true/false
+     */
+    public boolean existOperator() {
+        return processedBy != null && processedBy != 0 && StringUtils.isBlank(flowAutomateRuleName);
+    }
+
     public void regularDistribution(Map<String, Object> params, Flow flow) {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
@@ -315,6 +323,18 @@ public class Node extends BaseModel {
                 .map(Post::getPostId)
                 .collect(Collectors.toList());
     }
+
+    public List<Long> postIdLongList() {
+        if (CollectionUtils.isEmpty(bindPosts)) {
+            return Collections.emptyList();
+        }
+        return bindPosts.stream()
+            .map(Post::getPostId)
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
+    }
+
+
 
     /**
      * 判断该岗位是否有该节点权限

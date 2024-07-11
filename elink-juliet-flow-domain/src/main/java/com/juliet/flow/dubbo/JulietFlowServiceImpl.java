@@ -44,7 +44,7 @@ public class JulietFlowServiceImpl implements JulietFlowService {
     }
 
     @Override
-    public List<FlowVO> flowListByOperator(String flowCode, Long userId) {
-        return flowExecuteService.flowListByOperator(flowCode, userId);
+    public List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList) {
+        return flowExecuteService.flowListByOperator(flowCode, userId, postIdList);
     }
 }

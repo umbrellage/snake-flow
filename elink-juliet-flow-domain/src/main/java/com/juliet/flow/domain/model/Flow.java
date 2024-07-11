@@ -182,12 +182,15 @@ public class Flow extends BaseModel {
      * @param userId
      * @return
      */
-    public boolean isFlowOperator(Long userId) {
+    public boolean isFlowOperator(Long userId, List<Long> postIdList) {
         if (CollectionUtils.isEmpty(nodes)) {
             return false;
         }
         return nodes.stream()
-            .anyMatch(node -> userId.equals(node.getProcessedBy()));
+            .anyMatch(node -> {
+                return userId.equals(node.getProcessedBy()) ||
+                    (!Collections.disjoint(postIdList, node.postIdLongList()) && !node.existOperator() && node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED );
+            });
     }
 
     public Node findTodoNodeAnyMatch(List<Long> userIdList) {
