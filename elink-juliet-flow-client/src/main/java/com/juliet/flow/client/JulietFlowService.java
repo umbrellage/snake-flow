@@ -3,7 +3,6 @@ package com.juliet.flow.client;
 import com.juliet.flow.client.dto.FlowIdListDTO;
 import com.juliet.flow.client.dto.HistoricTaskInstance;
 import com.juliet.flow.client.dto.RollbackDTO;
-import com.juliet.flow.client.dto.TaskExecute;
 import com.juliet.flow.client.vo.FlowVO;
 
 import com.juliet.flow.client.vo.GraphVO;
@@ -28,4 +27,5 @@ public interface JulietFlowService {
      * @return
      */
     List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList);
+
 }

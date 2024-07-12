@@ -16,6 +16,7 @@ import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.Duration;
 import lombok.Data;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -644,6 +645,43 @@ public class Node extends BaseModel {
         node.activeTime = activeTime;
         return node;
     }
+
+
+//    @Override
+//    public Long id() {
+//        return id;
+//    }
+//
+//    @Override
+//    public LocalDateTime taskCreateTime() {
+//        return activeTime;
+//    }
+//
+//    @Override
+//    public LocalDateTime taskEndTime() {
+//        return finishTime;
+//    }
+//
+//    @Override
+//    public LocalDateTime taskClaimTime() {
+//        return claimTime;
+//    }
+//
+//    @Override
+//    public Duration getWorkTimeInMillis() {
+//        if (finishTime == null || claimTime == null) {
+//            return null;
+//        }
+//        return Duration.between(finishTime, claimTime);
+//    }
+//
+//    @Override
+//    public Duration getDurationInMillis() {
+//        if (finishTime == null || activeTime == null) {
+//            return null;
+//        }
+//        return Duration.between(finishTime, activeTime);
+//    }
 
 
 }
