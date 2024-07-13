@@ -1,16 +1,16 @@
-package com.juliet.flow.client;
+package com.juliet.flow.service;
 
 import com.juliet.flow.client.dto.HistoricTaskQueryObject;
 import com.juliet.flow.client.dto.HistoryTaskInstance;
 import java.util.List;
 
 /**
- * TaskService
+ * HistoryTaskInstanceService
  *
  * @author Geweilang
- * @date 2024/7/12
+ * @date 2024/7/13
  */
-public interface HistoryTaskService {
+public interface HistoryTaskInstanceService {
 
 
     List<HistoryTaskInstance> list(HistoricTaskQueryObject query);

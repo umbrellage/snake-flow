@@ -3,8 +3,10 @@ package com.juliet.flow.domain.entity;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.juliet.flow.client.dto.HistoryTaskInstance;
 import com.juliet.flow.domain.model.Node;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Data
 @TableName("jbpm_flow_node")
-public class NodeEntity extends BaseEntity {
+public class NodeEntity extends BaseEntity implements HistoryTaskInstance {
 
     @TableId
     private Long id;
@@ -141,4 +143,40 @@ public class NodeEntity extends BaseEntity {
         return Collections.emptyList();
     }
 
+
+    @Override
+    public Long id() {
+        return id;
+    }
+
+    @Override
+    public LocalDateTime taskCreateTime() {
+        return activeTime;
+    }
+
+    @Override
+    public LocalDateTime taskEndTime() {
+        return finishTime;
+    }
+
+    @Override
+    public Duration getWorkTimeInMillis() {
+        if (claimTime == null || finishTime == null) {
+            return null;
+        }
+        return Duration.between(claimTime, finishTime);
+    }
+
+    @Override
+    public Duration getDurationInMillis() {
+        if (activeTime == null || finishTime == null) {
+            return null;
+        }
+        return Duration.between(activeTime, finishTime);
+    }
+
+    @Override
+    public LocalDateTime taskClaimTime() {
+        return claimTime;
+    }
 }

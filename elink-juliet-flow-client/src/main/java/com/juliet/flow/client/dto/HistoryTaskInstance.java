@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public interface HistoryTaskInstance {
 
     /**
-     * 任务id
+     * 任务id,这里用节点id表示吧
      * @return taskId
      */
     Long id();

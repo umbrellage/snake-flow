@@ -1,30 +1,29 @@
-package com.juliet.flow.dubbo;
+package com.juliet.flow.service.impl;
 
-import com.juliet.flow.client.HistoryTaskService;
 import com.juliet.flow.client.dto.HistoricTaskQueryObject;
 import com.juliet.flow.client.dto.HistoryTaskInstance;
+import com.juliet.flow.repository.HistoryTaskRepository;
 import com.juliet.flow.service.HistoryTaskInstanceService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.stereotype.Service;
 
 /**
- * HistoryTaskServiceImpl
+ * HistoryTaskInstanceServiceImpl
  *
  * @author Geweilang
- * @date 2024/7/12
+ * @date 2024/7/13
  */
 @RequiredArgsConstructor
 @Service
-@DubboService(timeout = 5000)
-public class HistoryTaskServiceImpl implements HistoryTaskService {
+public class HistoryTaskInstanceServiceImpl implements HistoryTaskInstanceService {
 
     @Override
     public List<HistoryTaskInstance> list(HistoricTaskQueryObject query) {
-        return historyTaskInstanceService.list(query);
+        return historyTaskRepository.list(query);
     }
 
 
-    private final HistoryTaskInstanceService historyTaskInstanceService;
+
+    private final HistoryTaskRepository historyTaskRepository;
 }

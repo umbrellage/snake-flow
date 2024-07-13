@@ -57,6 +57,7 @@ t1.node_status, t1.custom_status, t1.custom_status, t1.processed_by, t1.del_flag
                 and t1.processed_by = #{query.userId}
             </if>
             <if test="query.supervisorId!=null">
+--                 这里like是不是有问题？
                 and t1.supervisor_ids like CONCAT('%^',#{query.supervisorId},'^%')
             </if>
             <if test="query.postIds!=null and query.postIds.size>0">
