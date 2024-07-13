@@ -16,6 +16,7 @@ import lombok.Data;
 public class HistoryTaskInstanceImpl implements HistoryTaskInstance, Serializable {
 
     private Long id;
+    private Long taskAssignee;
     private LocalDateTime taskCreateTime;
     private LocalDateTime taskEndTime;
     private LocalDateTime taskClaimTime;
@@ -24,6 +25,11 @@ public class HistoryTaskInstanceImpl implements HistoryTaskInstance, Serializabl
     @Override
     public Long id() {
         return id;
+    }
+
+    @Override
+    public Long taskAssignee() {
+        return taskAssignee;
     }
 
     @Override

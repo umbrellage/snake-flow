@@ -28,6 +28,7 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
     @Override
     public List<HistoryTaskInstance> list(HistoricTaskQueryObject queryObject) {
         List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
+            .in(CollectionUtils.isNotEmpty(queryObject.getTaskAssignees()), NodeEntity::getProcessedBy, queryObject.getTaskAssignees())
             .eq(queryObject.getFinished() != null && queryObject.getFinished(), NodeEntity::getStatus, NodeStatusEnum.PROCESSED.getCode())
             .le(queryObject.getFinishedBefore() != null, NodeEntity::getFinishTime, queryObject.getFinishedBefore())
             .ge(queryObject.getFinishedAfter() != null, NodeEntity::getFinishTime, queryObject.getFinishedAfter())
@@ -44,6 +45,7 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
                 instance.setTaskClaimTime(node.getClaimTime());
                 instance.setTaskCreateTime(node.getActiveTime());
                 instance.setTaskEndTime(node.getFinishTime());
+                instance.setTaskAssignee(node.getProcessedBy());
                 return instance;
             }).collect(Collectors.toList());
     }

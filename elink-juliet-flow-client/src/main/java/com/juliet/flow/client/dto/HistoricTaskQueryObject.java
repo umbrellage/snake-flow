@@ -3,6 +3,7 @@ package com.juliet.flow.client.dto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import lombok.Getter;
 
@@ -19,6 +20,11 @@ public class HistoricTaskQueryObject implements Serializable {
      * 操作人
      */
     private Long taskAssignee;
+
+    /**
+     * 操作人
+     */
+    private Collection<Long> taskAssignees;
     /**
      * 流程模版id
      */
@@ -48,6 +54,11 @@ public class HistoricTaskQueryObject implements Serializable {
 
     public HistoricTaskQueryObject taskAssignee(Long assignee) {
         taskAssignee = assignee;
+        return this;
+    }
+
+    public HistoricTaskQueryObject taskAssignee(Set<Long> assignees) {
+        taskAssignees = assignees;
         return this;
     }
 

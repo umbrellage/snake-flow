@@ -16,6 +16,11 @@ public interface HistoryTaskInstance {
      * @return taskId
      */
     Long id();
+    /**
+     * 操作人
+     * @return taskId
+     */
+    Long taskAssignee();
 
     /**
      * Time when the task was created.
