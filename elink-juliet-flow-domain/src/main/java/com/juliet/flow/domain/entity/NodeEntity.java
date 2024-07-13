@@ -22,7 +22,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @Data
 @TableName("jbpm_flow_node")
-public class NodeEntity extends BaseEntity implements HistoryTaskInstance {
+public class NodeEntity extends BaseEntity {
 
     @TableId
     private Long id;
@@ -141,42 +141,5 @@ public class NodeEntity extends BaseEntity implements HistoryTaskInstance {
                 .collect(Collectors.toList());
         }
         return Collections.emptyList();
-    }
-
-
-    @Override
-    public Long id() {
-        return id;
-    }
-
-    @Override
-    public LocalDateTime taskCreateTime() {
-        return activeTime;
-    }
-
-    @Override
-    public LocalDateTime taskEndTime() {
-        return finishTime;
-    }
-
-    @Override
-    public Duration getWorkTimeInMillis() {
-        if (claimTime == null || finishTime == null) {
-            return null;
-        }
-        return Duration.between(claimTime, finishTime);
-    }
-
-    @Override
-    public Duration getDurationInMillis() {
-        if (activeTime == null || finishTime == null) {
-            return null;
-        }
-        return Duration.between(activeTime, finishTime);
-    }
-
-    @Override
-    public LocalDateTime taskClaimTime() {
-        return claimTime;
     }
 }

@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.flow.client.dto.HistoryTaskInstance;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.Data;
@@ -12,7 +13,7 @@ import lombok.Data;
  * @date 2024/7/13
  */
 @Data
-public class HistoryTaskInstanceImpl implements HistoryTaskInstance {
+public class HistoryTaskInstanceImpl implements HistoryTaskInstance, Serializable {
 
     private Long id;
     private LocalDateTime taskCreateTime;
