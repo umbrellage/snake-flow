@@ -78,7 +78,7 @@ public class HistoricTaskQueryObject implements Serializable {
     }
 
 
-    public static HistoricTaskQueryObject builder() {
+    public static HistoricTaskQueryObject createHistoricTaskQuery() {
         return new HistoricTaskQueryObject();
     }
 
