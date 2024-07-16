@@ -44,7 +44,7 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
             .le(queryObject.getFinishedBefore() != null, NodeEntity::getFinishTime, queryObject.getFinishedBefore())
             .ge(queryObject.getFinishedAfter() != null, NodeEntity::getFinishTime, queryObject.getFinishedAfter())
             .eq(queryObject.getTaskAssignee() != null, NodeEntity::getProcessedBy, queryObject.getTaskAssignee())
-            .eq(queryObject.getTaskBpmId() != null && CollectionUtils.isNotEmpty(flowIdList), NodeEntity::getFlowId, flowIdList)
+            .in(queryObject.getTaskBpmId() != null && CollectionUtils.isNotEmpty(flowIdList), NodeEntity::getFlowId, flowIdList)
             .eq(queryObject.getProcessInstanceId() != null, NodeEntity::getFlowId, queryObject.getProcessInstanceId())
             .in(CollectionUtils.isNotEmpty(queryObject.getProcessInstanceIds()), NodeEntity::getFlowId, queryObject.getProcessInstanceIds())
         );
