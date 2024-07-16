@@ -4,8 +4,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.dto.HistoricTaskQueryObject;
 import com.juliet.flow.client.dto.HistoryTaskInstance;
+import com.juliet.flow.dao.FlowDao;
 import com.juliet.flow.dao.NodeDao;
+import com.juliet.flow.domain.entity.FlowEntity;
 import com.juliet.flow.domain.entity.NodeEntity;
+import com.juliet.flow.domain.model.Flow;
 import com.juliet.flow.domain.model.HistoryTaskInstanceImpl;
 import com.juliet.flow.repository.HistoryTaskRepository;
 import java.util.ArrayList;
@@ -27,13 +30,21 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
 
     @Override
     public List<HistoryTaskInstance> list(HistoricTaskQueryObject queryObject) {
+
+        List<Long> flowIdList = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+                .select(FlowEntity::getId)
+                .eq(FlowEntity::getFlowTemplateId, queryObject.getTaskBpmId()))
+            .stream()
+            .map(FlowEntity::getId)
+            .collect(Collectors.toList());
+
         List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
             .in(CollectionUtils.isNotEmpty(queryObject.getTaskAssignees()), NodeEntity::getProcessedBy, queryObject.getTaskAssignees())
             .eq(queryObject.getFinished() != null && queryObject.getFinished(), NodeEntity::getStatus, NodeStatusEnum.PROCESSED.getCode())
             .le(queryObject.getFinishedBefore() != null, NodeEntity::getFinishTime, queryObject.getFinishedBefore())
             .ge(queryObject.getFinishedAfter() != null, NodeEntity::getFinishTime, queryObject.getFinishedAfter())
             .eq(queryObject.getTaskAssignee() != null, NodeEntity::getProcessedBy, queryObject.getTaskAssignee())
-            .eq(queryObject.getTaskBpmId() != null, NodeEntity::getFlowTemplateId, queryObject.getTaskBpmId())
+            .eq(queryObject.getTaskBpmId() != null && CollectionUtils.isNotEmpty(flowIdList), NodeEntity::getFlowId, flowIdList)
             .eq(queryObject.getProcessInstanceId() != null, NodeEntity::getFlowId, queryObject.getProcessInstanceId())
             .in(CollectionUtils.isNotEmpty(queryObject.getProcessInstanceIds()), NodeEntity::getFlowId, queryObject.getProcessInstanceIds())
         );
@@ -53,4 +64,5 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
 
 
     private final NodeDao nodeDao;
+    private final FlowDao flowDao;
 }
