@@ -37,16 +37,31 @@ public class HistoryTaskInstance implements Serializable {
     /**
      * Difference between {@link #taskEndTime} and {@link #taskClaimTime}
      */
-    private Duration getWorkTimeInMillis;
+    private Duration workTimeInMillis;
 
     /**
      * Difference between {@link #taskEndTime} and {@link #taskCreateTime} in milliseconds.
      */
-    private Duration getDurationInMillis;
+    private Duration durationInMillis;
 
 
     /**
      * Time when the task was claimed.
      */
     private LocalDateTime taskClaimTime;
+
+
+    public Duration getWorkTimeInMillis() {
+        if (taskClaimTime == null || taskEndTime == null) {
+            return null;
+        }
+        return Duration.between(taskClaimTime, taskEndTime);
+    }
+
+    public Duration getDurationInMillis() {
+        if (taskCreateTime == null || taskEndTime == null) {
+            return null;
+        }
+        return Duration.between(taskCreateTime, taskEndTime);
+    }
 }
