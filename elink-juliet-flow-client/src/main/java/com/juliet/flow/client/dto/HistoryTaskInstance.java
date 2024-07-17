@@ -1,7 +1,9 @@
 package com.juliet.flow.client.dto;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import lombok.Data;
 
 /**
  * HistoryTaskInstance
@@ -9,48 +11,42 @@ import java.time.LocalDateTime;
  * @author Geweilang
  * @date 2024/7/12
  */
-public interface HistoryTaskInstance {
+@Data
+public class HistoryTaskInstance implements Serializable {
 
     /**
      * 任务id,这里用节点id表示吧
-     * @return taskId
      */
-    Long id();
+    private Long id;
     /**
      * 操作人
-     * @return taskId
      */
-    Long taskAssignee();
+    private Long taskAssignee;
 
     /**
      * Time when the task was created.
      * node activeTime
-     * @return LocalDateTime
      */
-    LocalDateTime taskCreateTime();
+    private LocalDateTime taskCreateTime;
 
     /**
      * Time when the task was completed
-     * @return LocalDateTime
      */
-    LocalDateTime taskEndTime();
+    private LocalDateTime taskEndTime;
 
     /**
-     * Difference between {@link #taskEndTime()} and {@link #taskClaimTime()}
-     * @return Duration
+     * Difference between {@link #taskEndTime} and {@link #taskClaimTime}
      */
-    Duration getWorkTimeInMillis();
+    private Duration getWorkTimeInMillis;
 
     /**
-     * Difference between {@link #taskEndTime()} and {@link #taskCreateTime()} in milliseconds.
-     * @return Duration
+     * Difference between {@link #taskEndTime} and {@link #taskCreateTime} in milliseconds.
      */
-    Duration getDurationInMillis();
+    private Duration getDurationInMillis;
 
 
     /**
      * Time when the task was claimed.
-     * @return LocalDateTime
      */
-    LocalDateTime taskClaimTime();
+    private LocalDateTime taskClaimTime;
 }

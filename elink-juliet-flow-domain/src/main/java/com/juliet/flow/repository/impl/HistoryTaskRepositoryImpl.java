@@ -8,10 +8,7 @@ import com.juliet.flow.dao.FlowDao;
 import com.juliet.flow.dao.NodeDao;
 import com.juliet.flow.domain.entity.FlowEntity;
 import com.juliet.flow.domain.entity.NodeEntity;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.HistoryTaskInstanceImpl;
 import com.juliet.flow.repository.HistoryTaskRepository;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +48,7 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
 
         return nodeEntityList.stream()
             .map(node -> {
-                HistoryTaskInstanceImpl instance = new HistoryTaskInstanceImpl();
+                HistoryTaskInstance instance = new HistoryTaskInstance();
                 instance.setId(node.getId());
                 instance.setTaskClaimTime(node.getClaimTime());
                 instance.setTaskCreateTime(node.getActiveTime());
