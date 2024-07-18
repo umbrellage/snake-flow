@@ -85,7 +85,6 @@ public class FlowCache {
 
     public void reset() {
         cache.invalidateAll();
-        redisService.deleteObject()
     }
 
     private String buildFlowCacheKey(FlowEntity flowEntity) {
