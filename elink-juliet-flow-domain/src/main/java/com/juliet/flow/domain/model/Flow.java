@@ -838,6 +838,7 @@ public class Flow extends BaseModel {
         setStatus(FlowStatusEnum.INVALID);
     }
 
+
     public List<Node> canFlowAutomate(Map<String, Object> automateParam) {
         return getNodes().stream()
             .filter(e -> e.getStatus() == NodeStatusEnum.ACTIVE || e.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
