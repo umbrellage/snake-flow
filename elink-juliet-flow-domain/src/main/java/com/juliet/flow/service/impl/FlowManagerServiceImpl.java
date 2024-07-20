@@ -132,7 +132,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (templateId != null) {
             flowTemplate = flowRepository.queryTemplateById(templateId);
         } else if (templateCode != null) {
-            flowTemplate = flowRepository.queryTemplateByCode(templateCode, SecurityUtils.getLoginUser().getSysUser().getTenantId());
+            flowTemplate = flowRepository.queryTemplateByCode(templateCode, 1L);
         }
         if (flowTemplate == null) {
             throw new ServiceException("没有找到流程模板，流程模板id:" + templateId);

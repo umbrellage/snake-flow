@@ -68,24 +68,4 @@ public class FlowTemplateController implements JulietTemplateClient {
         return AjaxResult.success();
     }
 
-    private void checkNodeParams(NodeDTO nodeDTO) {
-        if (nodeDTO.getForm() != null) {
-            BusinessAssert.assertNotNull(nodeDTO.getForm().getName(),
-                    StatusCode.ILLEGAL_PARAMS, "form.name");
-            BusinessAssert.assertNotNull(nodeDTO.getForm().getCode(),
-                    StatusCode.ILLEGAL_PARAMS, "form.code");
-            BusinessAssert.assertNotNull(nodeDTO.getForm().getPath(),
-                    StatusCode.ILLEGAL_PARAMS, "form.path");
-            if (!CollectionUtils.isEmpty(nodeDTO.getForm().getFields())) {
-                for (FieldDTO fieldDTO : nodeDTO.getForm().getFields()) {
-                    if (fieldDTO != null) {
-                        BusinessAssert.assertNotNull(fieldDTO.getCode(),
-                                StatusCode.ILLEGAL_PARAMS, "form.field.code");
-                        BusinessAssert.assertNotNull(fieldDTO.getName(),
-                                StatusCode.ILLEGAL_PARAMS, "form.field.name");
-                    }
-                }
-            }
-        }
-    }
 }
