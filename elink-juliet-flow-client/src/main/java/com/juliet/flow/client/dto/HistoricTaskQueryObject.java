@@ -29,6 +29,8 @@ public class HistoricTaskQueryObject implements Serializable {
      * 流程模版id
      */
     private Long taskBpmId;
+
+    private Collection<String> taskBpmCodeList;
     private Boolean finished;
     /**
      * 流程实例id
@@ -44,6 +46,11 @@ public class HistoricTaskQueryObject implements Serializable {
 
     public HistoricTaskQueryObject processInstanceIds(Set<Long> processInstanceIds) {
         this.processInstanceIds = processInstanceIds;
+        return this;
+    }
+
+    public HistoricTaskQueryObject taskBpmCodeList(Set<String> taskBpmCodeList) {
+        this.taskBpmCodeList = taskBpmCodeList;
         return this;
     }
 
