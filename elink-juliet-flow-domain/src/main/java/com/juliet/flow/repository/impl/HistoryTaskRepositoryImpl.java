@@ -45,6 +45,16 @@ public class HistoryTaskRepositoryImpl implements HistoryTaskRepository {
             flowIdList.addAll(taskBpmFlowIdList);
         }
 
+        if (CollectionUtils.isNotEmpty(queryObject.getTaskBpmIdList())) {
+            Set<Long> taskBpmFlowIdList = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+                    .select(FlowEntity::getId)
+                    .in(FlowEntity::getFlowTemplateId, queryObject.getTaskBpmIdList()))
+                .stream()
+                .map(FlowEntity::getId)
+                .collect(Collectors.toSet());
+            flowIdList.addAll(taskBpmFlowIdList);
+        }
+
         if (CollectionUtils.isNotEmpty(queryObject.getTaskBpmCodeList())) {
             List<Long> templateIdList = templateDao.selectList(Wrappers.<FlowTemplateEntity>lambdaQuery()
                     .select(FlowTemplateEntity::getId)

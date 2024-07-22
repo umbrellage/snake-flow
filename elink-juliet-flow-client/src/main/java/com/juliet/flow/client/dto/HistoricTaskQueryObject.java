@@ -28,7 +28,11 @@ public class HistoricTaskQueryObject implements Serializable {
     /**
      * 流程模版id
      */
+    @Deprecated
     private Long taskBpmId;
+
+    private Collection<Long> taskBpmIdList;
+
 
     private Collection<String> taskBpmCodeList;
     private Boolean finished;
@@ -68,9 +72,14 @@ public class HistoricTaskQueryObject implements Serializable {
         taskAssignees = assignees;
         return this;
     }
-
+    @Deprecated
     public HistoricTaskQueryObject taskBpmId(Long bpmId){
         taskBpmId = bpmId;
+        return this;
+    }
+
+    public HistoricTaskQueryObject taskBpmId(Collection<Long> bpmIdList){
+        this.taskBpmIdList = bpmIdList;
         return this;
     }
 
