@@ -710,6 +710,7 @@ public class Flow extends BaseModel {
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
                 }
+                // TODO: 2024/7/23 这个地方得再斟酌一下 
                 if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
                     node.setBindSuppliers(standardNode.getBindSuppliers());
                     node.setProcessedBy(null);
