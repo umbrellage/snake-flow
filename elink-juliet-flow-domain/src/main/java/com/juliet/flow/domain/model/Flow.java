@@ -709,8 +709,8 @@ public class Flow extends BaseModel {
                 if (node.getStatus() == NodeStatusEnum.ACTIVE) {
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
-                    node.setBindSuppliers(standardNode.getBindSuppliers());
                 }
+                node.setBindSuppliers(standardNode.getBindSuppliers());
             }
         });
 
