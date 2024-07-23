@@ -710,7 +710,10 @@ public class Flow extends BaseModel {
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
                 }
-                node.setBindSuppliers(standardNode.getBindSuppliers());
+                if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
+                    node.setBindSuppliers(standardNode.getBindSuppliers());
+                    node.setProcessedBy(null);
+                }
             }
         });
 
