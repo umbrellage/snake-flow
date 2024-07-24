@@ -746,6 +746,7 @@ public class Flow extends BaseModel {
                         .map(e -> {
                             Supplier supplier = new Supplier();
                             BeanUtils.copyProperties(e, supplier);
+                            supplier.setId(null);
                             return supplier;
                         })
                         .collect(Collectors.toList());
