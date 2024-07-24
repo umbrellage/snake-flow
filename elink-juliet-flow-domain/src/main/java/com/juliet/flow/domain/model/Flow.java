@@ -387,6 +387,35 @@ public class Flow extends BaseModel {
         return data;
     }
 
+    public FlowVO flowVONew(List<Flow> subFlowList) {
+        FlowVO data = new FlowVO();
+        data.setId(id);
+        data.setName(name);
+        data.setParentId(parentId);
+        data.setFlowTemplateId(flowTemplateId);
+        data.setTenantId(tenantId);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            List<NodeVO> nodeVOList = nodes.stream()
+                .map(e -> e.toNodeVo(this))
+                .collect(Collectors.toList());
+            data.setNodes(nodeVOList);
+        }
+        data.setHasSubFlow(CollectionUtils.isNotEmpty(subFlowList));
+        data.setSubFlowCount(subFlowList == null ? 0 : subFlowList.size());
+        data.setStatus(status.getCode());
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            List<FlowVO> subFlowVOList = subFlowList.stream()
+                .map(e -> e.flowVONew(Collections.emptyList()))
+                .collect(Collectors.toList());
+            data.setSubFlowList(subFlowVOList);
+        }
+        data.setTheLastProcessedBy(theLastProcessedBy());
+        return data;
+    }
+
+
+
+
     public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
         FlowVO data = flowVO(subFlowList);
         Map<Long, History> historyMap = historyList.stream()

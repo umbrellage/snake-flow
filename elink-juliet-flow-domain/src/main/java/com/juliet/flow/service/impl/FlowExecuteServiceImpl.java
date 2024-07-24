@@ -912,48 +912,103 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             if (mainNode != null) {
                 // 主流程节点，但不可以操作，返回null
                 if (!mainNode.isExecutable()) {
-                    return null;
+                    return mainFlow.flowVONew(subFlowList);
                 }
                 // 主流程节点，是正常流转的节点
                 if (!mainNode.isProcessed()) {
                     Flow result =  tryForwardFlowTask(mainFlow, mainNode, userId, data);
-                    return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+                    // 因为要返回整条流程所以加了上面的代码
+                    // -------------------------------------------
+                    tryFowAutomate(result, data);
+                    if (CollectionUtils.isNotEmpty(subFlowList)) {
+                        subFlowList.forEach(subFlow -> {
+                            Node subNode = subFlow.findNode(mainNode.getName());
+                            if (subNode.getStatus() == NodeStatusEnum.ACTIVE) {
+                                tryForwardFlowTask(subFlow, subNode, userId, data);
+                                tryFowAutomate(subFlow, data);
+                            }
+                        });
+
+                        return mainFlow.flowVONew(subFlowList);
+                    }
+
+                    return mainFlow.flowVO(Collections.emptyList());
+                    // ------------------------------------------------
+//                    return tryFowAutomate(result, data).flowVO(Collections.emptyList());
                 }
                 // 主流程节点，且是异常节点，但是不需要创建异常流程
                 if (mainNode.isProcessed() && skipCreateSubFlow) {
-                    return null;
+                    return mainFlow.flowVONew(subFlowList);
                 }
                 // 主流程节点，且是异常节点，但是需要创建异常流程
                 if (mainNode.isProcessed() && !skipCreateSubFlow) {
-                    Flow subFlow = mainFlow.subFlow();
-                    subFlow.modifyNodeStatus(mainNode);
-                    Node subNode = subFlow.findNode(mainNode.getName());
-                    Flow result =  tryForwardFlowTask(subFlow, subNode, userId, data);
-                    return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+                    Flow subNewFlow = mainFlow.subFlow();
+                    subNewFlow.modifyNodeStatus(mainNode);
+                    Node subNode = subNewFlow.findNode(mainNode.getName());
+                    tryForwardFlowTask(subNewFlow, subNode, userId, data);
+                    // ------------------
+                    tryFowAutomate(subNewFlow, data);
+                    List<Flow> calibrateFlowList = new ArrayList<>();
+                    calibrateFlowList.add(mainFlow);
+                    if (CollectionUtils.isNotEmpty(subFlowList)) {
+                        calibrateFlowList.addAll(subFlowList);
+                    }
+                    syncFlow(calibrateFlowList, subNewFlow);
+                    calibrateFlowList.forEach(calibrateFlow -> calibrateFlow.flowSelfCheck(data));
+                    if (CollectionUtils.isNotEmpty(subFlowList)) {
+                        subFlowList.forEach(subFlow -> {
+                            Node node = subFlow.findNode(mainNode.getName());
+                            if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                                tryForwardFlowTask(subFlow, node, userId, data);
+                                tryFowAutomate(subFlow, data);
+                            }
+                        });
+
+                        subFlowList.add(subNewFlow);
+                        return mainFlow.flowVONew(subFlowList);
+                    }
+
+                    return mainFlow.flowVONew(Collections.singletonList(subNewFlow));
+                    // ------------------
+//                    return tryFowAutomate(result, data).flowVO(Collections.emptyList());
                 }
             }
-
             // 如果是子流程的节点
             if (CollectionUtils.isNotEmpty(subFlowList)) {
-                Flow flow = subFlowList.stream()
+//                Flow flow = subFlowList.stream()
+//                    .filter(subFlow -> subFlow.findNode(nodeId) != null)
+//                    .findAny()
+//                    .orElse(null);
+//
+//                if (flow == null) {
+//                    return null;
+//                }
+//                Flow result = tryForwardFlowTask(flow, flow.findNode(nodeId), userId, data);
+//                return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+                Node handlerNode = subFlowList.stream()
                     .filter(subFlow -> subFlow.findNode(nodeId) != null)
+                    .map(e -> e.findNode(nodeId))
                     .findAny()
                     .orElse(null);
 
-                if (flow == null) {
-                    return null;
+                if (handlerNode == null) {
+                    return mainFlow.flowVONew(subFlowList);
                 }
-                Flow result = tryForwardFlowTask(flow, flow.findNode(nodeId), userId, data);
-                return tryFowAutomate(result, data).flowVO(Collections.emptyList());
+
+                subFlowList.forEach(subFlow -> {
+                    Node node = subFlow.findNode(handlerNode.getName());
+                    if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                        tryForwardFlowTask(subFlow, node, userId, data);
+                        tryFowAutomate(subFlow, data);
+                    }
+                });
+                return mainFlow.flowVONew(subFlowList);
             }
-            return null;
+            return mainFlow.flowVONew(subFlowList);
         } finally {
             flowRepository.refreshCache(mainFlow.getId());
         }
     }
-
-
-
 
 
     @Override
