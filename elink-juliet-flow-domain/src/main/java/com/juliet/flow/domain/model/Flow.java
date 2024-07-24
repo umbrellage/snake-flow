@@ -712,9 +712,7 @@ public class Flow extends BaseModel {
                 }
                 // TODO: 2024/7/23 这个地方得再斟酌一下 
                 if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
-                    node.getbi
-
-                    node.setBindSuppliers();
+                    node.setBindSuppliers(standardNode.getBindSuppliers());
                     node.setProcessedBy(standardNode.getProcessedBy());
                 }
             }
