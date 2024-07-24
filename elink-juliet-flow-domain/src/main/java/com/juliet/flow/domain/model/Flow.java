@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 流程
@@ -712,7 +713,14 @@ public class Flow extends BaseModel {
                 }
                 // TODO: 2024/7/23 这个地方得再斟酌一下 
                 if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
-                    node.setBindSuppliers(standardNode.getBindSuppliers());
+                    List<Supplier> supplierList = standardNode.getBindSuppliers().stream()
+                        .map(e -> {
+                            Supplier supplier = new Supplier();
+                            BeanUtils.copyProperties(e, supplier);
+                            return supplier;
+                        })
+                        .collect(Collectors.toList());
+                    node.setBindSuppliers(supplierList);
                     node.setProcessedBy(standardNode.getProcessedBy());
                 }
             }
