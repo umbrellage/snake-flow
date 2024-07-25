@@ -136,7 +136,7 @@ public class Flow extends BaseModel {
     /**
      * 当前流程节点是否已经结束
      */
-    public boolean isEnd() {
+    public boolean end() {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }

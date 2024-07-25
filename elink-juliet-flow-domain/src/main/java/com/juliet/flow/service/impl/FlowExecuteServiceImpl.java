@@ -21,7 +21,6 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.query.AssembleFlowCondition;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
-import com.juliet.flow.repository.impl.FlowCache;
 import com.juliet.flow.service.FlowExecuteService;
 import com.juliet.flow.service.TaskService;
 import java.time.LocalDateTime;
@@ -104,7 +103,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node node = dbFlow.startNode();
         dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
-        if (dbFlow.isEnd()) {
+        if (dbFlow.end()) {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
         flowRepository.update(dbFlow);
@@ -131,7 +130,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node node = dbFlow.startNode();
         dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
-        if (dbFlow.isEnd()) {
+        if (dbFlow.end()) {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
         flowRepository.update(dbFlow);
@@ -740,7 +739,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
         Node node = flow.startNode();
         flow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
-        if (flow.isEnd()) {
+        if (flow.end()) {
             flow.setStatus(FlowStatusEnum.END);
         }
 
@@ -1057,7 +1056,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     public Flow tryForwardFlowTask(Flow flow, Node node, Long userId, Map<String, Object> data) {
         flow.modifyNextNodeStatus(node.getId(), userId, data);
-        if (flow.isEnd()) {
+        if (flow.end()) {
             flow.setStatus(FlowStatusEnum.END);
         }
         return flow;
@@ -1073,8 +1072,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Flow flow = dto.getMainFlow();
         flow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, flow);
-        if (flow.isEnd() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
-                .allMatch(Flow::isEnd))) {
+        if (flow.end() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
+                .allMatch(Flow::end))) {
             end = true;
             flow.setStatus(FlowStatusEnum.END);
             exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
@@ -1124,7 +1123,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
                 .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
-        if (errorFlow.isEnd() && exFlowList.stream().allMatch(Flow::isEnd)) {
+        if (errorFlow.end() && exFlowList.stream().allMatch(Flow::end)) {
             flow.setStatus(FlowStatusEnum.END);
             exFlowList.forEach(exFlow -> exFlow.setStatus(FlowStatusEnum.END));
             exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
