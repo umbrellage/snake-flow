@@ -44,7 +44,7 @@ public class Flow extends BaseModel {
     private Long parentId;
 
     private Long flowTemplateId;
-    // TODO: 2023/6/15 许剑杰
+
     private String templateCode;
 
     private List<Node> nodes;
