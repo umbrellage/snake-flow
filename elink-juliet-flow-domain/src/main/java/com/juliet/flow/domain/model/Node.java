@@ -569,7 +569,9 @@ public class Node extends BaseModel {
         }
         data.setSupervisorIds(supervisorIds);
         data.setProcessedTime(processedTime);
-
+        data.setActiveTime(activeTime);
+        data.setClaimTime(claimTime);
+        data.setFinishTime(finishTime);
         if (flow != null) {
             data.setCode(flow.getTemplateCode());
             data.setMainFlowId(flow.getParentId() == null || flow.getParentId() == 0 ? flow.getId() : flow.getParentId());
