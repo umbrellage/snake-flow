@@ -214,14 +214,21 @@ public class Node extends BaseModel {
             }
             SupplierDTO supplierDTO = assignRule.getAssignSupplier(params);
             if (supplierDTO != null && supplierDTO.getSupplierId() != null) {
-                // todo 清空post,因为现在没有做供应商的岗位配置所以在供应商分配清楚岗位不然品牌方会收到待办
+                //清空post,因为现在没有做供应商的岗位配置所以在供应商分配清楚岗位不然品牌方会收到待办
                 bindPosts = Collections.emptyList();
+                // 如果之前有供应商了，判断新旧两个供应商是否一样，如果不一样那把操作人删除
+                if (CollectionUtils.isNotEmpty(bindSuppliers)) {
+                    String oldSupplierId = String.valueOf(bindSuppliers.get(0).getSupplierId());
+                    String newSupplierId = supplierDTO.getSupplierId();
+                    if (!StringUtils.equals(oldSupplierId, newSupplierId)) {
+                        processedBy = null;
+                    }
+                }
                 Supplier supplier = new Supplier();
                 supplier.setSupplierId(Long.valueOf(supplierDTO.getSupplierId()));
                 supplier.setSupplierType(supplierDTO.getSupplierType());
                 supplier.setSupplierName(supplierDTO.getSupplierName());
                 bindSuppliers = Collections.singletonList(supplier);
-                processedBy = null;
             }
         }
     }
@@ -562,7 +569,9 @@ public class Node extends BaseModel {
         }
         data.setSupervisorIds(supervisorIds);
         data.setProcessedTime(processedTime);
-
+        data.setActiveTime(activeTime);
+        data.setClaimTime(claimTime);
+        data.setFinishTime(finishTime);
         if (flow != null) {
             data.setCode(flow.getTemplateCode());
             data.setMainFlowId(flow.getParentId() == null || flow.getParentId() == 0 ? flow.getId() : flow.getParentId());

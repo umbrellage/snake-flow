@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
 
 /**
  * 流程
@@ -43,7 +44,7 @@ public class Flow extends BaseModel {
     private Long parentId;
 
     private Long flowTemplateId;
-    // TODO: 2023/6/15 许剑杰
+
     private String templateCode;
 
     private List<Node> nodes;
@@ -135,7 +136,7 @@ public class Flow extends BaseModel {
     /**
      * 当前流程节点是否已经结束
      */
-    public boolean isEnd() {
+    public boolean end() {
         if (CollectionUtils.isEmpty(nodes)) {
             throw new ServiceException("流程不存在任何节点", StatusCode.SERVICE_ERROR.getStatus());
         }
@@ -385,6 +386,35 @@ public class Flow extends BaseModel {
         data.setTheLastProcessedBy(theLastProcessedBy());
         return data;
     }
+
+    public FlowVO flowVONew(List<Flow> subFlowList) {
+        FlowVO data = new FlowVO();
+        data.setId(id);
+        data.setName(name);
+        data.setParentId(parentId);
+        data.setFlowTemplateId(flowTemplateId);
+        data.setTenantId(tenantId);
+        if (CollectionUtils.isNotEmpty(nodes)) {
+            List<NodeVO> nodeVOList = nodes.stream()
+                .map(e -> e.toNodeVo(this))
+                .collect(Collectors.toList());
+            data.setNodes(nodeVOList);
+        }
+        data.setHasSubFlow(CollectionUtils.isNotEmpty(subFlowList));
+        data.setSubFlowCount(subFlowList == null ? 0 : subFlowList.size());
+        data.setStatus(status.getCode());
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            List<FlowVO> subFlowVOList = subFlowList.stream()
+                .map(e -> e.flowVONew(Collections.emptyList()))
+                .collect(Collectors.toList());
+            data.setSubFlowList(subFlowVOList);
+        }
+        data.setTheLastProcessedBy(theLastProcessedBy());
+        return data;
+    }
+
+
+
 
     public FlowVO flowVO(List<FlowVO> subFlowList, List<History> historyList) {
         FlowVO data = flowVO(subFlowList);
@@ -710,6 +740,19 @@ public class Flow extends BaseModel {
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
                 }
+                // TODO: 2024/7/23 这个地方得再斟酌一下 
+                if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
+                    List<Supplier> supplierList = standardNode.getBindSuppliers().stream()
+                        .map(e -> {
+                            Supplier supplier = new Supplier();
+                            BeanUtils.copyProperties(e, supplier);
+                            supplier.setId(null);
+                            return supplier;
+                        })
+                        .collect(Collectors.toList());
+                    node.setBindSuppliers(supplierList);
+                    node.setProcessedBy(standardNode.getProcessedBy());
+                }
             }
         });
 
@@ -836,6 +879,7 @@ public class Flow extends BaseModel {
         });
         setStatus(FlowStatusEnum.INVALID);
     }
+
 
     public List<Node> canFlowAutomate(Map<String, Object> automateParam) {
         return getNodes().stream()

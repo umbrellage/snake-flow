@@ -132,7 +132,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (templateId != null) {
             flowTemplate = flowRepository.queryTemplateById(templateId);
         } else if (templateCode != null) {
-            flowTemplate = flowRepository.queryTemplateByCode(templateCode, SecurityUtils.getLoginUser().getSysUser().getTenantId());
+            flowTemplate = flowRepository.queryTemplateByCode(templateCode, 1L);
         }
         if (flowTemplate == null) {
             throw new ServiceException("没有找到流程模板，流程模板id:" + templateId);
@@ -289,7 +289,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                     if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(subList)) {
                         boolean flag = subList.stream().allMatch(e -> e.checkoutFlowNodeIsHandled(node.getName()));
                         if (!flag && consumer != null) {
-                            consumer.accept("有流程将经过当前节点，不可变更");
+                            consumer.accept("有流程将经过当前节点，无需操作，建议忽略");
                             canClickError.accept(Boolean.TRUE);
                         }
                         return flag;

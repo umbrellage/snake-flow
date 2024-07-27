@@ -28,7 +28,13 @@ public class HistoricTaskQueryObject implements Serializable {
     /**
      * 流程模版id
      */
+    @Deprecated
     private Long taskBpmId;
+
+    private Collection<Long> taskBpmIdList;
+
+
+    private Collection<String> taskBpmCodeList;
     private Boolean finished;
     /**
      * 流程实例id
@@ -42,8 +48,13 @@ public class HistoricTaskQueryObject implements Serializable {
     private LocalDateTime finishedAfter;
 
 
-    public HistoricTaskQueryObject processInstanceIds(Set<Long> processInstanceIds) {
+    public HistoricTaskQueryObject processInstanceIds(Collection<Long> processInstanceIds) {
         this.processInstanceIds = processInstanceIds;
+        return this;
+    }
+
+    public HistoricTaskQueryObject taskBpmCodeList(Collection<String> taskBpmCodeList) {
+        this.taskBpmCodeList = taskBpmCodeList;
         return this;
     }
 
@@ -61,9 +72,14 @@ public class HistoricTaskQueryObject implements Serializable {
         taskAssignees = assignees;
         return this;
     }
-
+    @Deprecated
     public HistoricTaskQueryObject taskBpmId(Long bpmId){
         taskBpmId = bpmId;
+        return this;
+    }
+
+    public HistoricTaskQueryObject taskBpmId(Collection<Long> bpmIdList){
+        this.taskBpmIdList = bpmIdList;
         return this;
     }
 

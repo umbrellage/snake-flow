@@ -121,6 +121,22 @@ public class NodeVO implements Serializable {
     @JsonDeserialize(using = String2DateTimeDes.class)
     private LocalDateTime processedTime;
 
+    /**
+     * 节点激活时间
+     */
+    @JsonSerialize(using = DateTime2String.class)
+    @JsonDeserialize(using = String2DateTimeDes.class)
+    private LocalDateTime activeTime;
+    /**
+     * 节点认领时间
+     */
+    @JsonSerialize(using = DateTime2String.class)
+    @JsonDeserialize(using = String2DateTimeDes.class)
+    private LocalDateTime claimTime;
+    @JsonSerialize(using = DateTime2String.class)
+    @JsonDeserialize(using = String2DateTimeDes.class)
+    private LocalDateTime finishTime;
+
     public Long nodeFormId() {
         if (form == null) {
             return null;
