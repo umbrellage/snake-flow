@@ -55,13 +55,13 @@ public class HistoryTaskInstance implements Serializable {
         if (taskClaimTime == null || taskEndTime == null) {
             return null;
         }
-        return Duration.between(taskClaimTime, taskEndTime);
+        return Duration.between(taskClaimTime, taskEndTime).abs();
     }
 
     public Duration getDurationInMillis() {
         if (taskCreateTime == null || taskEndTime == null) {
             return null;
         }
-        return Duration.between(taskCreateTime, taskEndTime);
+        return Duration.between(taskCreateTime, taskEndTime).abs();
     }
 }
