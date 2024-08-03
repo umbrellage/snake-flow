@@ -193,6 +193,7 @@ public class FlowAspect {
     private BpmDTO toBpmDTO(String julietFlowCode, Long userId, Long tenantId) {
         BpmDTO bpmDTO = new BpmDTO();
         bpmDTO.setTemplateCode(julietFlowCode);
+        bpmDTO.setData(FlowContext.getAttachmentMap() == null ? new HashMap<>() : FlowContext.getAttachmentMap());
         bpmDTO.setUserId(userId);
         bpmDTO.setTenantId(tenantId);
         return bpmDTO;
