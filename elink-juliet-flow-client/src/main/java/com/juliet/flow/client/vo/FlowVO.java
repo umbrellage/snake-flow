@@ -339,7 +339,7 @@ public class FlowVO implements Serializable {
                         new TreeSet<>(Comparator.comparing(NodeVO::distinct))), ArrayList::new));
     }
 
-    private List<NodeVO> allNodeList() {
+    public List<NodeVO> allNodeList() {
         List<FlowVO> allFlowList = allFlowList();
         return allFlowList.stream().map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
