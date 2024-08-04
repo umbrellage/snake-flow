@@ -84,7 +84,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .findAny()
                 .orElseThrow(() -> new ServiceException("找不到开始节点"));
         if (node.postAuthority(dto.getPostIdList())) {
-            return node.toNodeVo(null);
+            NodeVO nodeVO = node.toNodeVo(null);
+            nodeVO.setCode(template.getCode());
+            return nodeVO;
         }
         throw new ServiceException("该用户没有该节点的处理权限");
     }

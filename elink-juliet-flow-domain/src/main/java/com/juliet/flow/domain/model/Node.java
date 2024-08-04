@@ -229,6 +229,8 @@ public class Node extends BaseModel {
                 supplier.setSupplierType(supplierDTO.getSupplierType());
                 supplier.setSupplierName(supplierDTO.getSupplierName());
                 bindSuppliers = Collections.singletonList(supplier);
+            } else {
+                bindSuppliers = Collections.emptyList();
             }
         }
     }

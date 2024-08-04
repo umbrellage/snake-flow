@@ -27,11 +27,11 @@ public class FlowCache {
 
     private static final String FLOW_NODE_CACHE_PREFIX = "flow_node_id_";
 
-    private static Cache<String, Flow> cache = CacheBuilder.newBuilder()
-            .maximumSize(1000)
-            .concurrencyLevel(Runtime.getRuntime().availableProcessors())
-            .expireAfterWrite(10, TimeUnit.DAYS)
-            .build();
+//    private static Cache<String, Flow> cache = CacheBuilder.newBuilder()
+//            .maximumSize(1000)
+//            .concurrencyLevel(Runtime.getRuntime().availableProcessors())
+//            .expireAfterWrite(10, TimeUnit.DAYS)
+//            .build();
 
     private static Cache<String, Flow> parentFlowCache = CacheBuilder.newBuilder()
             .maximumSize(1000)
@@ -47,8 +47,8 @@ public class FlowCache {
             return;
         }
         String key = buildFlowCacheKey(flow.getId());
-        cache.put(key, flow);
-        redisService.<Flow>setCacheObject(buildFlowCacheKey(flow.getId()), flow, 10L, TimeUnit.MINUTES);
+//        cache.put(key, flow);
+        redisService.<Flow>setCacheObject(key, flow, 10L, TimeUnit.MINUTES);
     }
     public void setFlowList(List<Flow> flowList) {
         for (Flow flow : flowList) {
@@ -63,7 +63,7 @@ public class FlowCache {
 
     public void removeFlow(Long id) {
         redisService.deleteObject(buildFlowCacheKey(id));
-        cache.invalidate(buildFlowCacheKey(id));
+//        cache.invalidate(buildFlowCacheKey(id));
     }
 
     public FlowCacheData getFlowList(List<Long> idList) {
@@ -84,7 +84,7 @@ public class FlowCache {
     }
 
     public void reset() {
-        cache.invalidateAll();
+//        cache.invalidateAll();
     }
 
     private String buildFlowCacheKey(FlowEntity flowEntity) {
