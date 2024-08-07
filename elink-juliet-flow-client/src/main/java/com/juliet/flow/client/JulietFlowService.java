@@ -28,4 +28,12 @@ public interface JulietFlowService {
      */
     List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList);
 
+
+    /**
+     * 直接修改某个节点为待办类型
+     * @param flowId
+     * @param nodeId
+     */
+    void directTriggerTodo(Long flowId, Long nodeId);
+
 }
