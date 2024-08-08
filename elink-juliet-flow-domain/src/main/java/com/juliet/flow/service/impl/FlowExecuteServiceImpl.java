@@ -334,6 +334,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public void triggerTodo(Long flowId, Long nodeId) {
+        if (flowId == null || nodeId == null) {
+            return;
+        }
+        Flow flow = JulietSqlUtil.findById(flowId, flowRepository::queryById, "找不到流程");
+        flow.getNodes()
+            .forEach(node -> {
+                if (Objects.equals(node.getId(), nodeId)) {
+                    node.setTodoNotify(TodoNotifyEnum.NOTIFY);
+                }
+            });
+        flowRepository.update(flow);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void earlyEndFlow(Long flowId) {
         Flow flow = flowRepository.queryById(flowId);
