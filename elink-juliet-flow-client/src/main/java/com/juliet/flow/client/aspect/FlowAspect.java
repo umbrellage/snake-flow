@@ -177,6 +177,8 @@ public class FlowAspect {
                                     julietFlowId, JSON.toJSONString(nodeFieldDTO), JSON.toJSONString(forwardResult));
                         }
                         log.info("juliet flow forward success!");
+                    } else {
+
                     }
                 } else {
                     log.error("business forward error, flow abort! flow id:{}", julietFlowId);
