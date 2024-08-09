@@ -202,7 +202,7 @@ public class FlowVO implements Serializable {
 
 
     public boolean end() {
-        return status == 3 || (CollectionUtils.isEmpty(subFlowList) || subFlowList.stream().allMatch(FlowVO::allNodeEnd));
+        return status == 3 && (CollectionUtils.isEmpty(subFlowList) || subFlowList.stream().allMatch(FlowVO::end));
     }
 
     public boolean allNodeEnd() {
@@ -212,7 +212,12 @@ public class FlowVO implements Serializable {
 
     @Deprecated
     public List<String> flowCustomerStatus() {
-        if (end()) {
+        List<FlowVO> allFlow = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            allFlow.addAll(subFlowList);
+        }
+        allFlow.add(this);
+        if (allFlow.stream().allMatch(FlowVO::allNodeEnd)) {
             return Collections.singletonList(nodes.get(nodes.size() - 1).getCustomStatus());
         }
         if (CollectionUtils.isNotEmpty(subFlowList)) {
