@@ -3,13 +3,13 @@ spring:
     nacos:
       discovery:
         # 服务注册地址
-        server-addr: 10.0.0.153:8848
+        server-addr: 10.27.6.82:8848
       config:
         # 配置中心地址
-        server-addr: 10.0.0.153:8848
+        server-addr: 10.27.6.82:8848
 dubbo:
   registry:
-    address: nacos://10.0.0.153:8848
+    address: nacos://10.27.6.82:8848
 
 
 
