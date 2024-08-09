@@ -1065,7 +1065,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
 //                .flatMap(Collection::stream)
 //                .collect(Collectors.toList());
-        callback(flow.anomalyNotifyList());
+        callback(flow.anomalyNotifyList(dto));
         callback(subFlow.normalNotifyList());
 
         return forwardHistory.stream()

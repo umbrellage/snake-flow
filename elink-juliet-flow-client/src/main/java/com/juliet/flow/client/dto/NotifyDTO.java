@@ -26,7 +26,14 @@ public class NotifyDTO {
     private List<Long> supervisorIds;
     private String nodeName;
     private NodeVO nodeVO;
+    /**
+     * 被通知人，被通知节点上的操作人，即对应原nodeId上的人
+     */
     private Long userId;
+    /**
+     * 当前流程上的操作，当前这个flowId这个流程上操作了一下，影响到nodeId这个节点
+     */
+    private Long executorId;
     private List<String> postIdList;
     private NotifyTypeEnum type;
     private List<ProcessedByVO> preprocessedBy;
