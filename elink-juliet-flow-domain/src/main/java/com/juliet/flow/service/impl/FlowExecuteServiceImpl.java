@@ -1052,7 +1052,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node subNode = subFlow.findNode(node.getName());
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
-
+        if (subFlow.end()) {
+            subFlow.setStatus(FlowStatusEnum.END);
+        }
         flowRepository.add(subFlow);
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
