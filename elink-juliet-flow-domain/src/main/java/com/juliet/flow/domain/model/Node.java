@@ -310,6 +310,10 @@ public class Node extends BaseModel {
     }
 
     public NotifyDTO toNotifyCC(Flow flow, String remark) {
+        return toNotifyCC(flow, remark, null);
+    }
+
+    public NotifyDTO toNotifyCC(Flow flow, String remark, Long executorId) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
@@ -317,6 +321,7 @@ public class Node extends BaseModel {
         ret.setTodoNotify(todoNotify);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
+        ret.setExecutorId(executorId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
