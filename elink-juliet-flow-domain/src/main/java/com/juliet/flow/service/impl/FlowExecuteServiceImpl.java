@@ -346,6 +346,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 }
             });
         flowRepository.update(flow);
+        callback(flow.normalNotifyList());
     }
 
     @Override
