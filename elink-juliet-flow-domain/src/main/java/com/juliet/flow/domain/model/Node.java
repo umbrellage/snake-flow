@@ -516,7 +516,7 @@ public class Node extends BaseModel {
             return userId != null && userId.equals(processedBy);
         }
         if (status == NodeStatusEnum.TO_BE_CLAIMED) {
-            return isPostMatch(postIds) || isSupplierMatch(supplierId);
+            return isPostMatch(postIds, userId) || isSupplierMatch(supplierId);
         }
         return false;
     }
@@ -533,12 +533,15 @@ public class Node extends BaseModel {
     /**
      * 判断岗位是否匹配
      */
-    public boolean isPostMatch(List<Long> postIds) {
+    public boolean isPostMatch(List<Long> postIds, Long userId) {
         if (CollectionUtils.isEmpty(bindPosts)) {
             return false;
         }
         if (bindPosts.stream().anyMatch(post -> "-1".equals(post.getPostId()))) {
             return true;
+        }
+        if (CollectionUtils.isNotEmpty(claimableUserIds)) {
+            return claimableUserIds.contains(userId);
         }
         return !Collections.disjoint(postIds.stream().map(String::valueOf).collect(Collectors.toList()), bindPosts.stream()
                 .map(Post::getPostId)
