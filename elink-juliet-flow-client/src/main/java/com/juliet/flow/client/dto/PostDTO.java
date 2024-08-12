@@ -21,9 +21,4 @@ public class PostDTO {
      * 岗位名称
      */
     private String postName;
-    /**
-     * 岗位下用户id, String类型的Long
-     */
-    private List<String> postUserIdList;
-
 }
