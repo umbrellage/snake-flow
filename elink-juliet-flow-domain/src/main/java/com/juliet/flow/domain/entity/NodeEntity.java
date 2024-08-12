@@ -86,6 +86,12 @@ public class NodeEntity extends BaseEntity {
     @TableField(value = "supervisor_ids")
     private String supervisorIds;
 
+    /**
+     * 岗位下可以认领的人
+     */
+    @TableField(value = "claimable_user_ds")
+    private String claimableUserIds;
+
     @TableField(value = "node_status")
     private Integer status;
 
@@ -136,6 +142,16 @@ public class NodeEntity extends BaseEntity {
     public List<Long> supervisorIds() {
         if (StringUtils.isNotBlank(supervisorIds)) {
             return Arrays.stream(supervisorIds.split(","))
+                .map(e -> StringUtils.remove(e, "^"))
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
+    }
+
+    public List<Long> claimableUserIds() {
+        if (StringUtils.isNotBlank(claimableUserIds)) {
+            return Arrays.stream(claimableUserIds.split(","))
                 .map(e -> StringUtils.remove(e, "^"))
                 .map(Long::valueOf)
                 .collect(Collectors.toList());

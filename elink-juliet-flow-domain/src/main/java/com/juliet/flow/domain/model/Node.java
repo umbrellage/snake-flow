@@ -115,6 +115,11 @@ public class Node extends BaseModel {
     private String distributeNode;
 
     /**
+     * 岗位下可以认领的人
+     */
+    private List<Long> claimableUserIds;
+
+    /**
      * 处理人
      */
     private Long processedBy;
@@ -168,19 +173,28 @@ public class Node extends BaseModel {
         return supervisorIds.stream().map(this::formatOf).collect(Collectors.joining(","));
     }
 
+    public String claimableUserIds() {
+        if (CollectionUtils.isEmpty(claimableUserIds)) {
+            return "";
+        }
+        return claimableUserIds.stream().map(this::formatOf).collect(Collectors.joining(","));
+    }
+
+
     /**
-     * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法
+     * id 格式修改，如需修改前后缀字符，请一起修改以下方法
      *
-     * @param supervisorId
+     * @param id
      * @return
      * @see NodeEntity#supervisorIds()
      */
-    public String formatOf(Long supervisorId) {
-        if (supervisorId == null) {
+    public String formatOf(Long id) {
+        if (id == null) {
             return null;
         }
-        return "^" + supervisorId + "^";
+        return "^" + id + "^";
     }
+
 
     public LocalDateTime processedTime() {
         // 系统节点
@@ -575,6 +589,7 @@ public class Node extends BaseModel {
             data.setBindSuppliers(supplierVOList);
         }
         data.setSupervisorIds(supervisorIds);
+        data.setClaimableUserIds(claimableUserIds);
         data.setProcessedTime(processedTime);
         data.setActiveTime(activeTime);
         data.setClaimTime(claimTime);
@@ -637,6 +652,7 @@ public class Node extends BaseModel {
         node.submitRule = submitRule;
         node.processedBy = processedBy;
         node.supervisorIds = supervisorIds;
+        node.claimableUserIds = claimableUserIds;
         node.assignRule = assignRule;
         node.ruleAssignment = ruleAssignment;
         node.distributeNode = distributeNode;

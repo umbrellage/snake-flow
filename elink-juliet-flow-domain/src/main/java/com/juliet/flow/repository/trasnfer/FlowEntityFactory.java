@@ -291,7 +291,7 @@ public class FlowEntityFactory {
         nodeEntity.setFlowInnerAssignment(node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() ? 1 : 0);
         nodeEntity.setDistributeNode(node.getDistributeNode());
         nodeEntity.setSupervisorIds(node.supervisorIds());
-
+        nodeEntity.setClaimableUserIds(node.claimableUserIds());
         nodeEntity.setType(node.getType().getCode());
         nodeEntity.setStatus(node.getStatus().getCode());
         nodeEntity.setCustomStatus(node.getCustomStatus() == null ? "" : node.getCustomStatus());
@@ -367,6 +367,13 @@ public class FlowEntityFactory {
         } else {
             node.setSupervisorIds(Lists.newArrayList());
         }
+
+        if (StringUtils.isNotBlank(nodeEntity.getClaimableUserIds())) {
+            node.setClaimableUserIds(nodeEntity.claimableUserIds());
+        } else {
+            node.setClaimableUserIds(Lists.newArrayList());
+        }
+
         node.setStatus(NodeStatusEnum.byCode(nodeEntity.getStatus()));
         node.setCustomStatus(nodeEntity.getCustomStatus());
         node.setType(NodeTypeEnum.byCode(nodeEntity.getType()));
