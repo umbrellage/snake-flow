@@ -92,7 +92,10 @@ public class FlowVO implements Serializable {
                         .collect(Collectors.toList());
             }
             boolean samePostId = !Collections.disjoint(postIdList, postIds) || postIds.stream().anyMatch(postId -> postId == -1);
-            if (samePostId && nodeVO.getStatus() == 2) {
+            // 岗位下没有选择固定认领人或者固定认领人中包含用户
+            boolean noClaimUsersOrContain = CollectionUtils.isEmpty(nodeVO.getClaimableUserIds()) || !Collections.disjoint(nodeVO.getClaimableUserIds(), userIdList);
+            //同一个岗位，如果岗位下选择了固定可以认领的操作人那需要过滤
+            if (noClaimUsersOrContain && samePostId && nodeVO.getStatus() == 2) {
                 executor.setCanEdit(true);
             }
             // 3.属于该供应商的节点，节点未被认领
@@ -114,7 +117,7 @@ public class FlowVO implements Serializable {
                 executor.setWillEdit(true);
             }
             // 2. 用户属于该节点的岗位下，但未激活
-            if (samePostId && nodeVO.getStatus() == 1) {
+            if (samePostId && nodeVO.getStatus() == 1 && noClaimUsersOrContain) {
                 executor.setWillEdit(true);
             }
             if (nodeVO.getStatus() == 4 && userIdList.contains(nodeVO.getProcessedBy())) {
@@ -389,7 +392,8 @@ public class FlowVO implements Serializable {
             return true;
         }
         boolean supervisorExist = node.getSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) && !Collections.disjoint(userIdList, node.getSupervisorIds());
-        boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList);
+        boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) &&
+            (CollectionUtils.isEmpty(node.getClaimableUserIds()) || !Collections.disjoint(userIdList, node.getClaimableUserIds()));
         boolean ruleAssignmentExist = node.getProcessedBy() != null && node.getProcessedBy() != 0;
         boolean flowInnerExist = node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() && StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
         return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
