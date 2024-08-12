@@ -89,7 +89,7 @@ public class NodeEntity extends BaseEntity {
     /**
      * 岗位下可以认领的人
      */
-    @TableField(value = "claimable_user_ds")
+    @TableField(value = "claimable_user_ids")
     private String claimableUserIds;
 
     @TableField(value = "node_status")
