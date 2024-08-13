@@ -13,6 +13,7 @@ public class NotifyMessageDTO {
 
     private String templateCode;
     private Long flowId;
+    private Long mainFlowId;
     private NotifyTypeEnum type;
     private Long tenantId;
     /**
