@@ -1,6 +1,7 @@
 package com.juliet.flow.client.callback;
 
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 /**
@@ -19,4 +20,6 @@ public class NotifyMessageDTO {
      */
     private String msg;
     private Long userId;
+    @ApiModelProperty("操作人")
+    private Long executorId;
 }
