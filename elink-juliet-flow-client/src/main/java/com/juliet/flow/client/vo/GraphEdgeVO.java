@@ -1,8 +1,11 @@
 package com.juliet.flow.client.vo;
 
 import java.io.Serializable;
+
+import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -38,6 +41,12 @@ public class GraphEdgeVO implements Serializable {
     @Data
     public static class Property implements Serializable{
         private boolean activated;
+
+        @ApiModelProperty("标准周期天数")
+        private Integer standardCycleDays;
+
+        @ApiModelProperty("实际周期天数")
+        private Integer actualCycleDays;
     }
 
 }
