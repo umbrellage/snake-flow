@@ -14,6 +14,7 @@ import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
 import com.juliet.flow.constant.FlowConstant;
+import com.juliet.flow.domain.dto.TaskForwardDTO;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -505,13 +506,13 @@ public class Flow extends BaseModel {
      *
      * @return
      */
-    public List<NotifyDTO> anomalyNotifyList() {
+    public List<NotifyDTO> anomalyNotifyList(TaskForwardDTO dto) {
         if (CollectionUtils.isEmpty(nodes)) {
             return Collections.emptyList();
         }
         return nodes.stream()
                 .filter(Node::isToBeExecuted)
-                .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待"))
+                .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待", dto.getExecuteId()))
                 .collect(Collectors.toList());
     }
 
@@ -680,38 +681,38 @@ public class Flow extends BaseModel {
         return node.getStatus() == NodeStatusEnum.PROCESSED;
     }
 
-    /**
-     * 校准流程节点,并且返回需要被通知的待办
-     *
-     * @param standardFlow 标准流程，按照这个流程来校准
-     * @return 需要被通知的消息待办
-     */
-    @Deprecated
-    public List<NotifyDTO> calibrateFlow(Flow standardFlow) {
-        List<NotifyDTO> notifyNodeList = new ArrayList<>();
-        Map<String, Node> nodeMap = standardFlow.getNodes().stream()
-                .collect(Collectors.toMap(Node::getName, Function.identity()));
-        nodes.forEach(node -> {
-            Node standardNode = nodeMap.get(node.getName());
-            if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
-                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
-                    NotifyDTO cc = node.toNotifyCC(this, "已不会流经该节点，您不需要再处理该节点, 已将您的待办删除");
-                    notifyNodeList.add(cc);
-                    NotifyDTO delete = node.toNotifyDelete(this);
-                    notifyNodeList.add(delete);
-                }
-                node.setStatus(NodeStatusEnum.IGNORE);
-            }
-            if (standardNode.getStatus() != NodeStatusEnum.IGNORE) {
-                if (node.getStatus() == NodeStatusEnum.IGNORE) {
-                    node.setStatus(NodeStatusEnum.PROCESSED);
-                    node.setProcessedTime(LocalDateTime.now());
-                }
-            }
-        });
-
-        return notifyNodeList;
-    }
+//    /**
+//     * 校准流程节点,并且返回需要被通知的待办
+//     *
+//     * @param standardFlow 标准流程，按照这个流程来校准
+//     * @return 需要被通知的消息待办
+//     */
+//    @Deprecated
+//    public List<NotifyDTO> calibrateFlow(Flow standardFlow) {
+//        List<NotifyDTO> notifyNodeList = new ArrayList<>();
+//        Map<String, Node> nodeMap = standardFlow.getNodes().stream()
+//                .collect(Collectors.toMap(Node::getName, Function.identity()));
+//        nodes.forEach(node -> {
+//            Node standardNode = nodeMap.get(node.getName());
+//            if (standardNode.getStatus() == NodeStatusEnum.IGNORE) {
+//                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+//                    NotifyDTO cc = node.toNotifyCC(this, "已不会流经该节点，您不需要再处理该节点, 已将您的待办删除");
+//                    notifyNodeList.add(cc);
+//                    NotifyDTO delete = node.toNotifyDelete(this);
+//                    notifyNodeList.add(delete);
+//                }
+//                node.setStatus(NodeStatusEnum.IGNORE);
+//            }
+//            if (standardNode.getStatus() != NodeStatusEnum.IGNORE) {
+//                if (node.getStatus() == NodeStatusEnum.IGNORE) {
+//                    node.setStatus(NodeStatusEnum.PROCESSED);
+//                    node.setProcessedTime(LocalDateTime.now());
+//                }
+//            }
+//        });
+//
+//        return notifyNodeList;
+//    }
 
     /**
      * 校准流程节点,并且返回需要被通知的节点

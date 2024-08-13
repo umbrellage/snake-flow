@@ -115,6 +115,11 @@ public class Node extends BaseModel {
     private String distributeNode;
 
     /**
+     * 岗位下可以认领的人
+     */
+    private List<Long> claimableUserIds;
+
+    /**
      * 处理人
      */
     private Long processedBy;
@@ -168,19 +173,28 @@ public class Node extends BaseModel {
         return supervisorIds.stream().map(this::formatOf).collect(Collectors.joining(","));
     }
 
+    public String claimableUserIds() {
+        if (CollectionUtils.isEmpty(claimableUserIds)) {
+            return "";
+        }
+        return claimableUserIds.stream().map(this::formatOf).collect(Collectors.joining(","));
+    }
+
+
     /**
-     * supervisorId 格式修改，如需修改前后缀字符，请一起修改以下方法
+     * id 格式修改，如需修改前后缀字符，请一起修改以下方法
      *
-     * @param supervisorId
+     * @param id
      * @return
      * @see NodeEntity#supervisorIds()
      */
-    public String formatOf(Long supervisorId) {
-        if (supervisorId == null) {
+    public String formatOf(Long id) {
+        if (id == null) {
             return null;
         }
-        return "^" + supervisorId + "^";
+        return "^" + id + "^";
     }
+
 
     public LocalDateTime processedTime() {
         // 系统节点
@@ -310,6 +324,10 @@ public class Node extends BaseModel {
     }
 
     public NotifyDTO toNotifyCC(Flow flow, String remark) {
+        return toNotifyCC(flow, remark, null);
+    }
+
+    public NotifyDTO toNotifyCC(Flow flow, String remark, Long executorId) {
         NotifyDTO ret = new NotifyDTO();
         ret.setNodeId(id);
         ret.setNodeName(name);
@@ -317,6 +335,7 @@ public class Node extends BaseModel {
         ret.setTodoNotify(todoNotify);
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
+        ret.setExecutorId(executorId);
         ret.setMainFlowId(flow.getParentId());
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
@@ -497,7 +516,7 @@ public class Node extends BaseModel {
             return userId != null && userId.equals(processedBy);
         }
         if (status == NodeStatusEnum.TO_BE_CLAIMED) {
-            return isPostMatch(postIds) || isSupplierMatch(supplierId);
+            return isPostMatch(postIds, userId) || isSupplierMatch(supplierId);
         }
         return false;
     }
@@ -514,12 +533,15 @@ public class Node extends BaseModel {
     /**
      * 判断岗位是否匹配
      */
-    public boolean isPostMatch(List<Long> postIds) {
+    public boolean isPostMatch(List<Long> postIds, Long userId) {
         if (CollectionUtils.isEmpty(bindPosts)) {
             return false;
         }
         if (bindPosts.stream().anyMatch(post -> "-1".equals(post.getPostId()))) {
             return true;
+        }
+        if (CollectionUtils.isNotEmpty(claimableUserIds)) {
+            return claimableUserIds.contains(userId);
         }
         return !Collections.disjoint(postIds.stream().map(String::valueOf).collect(Collectors.toList()), bindPosts.stream()
                 .map(Post::getPostId)
@@ -570,6 +592,7 @@ public class Node extends BaseModel {
             data.setBindSuppliers(supplierVOList);
         }
         data.setSupervisorIds(supervisorIds);
+        data.setClaimableUserIds(claimableUserIds);
         data.setProcessedTime(processedTime);
         data.setActiveTime(activeTime);
         data.setClaimTime(claimTime);
@@ -632,6 +655,7 @@ public class Node extends BaseModel {
         node.submitRule = submitRule;
         node.processedBy = processedBy;
         node.supervisorIds = supervisorIds;
+        node.claimableUserIds = claimableUserIds;
         node.assignRule = assignRule;
         node.ruleAssignment = ruleAssignment;
         node.distributeNode = distributeNode;

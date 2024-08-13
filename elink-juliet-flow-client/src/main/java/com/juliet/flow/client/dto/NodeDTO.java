@@ -91,6 +91,11 @@ public class NodeDTO {
     private List<PostDTO> bindPosts;
 
     /**
+     * 岗位下可以认领的人
+     */
+    private List<Long> claimableUserIds;
+
+    /**
      * 绑定的供应商
      */
     private List<SupplierDTO> bindSuppliers;

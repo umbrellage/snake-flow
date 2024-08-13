@@ -66,6 +66,8 @@ public interface FlowExecuteService {
 
     void triggerTodo(Long flowId, Map<String, Object> triggerParam);
 
+    void triggerTodo(Long flowId, Long nodeId);
+
     void earlyEndFlow(Long flowId);
 
     void flowAutomate(Long flowId, Map<String, Object> automateParam);

@@ -96,6 +96,11 @@ public class NodeVO implements Serializable {
     private List<Long> supervisorIds;
 
     /**
+     * 岗位下可以认领的人
+     */
+    private List<Long> claimableUserIds;
+
+    /**
      * 上一个处理人
      */
     private List<ProcessedByVO> preprocessedBy;

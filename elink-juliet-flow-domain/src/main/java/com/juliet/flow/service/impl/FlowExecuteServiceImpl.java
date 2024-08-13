@@ -334,6 +334,22 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public void triggerTodo(Long flowId, Long nodeId) {
+        if (flowId == null || nodeId == null) {
+            return;
+        }
+        Flow flow = JulietSqlUtil.findById(flowId, flowRepository::queryById, "找不到流程");
+        flow.getNodes()
+            .forEach(node -> {
+                if (Objects.equals(node.getId(), nodeId)) {
+                    node.setTodoNotify(TodoNotifyEnum.NOTIFY);
+                }
+            });
+        flowRepository.update(flow);
+        callback(flow.normalNotifyList());
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public void earlyEndFlow(Long flowId) {
         Flow flow = flowRepository.queryById(flowId);
@@ -1037,7 +1053,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Node subNode = subFlow.findNode(node.getName());
         subFlow.modifyNextNodeStatus(subNode.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
-
+        if (subFlow.end()) {
+            subFlow.setStatus(FlowStatusEnum.END);
+        }
         flowRepository.add(subFlow);
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
@@ -1048,7 +1066,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
 //                .flatMap(Collection::stream)
 //                .collect(Collectors.toList());
-        callback(flow.anomalyNotifyList());
+        callback(flow.anomalyNotifyList(dto));
         callback(subFlow.normalNotifyList());
 
         return forwardHistory.stream()

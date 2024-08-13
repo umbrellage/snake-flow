@@ -46,4 +46,9 @@ public class JulietFlowServiceImpl implements JulietFlowService {
     public List<FlowVO> flowListByOperator(String flowCode, Long userId, List<Long> postIdList) {
         return flowExecuteService.flowListByOperator(flowCode, userId, postIdList);
     }
+
+    @Override
+    public void directTriggerTodo(Long flowId, Long nodeId) {
+        flowExecuteService.triggerTodo(flowId, nodeId);
+    }
 }
