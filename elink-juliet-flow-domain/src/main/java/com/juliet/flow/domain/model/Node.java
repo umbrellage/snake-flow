@@ -181,6 +181,11 @@ public class Node extends BaseModel {
     }
 
 
+    public Long mainFlowId() {
+        return this.mainFlowId != null && this.mainFlowId  != 0 ? mainFlowId : flowId;
+    }
+
+
     /**
      * id 格式修改，如需修改前后缀字符，请一起修改以下方法
      *
@@ -282,7 +287,7 @@ public class Node extends BaseModel {
         ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
-        ret.setMainFlowId(flow.getParentId());
+        ret.setMainFlowId(mainFlowId());
         if (supervisorAssignment) {
             ret.setType(NotifyTypeEnum.SUPERVISOR_ASSIGNMENT);
         }
@@ -301,7 +306,7 @@ public class Node extends BaseModel {
         ret.setNodeName(name);
         ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
-        ret.setMainFlowId(flow.getParentId());
+        ret.setMainFlowId(mainFlowId());
         ret.setType(NotifyTypeEnum.COMPLETE);
         ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
@@ -315,7 +320,7 @@ public class Node extends BaseModel {
         ret.setNodeName(name);
         ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
-        ret.setMainFlowId(flow.getParentId());
+        ret.setMainFlowId(mainFlowId());
         ret.setType(NotifyTypeEnum.DELETE);
         ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
@@ -336,7 +341,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
         ret.setExecutorId(executorId);
-        ret.setMainFlowId(flow.getParentId());
+        ret.setMainFlowId(mainFlowId());
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
         ret.setRemark(remark);
@@ -599,7 +604,7 @@ public class Node extends BaseModel {
         data.setFinishTime(finishTime);
         if (flow != null) {
             data.setCode(flow.getTemplateCode());
-            data.setMainFlowId(flow.getParentId() == null || flow.getParentId() == 0 ? flow.getId() : flow.getParentId());
+            data.setMainFlowId(mainFlowId());
             List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);
         }
