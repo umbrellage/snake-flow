@@ -133,6 +133,12 @@ public class Flow extends BaseModel {
         return parentId != null && parentId != 0;
     }
 
+    public Long mainFlowId() {
+        if (hasParentFlow()) {
+            return parentId;
+        }
+        return id;
+    }
 
     /**
      * 当前流程节点是否已经结束

@@ -40,8 +40,6 @@ public class Node extends BaseModel {
 
     private Long flowId;
 
-    private Long mainFlowId;
-
     private Long titleId;
 
     private String title;
@@ -180,12 +178,6 @@ public class Node extends BaseModel {
         return claimableUserIds.stream().map(this::formatOf).collect(Collectors.joining(","));
     }
 
-
-    public Long mainFlowId() {
-        return this.mainFlowId != null && this.mainFlowId  != 0 ? mainFlowId : flowId;
-    }
-
-
     /**
      * id 格式修改，如需修改前后缀字符，请一起修改以下方法
      *
@@ -287,7 +279,7 @@ public class Node extends BaseModel {
         ret.setCode(flow.getTemplateCode());
         ret.setPostIdList(postIdList());
         ret.setUserId(processedBy);
-        ret.setMainFlowId(mainFlowId());
+        ret.setMainFlowId(flow.mainFlowId());
         if (supervisorAssignment) {
             ret.setType(NotifyTypeEnum.SUPERVISOR_ASSIGNMENT);
         }
@@ -306,7 +298,7 @@ public class Node extends BaseModel {
         ret.setNodeName(name);
         ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
-        ret.setMainFlowId(mainFlowId());
+        ret.setMainFlowId(flow.mainFlowId());
         ret.setType(NotifyTypeEnum.COMPLETE);
         ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
@@ -320,7 +312,7 @@ public class Node extends BaseModel {
         ret.setNodeName(name);
         ret.setNodeVO(toNodeVo(flow));
         ret.setFlowId(flowId);
-        ret.setMainFlowId(mainFlowId());
+        ret.setMainFlowId(flow.mainFlowId());
         ret.setType(NotifyTypeEnum.DELETE);
         ret.setCode(flow.getTemplateCode());
         ret.setTenantId(getTenantId());
@@ -341,7 +333,7 @@ public class Node extends BaseModel {
         ret.setFlowId(flowId);
         ret.setUserId(processedBy);
         ret.setExecutorId(executorId);
-        ret.setMainFlowId(mainFlowId());
+        ret.setMainFlowId(flow.mainFlowId());
         ret.setType(NotifyTypeEnum.CC);
         ret.setTenantId(getTenantId());
         ret.setRemark(remark);
@@ -604,7 +596,7 @@ public class Node extends BaseModel {
         data.setFinishTime(finishTime);
         if (flow != null) {
             data.setCode(flow.getTemplateCode());
-            data.setMainFlowId(mainFlowId());
+            data.setMainFlowId(flow.mainFlowId());
             List<ProcessedByVO> preProcessedBy = processedByList(flow);
             data.setPreprocessedBy(preProcessedBy);
         }
