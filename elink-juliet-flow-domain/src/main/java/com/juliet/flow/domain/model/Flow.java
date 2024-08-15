@@ -518,6 +518,8 @@ public class Flow extends BaseModel {
         }
         return nodes.stream()
                 .filter(Node::isToBeExecuted)
+                // 排除当前变更节点紧挨着的节点
+                .filter(node -> !dto.getExecuteNode().nextNameList().contains(node.getName()))
                 .map(node -> node.toNotifyCC(this, "存在变更流程，您可以继续提交，也可以等待", dto.getExecuteId()))
                 .collect(Collectors.toList());
     }
