@@ -1039,13 +1039,13 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         // 该节点是异常节点，要对过去的节点进行修改，需要新建一个流程处理
         // 判断有没有必要创建一条异常流程
         List<Flow> subList = flowRepository.listFlowByParentId(node.getFlowId());
-        if (CollectionUtils.isNotEmpty(subList)) {
-            boolean flag = subList.stream()
-                    .allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
-            if (!flag) {
-                throw new ServiceException("有流程将经过当前节点，不可变更");
-            }
-        }
+//        if (CollectionUtils.isNotEmpty(subList)) {
+//            boolean flag = subList.stream()
+//                    .allMatch(subFlow -> subFlow.checkoutFlowNodeIsHandled(node.getName()));
+//            if (!flag) {
+//                throw new ServiceException("有流程将经过当前节点，不可变更");
+//            }
+//        }
         log.info("mamba flow:{}", JSON.toJSONString(flow));
         Flow subFlow = flow.subFlow();
         log.info("mamba new subFlow:{}", JSON.toJSONString(subFlow));
