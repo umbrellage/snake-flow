@@ -31,6 +31,8 @@ public class GraphEdgeVO implements Serializable {
 
     private List<PointVO> pointsList;
 
+    private Text text;
+
     @Data
     public static class PointVO implements Serializable {
 
