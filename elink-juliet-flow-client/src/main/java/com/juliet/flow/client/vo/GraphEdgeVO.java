@@ -47,6 +47,14 @@ public class GraphEdgeVO implements Serializable {
 
         @ApiModelProperty("实际周期天数")
         private Integer actualCycleDays;
+
+        private String text;
+    }
+    @Data
+    public static class Text implements Serializable {
+        private String value;
+        private Double x;
+        private Double y;
     }
 
 }
