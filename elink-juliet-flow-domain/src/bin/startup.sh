@@ -142,3 +142,4 @@ if [ -z "$PID" ]; then
 else
     echo $(date +'%Y-%m-%d %H:%M:%S')" ##服务启动成功## PID:"$PID
 fi
+

@@ -67,6 +67,8 @@ public class ProcessConfigRPCDTO {
         private Point startPoint;
         private Point endPoint;
         private List<Point> pointsList;
+        private Text text;
+
 
     }
 

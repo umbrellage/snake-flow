@@ -31,6 +31,8 @@ public class GraphEdgeVO implements Serializable {
 
     private List<PointVO> pointsList;
 
+    private Text text;
+
     @Data
     public static class PointVO implements Serializable {
 
@@ -40,6 +42,9 @@ public class GraphEdgeVO implements Serializable {
     }
     @Data
     public static class Property implements Serializable{
+        @ApiModelProperty("true，通过线的，false 通过点的，特殊业务用与流程引擎无关")
+        private boolean useEdgeStatus;
+
         private boolean activated;
 
         @ApiModelProperty("标准周期天数")
@@ -47,6 +52,14 @@ public class GraphEdgeVO implements Serializable {
 
         @ApiModelProperty("实际周期天数")
         private Integer actualCycleDays;
+
+        private String text;
+    }
+    @Data
+    public static class Text implements Serializable {
+        private String value;
+        private Double x;
+        private Double y;
     }
 
 }
