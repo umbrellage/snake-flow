@@ -39,6 +39,11 @@ public class GraphNodeVO implements Serializable {
 
         private String name;
         /**
+         * true隐藏可办待办
+         */
+        private boolean hideTodoType;
+
+        /**
          * 是否是当前节点
          */
         private boolean activated;
