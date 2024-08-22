@@ -24,6 +24,7 @@ import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowExecuteService;
 import com.juliet.flow.service.TaskService;
 import java.time.LocalDateTime;
+import java.util.concurrent.locks.ReentrantLock;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.compress.utils.Lists;
@@ -820,56 +821,58 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
-        List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
-        // 需要被执行的节点列表
-        List<Node> executableNode = new ArrayList<>();
-        Flow flow = flowRepository.queryById(dto.getFlowId());
-        if (flow == null) {
-            return historicTaskInstanceList;
-        }
-        Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
-        // 异常子流程
-        List<Flow> subFlowList = new ArrayList<>();
-        // 主流程
-        Flow mainFlow = null;
-        // 如果当前需要处理的是异常流程的节点
-        if (flow.hasParentFlow()) {
-            subFlowList = flowRepository.listFlowByParentId(flow.getParentId());
-            mainFlow = flowRepository.queryById(flow.getParentId());
-        }
-        if (!flow.hasParentFlow()) {
-            subFlowList = flowRepository.listFlowByParentId(flow.getId());
-            mainFlow = flow;
-        }
-        assert mainFlow != null;
+        synchronized (dto.getFlowId()) {
+            List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
+            // 需要被执行的节点列表
+            List<Node> executableNode = new ArrayList<>();
+            Flow flow = flowRepository.queryById(dto.getFlowId());
+            if (flow == null) {
+                return historicTaskInstanceList;
+            }
+            Node currentFlowNode = flowRepository.queryNodeById(dto.getNodeId());
+            // 异常子流程
+            List<Flow> subFlowList = new ArrayList<>();
+            // 主流程
+            Flow mainFlow = null;
+            // 如果当前需要处理的是异常流程的节点
+            if (flow.hasParentFlow()) {
+                subFlowList = flowRepository.listFlowByParentId(flow.getParentId());
+                mainFlow = flowRepository.queryById(flow.getParentId());
+            }
+            if (!flow.hasParentFlow()) {
+                subFlowList = flowRepository.listFlowByParentId(flow.getId());
+                mainFlow = flow;
+            }
+            assert mainFlow != null;
 //        if (mainFlow.isFlowEnd()) {
 //            throw new ServiceException("流程已结束");
 //        }
-        subFlowList.add(mainFlow);
-        if (CollectionUtils.isNotEmpty(subFlowList)) {
-            subFlowList.stream()
+            subFlowList.add(mainFlow);
+            if (CollectionUtils.isNotEmpty(subFlowList)) {
+                subFlowList.stream()
                     .filter(subFlow -> {
                         Node node = subFlow.findNode(currentFlowNode.getName());
                         return node.isNormalExecutable() && subFlow.ifPreNodeIsHandle(node.getName());
                     })
                     .forEach(subFlow -> executableNode.add(subFlow.findNode(currentFlowNode.getName())));
-        }
+            }
 
-        executableNode.add(currentFlowNode);
+            executableNode.add(currentFlowNode);
 
-        List<Node> nodeList = new ArrayList<>(
+            List<Node> nodeList = new ArrayList<>(
                 executableNode.stream().collect(Collectors.toMap(Node::getId, Function.identity(), (v1, v2) -> v1))
-                        .values());
+                    .values());
 
-        for (Node node : nodeList) {
-            List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(),
+            for (Node node : nodeList) {
+                List<HistoricTaskInstance> taskInstances = task(mainFlow, node.getId(), node.getProcessedBy(),
                     dto.getData(), dto.getSkipCreateSubFlow());
-            historicTaskInstanceList.addAll(taskInstances);
-        }
+                historicTaskInstanceList.addAll(taskInstances);
+            }
 
-        return historicTaskInstanceList.stream()
+            return historicTaskInstanceList.stream()
                 .distinct()
                 .collect(Collectors.toList());
+        }
     }
 
     /**

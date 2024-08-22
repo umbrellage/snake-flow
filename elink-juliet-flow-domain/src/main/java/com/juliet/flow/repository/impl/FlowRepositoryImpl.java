@@ -287,14 +287,6 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
-    public void updateStatusById(FlowStatusEnum status, Long id) {
-        FlowEntity flowEntity = new FlowEntity();
-        flowEntity.setId(id);
-        flowEntity.setStatus(status.getCode());
-        flowDao.updateById(flowEntity);
-    }
-
-    @Override
     public FlowTemplate queryTemplateById(Long id) {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectById(id);
         if (flowTemplateEntity == null) {

@@ -41,8 +41,6 @@ public interface FlowRepository {
 
     List<Flow> queryMainFlowById(Collection<Long> idList);
 
-    void updateStatusById(FlowStatusEnum status, Long id);
-
     FlowTemplate queryTemplateById(Long id);
 
     FlowTemplate queryTemplateByCode(String code);
