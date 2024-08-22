@@ -11,6 +11,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -446,6 +447,19 @@ public class FlowVO implements Serializable {
             .filter(e -> Objects.equals(e.getProcessedBy(), userId))
             .filter(e -> e.getStatus() == 3)
             .collect(Collectors.toList());
+    }
+
+    // 获取主流程节中指定节点提交时间
+    public LocalDateTime mailFlowNodeExecuteDateTime(String title) {
+        if (CollectionUtils.isEmpty(nodes)) {
+            return null;
+        }
+        for (NodeVO nodeVO : nodes) {
+            if (Objects.equals(title, nodeVO.getTitle()) && Objects.equals(nodeVO.getStatus(), NodeStatusEnum.PROCESSED.getCode()) && nodeVO.getProcessedTime() != null) {
+                return nodeVO.getProcessedTime();
+            }
+        }
+        return null;
     }
 
 }
