@@ -42,6 +42,9 @@ public class GraphEdgeVO implements Serializable {
     }
     @Data
     public static class Property implements Serializable{
+        @ApiModelProperty("true，通过线的，false 通过点的，特殊业务用与流程引擎无关")
+        private boolean useEdgeStatus;
+
         private boolean activated;
 
         @ApiModelProperty("标准周期天数")
