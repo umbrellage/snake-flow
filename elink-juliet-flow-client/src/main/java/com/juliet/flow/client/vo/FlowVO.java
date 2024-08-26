@@ -152,7 +152,7 @@ public class FlowVO implements Serializable {
         // 已经完成的节点,如果他们的子流程对应的节点只要不是状态等于3就可以变更
         boolean canChange = userDoneNodeList.stream()
             .anyMatch(nodeVO -> subFlowList.stream()
-                .allMatch(flowVO -> flowVO.nodeIsActive(nodeVO.getName()))
+                .allMatch(flowVO -> flowVO.nodeIsNotActive(nodeVO.getName()))
             );
         executor.setCanChange(canChange);
         return executor;
@@ -210,12 +210,12 @@ public class FlowVO implements Serializable {
         return node.getStatus() == 4;
     }
 
-    public Boolean nodeIsActive(String nodeName) {
+    public Boolean nodeIsNotActive(String nodeName) {
         NodeVO node = nodes.stream()
             .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
             .findAny()
             .orElseThrow(() -> new ServiceException("找不到节点"));
-        return node.getStatus() == 3;
+        return node.getStatus() != 3;
     }
 
 
