@@ -56,6 +56,11 @@ import static java.util.stream.Collectors.toCollection;
 @Slf4j
 public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
+    /**
+     * 流程流转锁容器
+     */
+    private final Map<Long, Object> lockMap = new ConcurrentHashMap<>();
+
     @Autowired
     private FlowRepository flowRepository;
 
@@ -369,8 +374,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
-        Flow flow = flowRepository.queryById(flowId);
-        flowAutomate(flow, automateParam);
+        Object lock = lockMap.computeIfAbsent(flowId, id -> new Object());
+        try {
+            synchronized (lock) {
+                Flow flow = flowRepository.queryById(flowId);
+                flowAutomate(flow, automateParam);
+            }
+        } finally {
+            lockMap.remove(flowId);
+        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -403,10 +415,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
 
         flowRepository.update(flow);
-        List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
-        if (CollectionUtils.isNotEmpty(flowList)) {
-            flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
-        }
+        // TODO: 2024/8/27 这里真的需要吗？ 主流程节点在流转时会一并将异常流程的节点流转掉, 先注释掉吧
+//        List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
+//        if (CollectionUtils.isNotEmpty(flowList)) {
+//            flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
+//        }
 
     }
 
@@ -818,8 +831,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 //        supplier2.setTenantId(1L);
 
     }
-
-    private final Map<Long, Object> lockMap = new ConcurrentHashMap<>();
 
     @Override
     @Transactional(rollbackFor = Exception.class)
