@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,8 +40,10 @@ public class CustomizeAssignRule extends BaseAssignRule {
         return ruleList.stream()
             .filter(e -> RuleUtil.matchRule(params, e.getRules()))
             .map(AssignmentRuleDTO::getOperatorUser)
+            .filter(Objects::nonNull)
             .flatMap(Collection::stream)
             .map(Selection::getValue)
+            .filter(Objects::nonNull)
             .findAny()
             .orElse(null);
     }

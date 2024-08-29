@@ -186,5 +186,4 @@ public class NodeVO implements Serializable {
         return Arrays.stream(nextName.split(","))
             .collect(Collectors.toList());
     }
-
 }
