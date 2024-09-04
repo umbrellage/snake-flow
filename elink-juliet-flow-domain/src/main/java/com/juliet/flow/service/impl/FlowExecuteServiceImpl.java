@@ -187,6 +187,35 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         return node.toNodeVo(flow);
     }
 
+    public NodeVO nodeNew(TaskDTO dto) {
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        List<Flow> subFlowList = findSubFlowList(dto.getFlowId());
+        // 如果节点id存在那么优先级肯定是最高的
+        if (dto.getNodeId() != null) {
+            Node node = flow.findNode(dto.getNodeId());
+            if (node != null) {
+                return node.toNodeVo(flow);
+            }
+            Flow sub = subFlowList.stream()
+                .filter(subFlow -> {
+                    return subFlow.getNodes().stream()
+                        .anyMatch(subNode -> Objects.equals(subNode.getId(), dto.getNodeId()));
+                })
+                .findFirst()
+                .orElseThrow(() -> new ServiceException("流程id与节点id不符合"));
+            return sub.findNode(dto.getNodeId()).toNodeVo(sub);
+        }
+
+        if (dto.getUserId() != null) {
+
+        }
+
+        // TODO: 2024/9/4
+
+
+        return null;
+    }
+
 
     @Deprecated
     @Override
@@ -196,10 +225,22 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (flow == null) {
             return null;
         }
+        List<Flow> subFlowList = findSubFlowList(dto.getFlowId());
         Optional.ofNullable(dto.getUserId()).orElseThrow(() -> new ServiceException("用户id 不可以为空"));
         Node node;
         if (dto.getNodeId() != null) {
             node = flow.findNode(dto.getNodeId());
+            if (node != null) {
+                return node.toNodeVo(flow);
+            }
+            Flow sub = subFlowList.stream()
+                .filter(subFlow -> {
+                    return subFlow.getNodes().stream()
+                        .anyMatch(subNode -> Objects.equals(subNode.getId(), dto.getNodeId()));
+                })
+                .findFirst()
+                .orElseThrow(() -> new ServiceException("流程id与节点id不符合"));
+            return sub.findNode(dto.getNodeId()).toNodeVo(sub);
         } else {
             node = flow.findTodoNode(dto.getUserId());
         }
@@ -223,7 +264,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             if (canDoNode != null) {
                 return canDoNode.toNodeVo(flow);
             }
-            Node subCandoNode = findSubFlowList(flow.getId()).stream()
+            Node subCandoNode = subFlowList.stream()
                     .map(subFlow -> subFlow.findCanDoAndCanExecuteNodeAny(dto.getUserId(), dto.getPostIdList(), dto.getSupplierId()))
                     .filter(Objects::nonNull)
                     .findAny()
@@ -599,6 +640,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
 
     private List<Flow> findSubFlowList(Long id) {
+        if (id == null) {
+            return Collections.emptyList();
+        }
         List<Flow> flowList = flowRepository.listFlowByParentId(id);
         if (CollectionUtils.isEmpty(flowList)) {
             return Collections.emptyList();
