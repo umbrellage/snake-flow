@@ -90,12 +90,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
                 .findAny()
                 .orElseThrow(() -> new ServiceException("找不到开始节点"));
-        if (node.postAuthority(dto.getPostIdList())) {
-            NodeVO nodeVO = node.toNodeVo(null);
-            nodeVO.setCode(template.getCode());
-            return nodeVO;
-        }
-        throw new ServiceException("该用户没有该节点的处理权限");
+        NodeVO nodeVO = node.toNodeVo(null);
+        nodeVO.setCode(template.getCode());
+        return nodeVO;
+//        if (node.postAuthority(dto.getPostIdList())) {
+//            NodeVO nodeVO = node.toNodeVo(null);
+//            nodeVO.setCode(template.getCode());
+//            return nodeVO;
+//        }
+//        throw new ServiceException("该用户没有该节点的处理权限");
     }
 
     @Transactional(rollbackFor = Exception.class)
