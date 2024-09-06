@@ -93,6 +93,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         NodeVO nodeVO = node.toNodeVo(null);
         nodeVO.setCode(template.getCode());
         return nodeVO;
+        // TODO: 2024/9/6 下面代码不能删，现在解除权限校验 
 //        if (node.postAuthority(dto.getPostIdList())) {
 //            NodeVO nodeVO = node.toNodeVo(null);
 //            nodeVO.setCode(template.getCode());
