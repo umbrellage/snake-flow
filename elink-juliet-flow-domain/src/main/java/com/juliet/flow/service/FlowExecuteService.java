@@ -89,4 +89,6 @@ public interface FlowExecuteService {
     void trxTest();
 
     void trxTest2();
+
+    void distributionNodeOperator4Post(Long flowId, Long postId, Long userId);
 }

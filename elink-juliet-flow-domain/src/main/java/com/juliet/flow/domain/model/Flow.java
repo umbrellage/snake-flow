@@ -920,4 +920,23 @@ public class Flow extends BaseModel {
 
 
     }
+
+
+    /**
+     * 给某个岗位的节点的分配操作人
+     * @param postId
+     * @param userId
+     */
+    public void distributionNodeOperator4Post(Long postId, Long userId) {
+        nodes.stream()
+            .filter(node -> CollectionUtils.isNotEmpty(node.getBindPosts()))
+            .filter(Node::isNotBeExecuted)
+            .forEach(node -> {
+                if (node.getBindPosts().stream().anyMatch(post ->
+                    StringUtils.equals(post.getPostId(), String.valueOf(postId)))) {
+                    node.setProcessedBy(userId);
+                    node.setClaimTime(LocalDateTime.now());
+                }
+            });
+    }
 }

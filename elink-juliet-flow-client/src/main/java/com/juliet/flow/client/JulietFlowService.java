@@ -36,4 +36,12 @@ public interface JulietFlowService {
      */
     void directTriggerTodo(Long flowId, Long nodeId);
 
+    /**
+     * 给某个岗位的节点的分配操作人
+     * @param flowId
+     * @param postId
+     * @param userId
+     */
+    void distributionNodeOperator4Post(Long flowId, Long postId, Long userId);
+
 }

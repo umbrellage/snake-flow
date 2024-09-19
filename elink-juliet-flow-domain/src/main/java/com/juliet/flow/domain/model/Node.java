@@ -458,6 +458,17 @@ public class Node extends BaseModel {
         return status == NodeStatusEnum.ACTIVE;
     }
 
+
+    /**
+     * 判断节点是否已认领，待被执行
+     *
+     * @return
+     */
+    public boolean isNotBeExecuted() {
+        return status == NodeStatusEnum.ACTIVE || status == NodeStatusEnum.TO_BE_CLAIMED || status == NodeStatusEnum.NOT_ACTIVE;
+    }
+
+
     /**
      * 判断节点是否是待办的
      *

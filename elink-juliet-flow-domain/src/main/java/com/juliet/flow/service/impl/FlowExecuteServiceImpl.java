@@ -882,6 +882,24 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    public synchronized void distributionNodeOperator4Post(Long flowId, Long postId, Long userId) {
+        if (postId == null || userId == null || flowId == null) {
+            return;
+        }
+        Flow flow = JulietSqlUtil.findById(flowId, flowRepository::queryById, "找不到流程");
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flowId);
+        flow.distributionNodeOperator4Post(postId, userId);
+
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            subFlowList.forEach(subFlow -> subFlow.distributionNodeOperator4Post(postId, userId));
+        }
+
+        flowRepository.update(flow);
+        subFlowList.forEach(subFlow -> flowRepository.update(subFlow));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
         Object lock = lockMap.computeIfAbsent(dto.getFlowId(), id -> new Object());
         synchronized (lock) {

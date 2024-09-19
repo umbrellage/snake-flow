@@ -51,4 +51,9 @@ public class JulietFlowServiceImpl implements JulietFlowService {
     public void directTriggerTodo(Long flowId, Long nodeId) {
         flowExecuteService.triggerTodo(flowId, nodeId);
     }
+
+    @Override
+    public void distributionNodeOperator4Post(Long flowId, Long postId, Long userId) {
+        flowExecuteService.distributionNodeOperator4Post(flowId, postId, userId);
+    }
 }
