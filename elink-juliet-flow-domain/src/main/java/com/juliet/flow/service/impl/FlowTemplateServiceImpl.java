@@ -18,6 +18,7 @@ import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.model.rule.RuleFactory;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.service.FlowTemplateService;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -131,7 +132,11 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
         node.setCustomStatus(nodeDTO.getCustomStatus());
         node.setType(NodeTypeEnum.byCode(nodeDTO.getType()));
         node.setAccessRule(RuleFactory.getAccessRule(nodeDTO.getAccessRuleName()));
-        node.setSupervisorIds(nodeDTO.getSupervisorIds());
+        if (nodeDTO.getSupervisorAssignment()) {
+            node.setSupervisorIds(nodeDTO.getSupervisorIds());
+        } else {
+            node.setSupervisorIds(Collections.emptyList());
+        }
         node.setClaimableUserIds(nodeDTO.getClaimableUserIds());
         node.setRuleAssignment(nodeDTO.getRuleAssignment());
         node.setFlowInnerAssignment(nodeDTO.getFlowInnerAssignment());
