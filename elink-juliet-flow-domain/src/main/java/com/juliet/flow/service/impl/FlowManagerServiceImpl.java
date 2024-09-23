@@ -84,18 +84,18 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private boolean isOldFabricFlow(Flow flow, FlowTemplate flowTemplate) {
-        if (!Arrays.asList("manage_sample", "match_sample", "mt_find_fabric").contains(flowTemplate.getCode())) {
+        if (!Arrays.asList("manage_sample", "match_sample", "mt_find_fabric", "manage_sample_del", "match_sample_del", "mt_find_fabric_del").contains(flowTemplate.getCode())) {
             return false;
         }
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.set(2024, 9, 23);
-//        calendar.set(Calendar.HOUR, 20);
-//        calendar.set(Calendar.MINUTE, 30);
-//        calendar.set(Calendar.SECOND, 0);
-//        if (flow.getCreateTime().before(calendar.getTime())) {
-//            return true;
-//        }
-        return true;
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2024, 9, 23);
+        calendar.set(Calendar.HOUR, 20);
+        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.SECOND, 0);
+        if (flow.getCreateTime().before(calendar.getTime())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -381,10 +381,14 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private String findJsonFile(FlowTemplate flowTemplate) {
-        if (flowTemplate.getCode().startsWith("supplier_settled")) {
+        String templateCode = flowTemplate.getCode();
+        if (templateCode.endsWith("_del")) {
+            templateCode = templateCode.replace("_del", "");
+        }
+        if (templateCode.startsWith("supplier_settled")) {
             return "/graph/supplier_settled.json";
         }
-        return "/graph/" + flowTemplate.getCode() + ".json";
+        return "/graph/" + templateCode + ".json";
     }
 
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
