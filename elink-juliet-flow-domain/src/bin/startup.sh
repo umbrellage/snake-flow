@@ -87,6 +87,9 @@ JAVA_OPT="${JAVA_OPT} -XX:-OmitStackTraceInFastThrow"
 if test -n "$1" && [ $1 = "debug" ]; then
     JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9907"
 fi
+if test -n "$1" && [ $1 = "prod-debug" ]; then
+    JAVA_OPT="${JAVA_OPT} -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=10003"
+fi
 
 if test -n "$2" && [ $2 = "skywalking" ]; then
     JAVA_OPT="${JAVA_OPT} -javaagent:/usr/local/agent/skywalking-agent/skywalking-agent.jar -DSW_AGENT_NAME=elink::elink-juliet-flow -Dskywalking_config=/usr/local/agent/skywalking-agent/custom.config "
