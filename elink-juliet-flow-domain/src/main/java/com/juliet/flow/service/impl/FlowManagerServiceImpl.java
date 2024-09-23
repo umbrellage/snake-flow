@@ -23,10 +23,7 @@ import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,7 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * @author xujianjie
@@ -68,7 +64,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         GraphVO vo = null;
         String json = null;
 
-        if (flowTemplate.getDto() == null) {
+        if (flowTemplate.getDto() == null && !isOldFabricFlow(flow, flowTemplate)) {
             String jsonFilePath = findJsonFile(flowTemplate);
             try {
                 json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
@@ -78,13 +74,28 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         } else {
             json = JSON.toJSONString(flowTemplate.getDto());
         }
-
+        //
         List<History> historyList = historyRepository.queryByFlowId(id);
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
 //        fillDefaultRequire(vo);
         fillFlowInfo(flow, vo);
         fillEdgeInfo(flow, vo, historyList);
         return vo;
+    }
+
+    private boolean isOldFabricFlow(Flow flow, FlowTemplate flowTemplate) {
+        if (!Arrays.asList("manage_sample", "match_sample", "mt_find_fabric").contains(flowTemplate.getCode())) {
+            return false;
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2024, 9, 23);
+        calendar.set(Calendar.HOUR, 23);
+        calendar.set(Calendar.MINUTE, 30);
+        calendar.set(Calendar.SECOND, 0);
+        if (flow.getCreateTime().before(calendar.getTime())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
