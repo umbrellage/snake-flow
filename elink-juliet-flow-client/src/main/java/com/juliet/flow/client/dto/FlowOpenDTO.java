@@ -22,4 +22,9 @@ public class FlowOpenDTO {
     private Long templateId;
 
     private List<Long> postIdList;
+
+    /**
+     * 是否供应商操作
+     */
+    private Boolean supplierOperator;
 }

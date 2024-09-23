@@ -87,19 +87,21 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             return null;
         }
         Node node = template.getNodes().stream()
-                .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("找不到开始节点"));
-        NodeVO nodeVO = node.toNodeVo(null);
-        nodeVO.setCode(template.getCode());
-        return nodeVO;
-        // TODO: 2024/9/6 下面代码不能删，现在解除权限校验 
-//        if (node.postAuthority(dto.getPostIdList())) {
-//            NodeVO nodeVO = node.toNodeVo(null);
-//            nodeVO.setCode(template.getCode());
-//            return nodeVO;
-//        }
-//        throw new ServiceException("该用户没有该节点的处理权限");
+            .filter(nodeT -> StringUtils.isBlank(nodeT.getPreName()))
+            .findAny()
+            .orElseThrow(() -> new ServiceException("找不到开始节点"));
+        // 如果是供应商不做判断
+        if (dto.getSupplierOperator() != null && dto.getSupplierOperator()) {
+            NodeVO nodeVO = node.toNodeVo(null);
+            nodeVO.setCode(template.getCode());
+            return nodeVO;
+        }
+        if (node.postAuthority(dto.getPostIdList())) {
+            NodeVO nodeVO = node.toNodeVo(null);
+            nodeVO.setCode(template.getCode());
+            return nodeVO;
+        }
+        throw new ServiceException("该用户没有该节点的处理权限");
     }
 
     @Transactional(rollbackFor = Exception.class)
