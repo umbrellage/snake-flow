@@ -84,7 +84,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private boolean isOldFabricFlow(Flow flow, FlowTemplate flowTemplate) {
-        if (!Arrays.asList("manage_sample", "match_sample", "mt_find_fabric", "manage_sample_del", "match_sample_del", "mt_find_fabric_del").contains(flowTemplate.getCode())) {
+        if (!Arrays.asList("manage_sample", "match_sample", "manage_sample_del", "match_sample_del").contains(flowTemplate.getCode())) {
             return false;
         }
         Calendar calendar = Calendar.getInstance();
