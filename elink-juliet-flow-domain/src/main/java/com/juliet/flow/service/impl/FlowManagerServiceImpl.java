@@ -87,15 +87,15 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         if (!Arrays.asList("manage_sample", "match_sample", "mt_find_fabric").contains(flowTemplate.getCode())) {
             return false;
         }
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2024, 9, 23);
-        calendar.set(Calendar.HOUR, 20);
-        calendar.set(Calendar.MINUTE, 30);
-        calendar.set(Calendar.SECOND, 0);
-        if (flow.getCreateTime().before(calendar.getTime())) {
-            return true;
-        }
-        return false;
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.set(2024, 9, 23);
+//        calendar.set(Calendar.HOUR, 20);
+//        calendar.set(Calendar.MINUTE, 30);
+//        calendar.set(Calendar.SECOND, 0);
+//        if (flow.getCreateTime().before(calendar.getTime())) {
+//            return true;
+//        }
+        return true;
     }
 
     @Override
