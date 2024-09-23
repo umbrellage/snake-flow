@@ -64,7 +64,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         GraphVO vo = null;
         String json = null;
 
-        if (flowTemplate.getDto() == null && !isOldFabricFlow(flow, flowTemplate)) {
+        if (flowTemplate.getDto() == null || isOldFabricFlow(flow, flowTemplate)) {
             String jsonFilePath = findJsonFile(flowTemplate);
             try {
                 json = IOUtils.resourceToString(jsonFilePath, Charsets.toCharset("UTF-8"));
