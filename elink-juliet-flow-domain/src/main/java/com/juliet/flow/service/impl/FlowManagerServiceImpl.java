@@ -88,7 +88,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             return false;
         }
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2024, 9, 23);
+        calendar.set(2024, Calendar.SEPTEMBER, 23);
         calendar.set(Calendar.HOUR, 20);
         calendar.set(Calendar.MINUTE, 30);
         calendar.set(Calendar.SECOND, 0);

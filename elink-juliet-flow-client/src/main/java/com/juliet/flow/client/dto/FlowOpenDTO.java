@@ -3,8 +3,6 @@ package com.juliet.flow.client.dto;
 import java.util.List;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
-
 /**
  * @author xujianjie
  * @date 2023-05-09
@@ -27,4 +25,5 @@ public class FlowOpenDTO {
      * 是否供应商操作
      */
     private Boolean supplierOperator;
+
 }
