@@ -301,7 +301,8 @@ public class FlowRepositoryImpl implements FlowRepository {
     public FlowTemplate queryTemplateByCode(String code) {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(Wrappers.<FlowTemplateEntity>lambdaQuery()
                 .eq(FlowTemplateEntity::getCode, code)
-                .last("limit 1"));
+            .orderByDesc(FlowTemplateEntity::getCreateTime)
+            .last("limit 1"));
         if (flowTemplateEntity == null) {
             return null;
         }
@@ -315,7 +316,7 @@ public class FlowRepositoryImpl implements FlowRepository {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(
                 Wrappers.<FlowTemplateEntity>lambdaQuery().eq(FlowTemplateEntity::getCode, code)
                         .eq(FlowTemplateEntity::getTenantId, tenantId)
-//                        .orderByDesc(FlowTemplateEntity::getUpdateTime)
+                        .orderByDesc(FlowTemplateEntity::getCreateTime)
                         .last("limit 1"));
         if (flowTemplateEntity == null) {
             return null;

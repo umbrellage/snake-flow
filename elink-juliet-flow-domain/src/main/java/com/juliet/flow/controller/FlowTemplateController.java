@@ -55,6 +55,7 @@ public class FlowTemplateController implements JulietTemplateClient {
         return AjaxResult.success(flowTemplateService.queryById(id));
     }
 
+    @Deprecated
     @ApiOperation("获取更新时间")
     public AjaxResult<String> updateTimeByCode(String code) {
         String data = flowTemplateService.updateTimeByCode(code);
