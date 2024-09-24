@@ -22,7 +22,9 @@ import com.juliet.flow.domain.model.Post;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -392,7 +394,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     }
 
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
-        return node.getName().equals(graphNodeVO.getId()) || node.getName().equals(graphNodeVO.getProperties().getName());
+        return node.getName().equals(graphNodeVO.getId()) ||
+            node.getName().equals(graphNodeVO.getProperties().getName()) ||
+            node.getTitle().equals(graphNodeVO.getProperties().getName());
     }
 
     /**
