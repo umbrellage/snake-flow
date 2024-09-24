@@ -396,7 +396,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
         return node.getName().equals(graphNodeVO.getId()) ||
             node.getName().equals(graphNodeVO.getProperties().getName()) ||
-            node.getTitle().equals(graphNodeVO.getProperties().getName());
+            node.getTitle().equals(graphNodeVO.getProperties().getText());
     }
 
     /**
