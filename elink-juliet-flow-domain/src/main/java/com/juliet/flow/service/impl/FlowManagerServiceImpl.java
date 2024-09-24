@@ -19,6 +19,7 @@ import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
 import com.juliet.flow.domain.model.Post;
+import com.juliet.flow.domain.model.TempGraphContext;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
@@ -80,8 +81,13 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         List<History> historyList = historyRepository.queryByFlowId(id);
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
 //        fillDefaultRequire(vo);
+
+        // TODO: 2024/9/24 后面删除临时解决线上匹样单bug
+        TempGraphContext.putFlow(flow);
+        TempGraphContext.putGraphVO(vo);
         fillFlowInfo(flow, vo);
         fillEdgeInfo(flow, vo, historyList);
+        TempGraphContext.clean();
         return vo;
     }
 
@@ -395,7 +401,8 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
         return node.getName().equals(graphNodeVO.getId()) ||
-            node.getName().equals(graphNodeVO.getProperties().getName());
+            node.getName().equals(graphNodeVO.getProperties().getName()) ||
+            (node.getTitle().equals(graphNodeVO.getProperties().getText()) && TempGraphContext.preNodeBothEq(graphNodeVO, node));
     }
 
     /**
