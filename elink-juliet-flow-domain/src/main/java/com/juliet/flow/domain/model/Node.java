@@ -642,7 +642,9 @@ public class Node extends BaseModel {
             newForm.setName(form.getName());
             newForm.setPath(form.getPath());
             newForm.setCode(form.getCode());
-            newForm.setFields(form.getFields().stream().map(Field::deepCopy).collect(Collectors.toList()));
+            if (CollectionUtils.isNotEmpty(form.getFields())) {
+                newForm.setFields(form.getFields().stream().map(Field::deepCopy).collect(Collectors.toList()));
+            }
             newForm.setCreateBy(form.getCreateBy());
             newForm.setCreateTime(new Date());
             newForm.setUpdateBy(form.getUpdateBy());
