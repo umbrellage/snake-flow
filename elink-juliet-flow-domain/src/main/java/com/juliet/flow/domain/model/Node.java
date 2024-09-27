@@ -210,6 +210,16 @@ public class Node extends BaseModel {
 
     }
 
+    public LocalDateTime processedTimeV2() {
+        if (finishTime != null) {
+            return finishTime;
+        }
+        if (activeTime != null) {
+            return activeTime;
+        }
+        return claimTime;
+    }
+
     /**
      * 是否存在操作人
      * @return true/false

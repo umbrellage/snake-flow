@@ -936,6 +936,7 @@ public class Flow extends BaseModel {
                     StringUtils.equals(post.getPostId(), String.valueOf(postId)))) {
                     node.setProcessedBy(userId);
                     node.setClaimTime(LocalDateTime.now());
+                    node.setActiveTime(LocalDateTime.now());
                     if (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
                         node.setStatus(NodeStatusEnum.ACTIVE);
                     }

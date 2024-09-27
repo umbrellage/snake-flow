@@ -120,7 +120,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
             Long nodeId = getNodeIdByName(graphNodeVO, flow);
             if (nodeId != null) {
                 graphNodeVO.getProperties().setNodeId(String.valueOf(nodeId));
-                LocalDateTime time = nodeMap.get(nodeId).processedTime();
+                LocalDateTime time = nodeMap.get(nodeId).processedTimeV2();
                 Long processBy = nodeMap.get(nodeId).getProcessedBy();
                 List<Post> postList = nodeMap.get(nodeId).getBindPosts();
                 if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(postList)) {
