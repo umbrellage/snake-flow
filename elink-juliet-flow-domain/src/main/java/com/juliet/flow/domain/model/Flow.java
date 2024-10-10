@@ -882,6 +882,10 @@ public class Flow extends BaseModel {
      * 提前结束流程
      */
     public void earlyEndFlow() {
+        setStatus(FlowStatusEnum.INVALID);
+    }
+
+    public void earlyEndFlowAndNode() {
         nodes.forEach(node -> {
             if (node.getStatus() != NodeStatusEnum.PROCESSED && node.getStatus() != NodeStatusEnum.IGNORE) {
                 node.setStatus(NodeStatusEnum.PROCESSED);

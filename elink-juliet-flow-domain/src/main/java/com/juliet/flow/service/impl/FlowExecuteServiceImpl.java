@@ -584,7 +584,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<Flow> subFlowList = flowRepository.listFlowByParentId(redo.getFlowId());
         subFlowList.add(flow);
         subFlowList.stream()
-                .peek(Flow::earlyEndFlow)
+                .peek(Flow::earlyEndFlowAndNode)
                 .forEach(e -> flowRepository.update(e));
 
         if (redo.getNodeId() == null) {
