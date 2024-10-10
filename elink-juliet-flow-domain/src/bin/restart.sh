@@ -16,6 +16,8 @@ APPLICATION_JAR="@build.finalName@.jar"
 echo stop ${APPLICATION} Application...
 sh shutdown.sh
 
+sleep 3
+
 # 启动服务
 echo start ${APPLICATION} Application...
 sh startup.sh $1 $2
