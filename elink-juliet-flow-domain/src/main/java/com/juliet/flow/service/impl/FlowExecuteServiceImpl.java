@@ -544,6 +544,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         callback(flow.normalNotifyList());
     }
 
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void designationOperator(DesignationOperator dto) {
         if (CollectionUtils.isEmpty(dto.getNodeIdList())) {
@@ -553,15 +554,16 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (flow == null) {
             return;
         }
-        flow.getNodes().forEach(node -> {
-            if (dto.getNodeIdList().contains(node.getId())) {
-                node.setProcessedBy(dto.getOperator());
-                node.setProcessedTime(LocalDateTime.now());
-                if (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
-                    node.setStatus(NodeStatusEnum.ACTIVE);
-                }
-            }
-        });
+        List<String> needDesignationNodeList = flow.getNodes().stream()
+            .filter(node -> dto.getNodeIdList().contains(node.getId()))
+            .map(Node::getName)
+            .collect(Collectors.toList());
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(flow.getId());
+        flow.designationOperator(needDesignationNodeList, dto.getOperator());
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            subFlowList.forEach(subFlow -> subFlow.designationOperator(needDesignationNodeList, dto.getOperator()));
+            subFlowList.forEach(subFlow -> flowRepository.update(subFlow));
+        }
         flowRepository.update(flow);
     }
 

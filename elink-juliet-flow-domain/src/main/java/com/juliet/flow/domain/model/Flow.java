@@ -211,6 +211,18 @@ public class Flow extends BaseModel {
                 .orElse(null);
     }
 
+    public void designationOperator(List<String> nodeName, Long operator) {
+        getNodes().forEach(node -> {
+            if (nodeName.contains(node.getName())) {
+                node.setProcessedBy(operator);
+                node.setProcessedTime(LocalDateTime.now());
+                if (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+                    node.setStatus(NodeStatusEnum.ACTIVE);
+                }
+            }
+        });
+    }
+
 
     public Node findNode(Long nodeId) {
         if (CollectionUtils.isEmpty(nodes)) {
