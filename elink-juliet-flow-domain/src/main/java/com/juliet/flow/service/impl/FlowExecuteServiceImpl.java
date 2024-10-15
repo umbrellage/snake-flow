@@ -227,13 +227,14 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Override
     public NodeVO node(TaskDTO dto) {
         // TODO: 2024/4/23 重写
+        // TODO: 2024/10/15 这段垃圾代码真的受不了了，我要重写
         Flow flow = flowRepository.queryById(dto.getFlowId());
         if (flow == null) {
             return null;
         }
         List<Flow> subFlowList = findSubFlowList(dto.getFlowId());
         Optional.ofNullable(dto.getUserId()).orElseThrow(() -> new ServiceException("用户id 不可以为空"));
-        Node node;
+        Node node = null;
         if (dto.getNodeId() != null) {
             node = flow.findNode(dto.getNodeId());
             if (node != null) {
@@ -247,8 +248,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .findFirst()
                 .orElseThrow(() -> new ServiceException("流程id与节点id不符合"));
             return sub.findNode(dto.getNodeId()).toNodeVo(sub);
-        } else {
+        }
+        if (dto.getUserId() != null) {
             node = flow.findTodoNode(dto.getUserId());
+        }
+        if (node == null && CollectionUtils.isNotEmpty(dto.getPostIdList())) {
+            node = flow.findNodeByPostIdList(dto.getPostIdList(), dto.getUserId());
         }
         if (node == null && dto.getSupplierId() != null) {
             node = flow.findNodeBySupplierId(dto.getSupplierId());

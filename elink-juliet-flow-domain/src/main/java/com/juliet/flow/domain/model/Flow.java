@@ -174,6 +174,20 @@ public class Flow extends BaseModel {
     }
 
 
+    /**
+     * 根据岗位查找一个待办节点
+     * @param postIdList
+     * @return
+     */
+    public Node findNodeByPostIdList(List<Long> postIdList, Long userId) {
+        return nodes.stream()
+            .filter(node -> node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED)
+            .filter(node -> node.isPostMatch(postIdList, userId))
+            .findFirst()
+            .orElse(null);
+    }
+
+
     public Node findTodoNode(Long userId) {
         if (CollectionUtils.isEmpty(nodes)) {
             return null;
