@@ -270,12 +270,12 @@ public class FlowVO implements Serializable {
      */
     public List<Long> processedBy() {
         List<FlowVO> allFlowList = allFlowList();
-        return allFlowList.stream().map(FlowVO::getNodes)
+        return allFlowList.stream()
+                .map(FlowVO::getNodes)
                 .flatMap(Collection::stream)
                 .filter(nodeVO -> nodeVO.getStatus() == 3)
                 .map(NodeVO::getProcessedBy)
                 .filter(e -> e != null && e != 0)
-                .distinct()
                 .collect(Collectors.toList());
     }
 
