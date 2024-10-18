@@ -276,6 +276,7 @@ public class FlowVO implements Serializable {
                 .filter(nodeVO -> nodeVO.getStatus() == 3)
                 .map(NodeVO::getProcessedBy)
                 .filter(e -> e != null && e != 0)
+                .distinct()
                 .collect(Collectors.toList());
     }
 
