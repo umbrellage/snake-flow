@@ -393,9 +393,11 @@ public class Flow extends BaseModel {
             currentNode.setClaimTime(LocalDateTime.now());
             currentNode.setProcessedTime(LocalDateTime.now());
         } else {
-            currentNode.setProcessedBy(userId);
-            currentNode.setProcessedTime(LocalDateTime.now());
-            currentNode.setClaimTime(LocalDateTime.now());
+            if (!Objects.equals(currentNode.getProcessedBy(), userId)) {
+                currentNode.setProcessedBy(userId);
+                currentNode.setProcessedTime(LocalDateTime.now());
+                currentNode.setClaimTime(LocalDateTime.now());
+            }
         }
     }
 
