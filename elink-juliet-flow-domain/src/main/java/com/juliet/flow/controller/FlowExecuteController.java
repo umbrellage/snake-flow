@@ -258,7 +258,8 @@ public class FlowExecuteController implements JulietFlowClient {
         flowExecuteService.recoverFlow(flowId);
         return AjaxResult.success();
     }
-
+    @ApiOperation("回退到某一个节点")
+    @PostMapping("/bpm/rollbackPrefixNode")
     public AjaxResult<List<HistoricTaskInstance>> rollbackPrefixNode(Long flowId, Long nodeId) {
         List<HistoricTaskInstance> history = flowExecuteService.rollbackPrefixNode(flowId, nodeId);
         return AjaxResult.success(history);
