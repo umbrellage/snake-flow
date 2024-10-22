@@ -1211,7 +1211,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
-        flow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
+        List<Node> activeNodeList = flow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, flow);
         if (flow.end() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                 .allMatch(Flow::end))) {
@@ -1230,7 +1230,10 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             callback(Collections.singletonList(flow.flowEndNotify()));
         }
         List<History> forwardHistory = flow.forwardHistory(node.getId(), dto.getExecuteId());
+        List<History> activeHistory = flow.activeHistory(dto.getExecuteId(), node.getId(), activeNodeList);
+        forwardHistory.addAll(activeHistory);
         historyRepository.add(forwardHistory);
+
         callback(flow.normalNotifyList());
         callback(Collections.singletonList(node.toNotifyComplete(flow)));
 

@@ -40,6 +40,8 @@ public enum OperateTypeEnum {
      */
     ERROR(6),
 
+    ACTIVE(7),
+
     ;
 
 

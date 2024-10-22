@@ -3,6 +3,7 @@ package com.juliet.flow.domain.model;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;

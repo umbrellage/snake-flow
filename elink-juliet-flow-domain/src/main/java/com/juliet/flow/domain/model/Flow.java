@@ -3,6 +3,7 @@ package com.juliet.flow.domain.model;
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.flow.client.common.NotifyTypeEnum;
+import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
 import com.juliet.flow.client.dto.NotifyDTO;
 import com.juliet.flow.client.dto.RollbackDTO;
@@ -112,6 +113,28 @@ public class Flow extends BaseModel {
                         node.getType() == NodeTypeEnum.END)
                 .map(node -> History.of(this, userId, nodeId, node.getId()))
                 .collect(Collectors.toList());
+    }
+
+
+    public List<History> activeHistory(Long userId, Long sourceNodeId, List<Node> nodeList) {
+        if (CollectionUtils.isEmpty(nodeList)) {
+            return Collections.emptyList();
+        }
+
+        return nodeList.stream()
+            .map(node -> {
+                History history = new History();
+                history.setAction(OperateTypeEnum.ACTIVE);
+                history.setFlowId(id);
+                history.setMainFlowId(mainFlowId());
+                history.setSourceNodeId(sourceNodeId);
+                history.setTargetNodeId(node.getId());
+                history.setCreateTime(LocalDateTime.now());
+                history.setTenantId(1L);
+                history.setAssignee(userId);
+                return history;
+            })
+            .collect(Collectors.toList());
     }
 
 
@@ -584,19 +607,21 @@ public class Flow extends BaseModel {
         }
     }
 
-    public void activeNode(Node node, Map<String, Object> param) {
+    public List<Node> activeNode(Node node, Map<String, Object> param) {
+        List<Node> activeNodeList = new ArrayList<>();
         log.debug("node id:{}, status:{}, param:{}", node.getId(), node.getStatus(), JSON.toJSONString(param));
         boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule() == null || node.getActiveRule()
                 .activeSelf(this));
         // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
         if (preHandled) {
+            param.put(FlowConstant.INNER_FLOW, this);
+            param.put(FlowConstant.CURRENT_NODE, node);
             if (node.getAccessRule() != null) {
-                param.put(FlowConstant.INNER_FLOW, this);
-                param.put(FlowConstant.CURRENT_NODE, node);
                 boolean flag = node.getAccessRule().accessRule(param, node.getId());
                 // 如果规则不匹配，递归修改后面节点的状态为忽略
                 if (!flag) {
                     ignoreEqualAfterNode(node);
+                    return Collections.emptyList();
                 }
             }
             if (node.getType() == NodeTypeEnum.END) {
@@ -604,8 +629,9 @@ public class Flow extends BaseModel {
                 node.setProcessedTime(LocalDateTime.now());
                 node.setFinishTime(LocalDateTime.now());
                 node.setActiveTime(LocalDateTime.now());
-                return;
+                return Collections.emptyList();
             }
+            activeNodeList.add(node);
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
                 // 规则分配
                 node.regularDistribution(param, this);
@@ -624,7 +650,7 @@ public class Flow extends BaseModel {
                     node.setActiveTime(LocalDateTime.now());
                     node.setClaimTime(null);
                 }
-                return;
+                return Collections.emptyList();
             }
             if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                 node.setStatus(NodeStatusEnum.ACTIVE);
@@ -632,7 +658,10 @@ public class Flow extends BaseModel {
                 node.setClaimTime(LocalDateTime.now());
                 node.setFinishTime(null);
             }
+        } else {
+            log.error("node is not active, nodeId:{}", node.getId());
         }
+        return Collections.emptyList();
     }
 
     /**
@@ -640,10 +669,10 @@ public class Flow extends BaseModel {
      *
      * @param nodeId
      */
-    public void modifyNextNodeStatus(Long nodeId, Long userId, Map<String, Object> param) {
+    public List<Node> modifyNextNodeStatus(Long nodeId, Long userId, Map<String, Object> param) {
         Node currentNode = findNode(nodeId);
         if (currentNode == null) {
-            return;
+            return Collections.emptyList();
         }
 
         List<String> nextNameList = currentNode.nextNameList();
@@ -658,9 +687,12 @@ public class Flow extends BaseModel {
         });
         // 修改节点消息通知状态
         modifyNodeTodoStatusAndActiveSelf(nodeId, param);
-        nextNameList.stream()
-                .map(this::findNode)
-                .forEach(node -> activeNode(node, param));
+        return nextNameList.stream()
+            .map(this::findNode)
+            .map(node -> activeNode(node, param))
+            .flatMap(Collection::stream)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
     }
 
     public void modifyNodeTodoStatusAndActiveSelf(Long completeNodeId, Map<String, Object> param) {
