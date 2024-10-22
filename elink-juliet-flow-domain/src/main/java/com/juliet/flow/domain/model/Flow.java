@@ -609,7 +609,7 @@ public class Flow extends BaseModel {
 
     public List<Node> activeNode(Node node, Map<String, Object> param) {
         List<Node> activeNodeList = new ArrayList<>();
-        log.debug("node id:{}, status:{}, param:{}", node.getId(), node.getStatus(), JSON.toJSONString(param));
+        log.info("node id:{}, status:{}, param:{}", node.getId(), node.getStatus(), JSON.toJSONString(param));
         boolean preHandled = ifPreNodeIsHandle(node.getName()) && (node.getActiveRule() == null || node.getActiveRule()
                 .activeSelf(this));
         // 如果需要激活的节点的前置节点都已经完成，节点才可以激活
