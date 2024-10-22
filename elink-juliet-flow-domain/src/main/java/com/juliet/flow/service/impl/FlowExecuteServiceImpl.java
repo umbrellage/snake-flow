@@ -908,6 +908,29 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     }
 
     @Override
+    public List<HistoricTaskInstance> rollbackPrefixNode(Long flowId, Long nodeId) {
+        // TODO: 2024/10/22 目前只回退主流程
+        Flow flow = flowRepository.queryById(flowId);
+        if (flow == null) {
+            log.error("[rollbackPrefixNode] flowId:{} is not found", flowId);
+            return Collections.emptyList();
+        }
+
+        Node targetNode = flow.getNodes().stream()
+            .filter(node -> Objects.equals(node.getId(), nodeId))
+            .findFirst()
+            .orElse(null);
+        if (targetNode == null) {
+            log.error("[rollbackPrefixNode] nodeId:{} is not found", nodeId);
+            return Collections.emptyList();
+        }
+
+        flow.rollback(targetNode);
+        flowRepository.update(flow);
+        return Collections.emptyList();
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
         Object lock = lockMap.computeIfAbsent(dto.getFlowId(), id -> new Object());

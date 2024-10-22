@@ -91,4 +91,6 @@ public interface FlowExecuteService {
     void trxTest2();
 
     void distributionNodeOperator4Post(Long flowId, Long postId, Long userId);
+
+    List<HistoricTaskInstance> rollbackPrefixNode(Long flowId, Long nodeId);
 }

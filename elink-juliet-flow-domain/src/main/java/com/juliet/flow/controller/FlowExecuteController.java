@@ -244,6 +244,8 @@ public class FlowExecuteController implements JulietFlowClient {
         return AjaxResult.success();
     }
 
+
+
     @Override
     public AjaxResult<Void> earlyEndFlow(Long flowId) {
         flowExecuteService.earlyEndFlow(flowId);
@@ -255,6 +257,11 @@ public class FlowExecuteController implements JulietFlowClient {
 
         flowExecuteService.recoverFlow(flowId);
         return AjaxResult.success();
+    }
+
+    public AjaxResult<List<HistoricTaskInstance>> rollbackPrefixNode(Long flowId, Long nodeId) {
+        List<HistoricTaskInstance> history = flowExecuteService.rollbackPrefixNode(flowId, nodeId);
+        return AjaxResult.success(history);
     }
 
     @Override
