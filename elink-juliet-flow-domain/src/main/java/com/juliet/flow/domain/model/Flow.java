@@ -661,7 +661,7 @@ public class Flow extends BaseModel {
         } else {
             log.error("node is not active, nodeId:{}", node.getId());
         }
-        return Collections.emptyList();
+        return activeNodeList;
     }
 
     /**
