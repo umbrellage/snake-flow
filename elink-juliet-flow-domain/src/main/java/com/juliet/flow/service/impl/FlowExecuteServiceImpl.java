@@ -1208,11 +1208,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         boolean end = false;
         // 查询异常流程
         List<Flow> exFlowList = flowRepository.listFlowByParentId(dto.getMainFlow().getId());
-        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
+//        List<Flow> calibrateFlowList = new ArrayList<>(exFlowList);
         Node node = dto.getExecuteNode();
         Flow flow = dto.getMainFlow();
         List<Node> activeNodeList = flow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
-        syncFlow(calibrateFlowList, flow);
+//        syncFlow(calibrateFlowList, flow);
         if (flow.end() && (CollectionUtils.isEmpty(exFlowList) || exFlowList.stream()
                 .allMatch(Flow::end))) {
             end = true;
@@ -1221,9 +1221,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             exFlowList.forEach(exFlow -> flowRepository.update(exFlow));
             log.info("流程结束发送通知");
         }
-        calibrateFlowList.stream()
-                .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
-                .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
+//        calibrateFlowList.stream()
+//                .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
+//                .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         flowRepository.update(flow);
         // 发送消息提醒
         if (end) {
@@ -1266,6 +1266,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         syncFlow(calibrateFlowList, errorFlow);
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
+                // 校准流程之后把所有流程该激活的要激活起来，排除自己
+                .filter(calibrateFlow -> !Objects.equals(calibrateFlow.getId(), errorFlow.getId()))
                 .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         if (errorFlow.end() && exFlowList.stream().allMatch(Flow::end)) {
             flow.setStatus(FlowStatusEnum.END);
