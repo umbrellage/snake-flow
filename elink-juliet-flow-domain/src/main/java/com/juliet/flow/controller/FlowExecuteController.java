@@ -2,6 +2,7 @@ package com.juliet.flow.controller;
 
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.web.domain.AjaxResult;
+import com.juliet.common.redis.lock.RedisLock;
 import com.juliet.flow.client.JulietFlowClient;
 import com.juliet.flow.client.dto.BpmDTO;
 import com.juliet.flow.client.dto.DesignationOperator;
@@ -70,6 +71,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("通过表单字段查询节点，并执行")
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> forward(NodeFieldDTO dto) {
         flowExecuteService.forward(dto);
         // TODO: 2024/4/24 事务问题暂时先放这，为什么不放下一层呢，因为会有问题，先这样
@@ -79,6 +81,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("通过表单字段查询节点，并执行")
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<List<HistoricTaskInstance>> forwardV2(NodeFieldDTO dto) {
         log.info("mamba param:{}", JSON.toJSONString(dto));
         List<HistoricTaskInstance> instanceList = flowExecuteService.forward(dto);
@@ -142,6 +145,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
     @ApiOperation("认领待办任务、修改待办人、分配一个待办人")
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> claimTask(TaskDTO dto) {
         flowExecuteService.claimTask(dto);
         return AjaxResult.success();
@@ -166,6 +170,7 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> designationOperator(DesignationOperator dto) {
         flowExecuteService.designationOperator(dto);
         return AjaxResult.success();
@@ -216,29 +221,34 @@ public class FlowExecuteController implements JulietFlowClient {
     }
 
     @Override
+    @RedisLock(key = "#redo.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<List<HistoricTaskInstance>> bpmRedo(RedoDTO redo) {
         return AjaxResult.success(flowExecuteService.execute(redo));
     }
 
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> invalid(InvalidDTO dto) {
         flowExecuteService.invalid(dto);
         return AjaxResult.success();
     }
 
     @Override
+    @RedisLock(key = "#dto.flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> delete(InvalidDTO dto) {
         flowExecuteService.delete(dto);
         return AjaxResult.success();
     }
 
     @Override
+    @RedisLock(key = "#flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> triggerTodo(Long flowId, Map<String, Object> triggerParam) {
         flowExecuteService.triggerTodo(flowId, triggerParam);
         return AjaxResult.success();
     }
 
     @Override
+    @RedisLock(key = "#flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> flowAutomate(Long flowId, Map<String, Object> automateParam) {
         flowExecuteService.flowAutomate(flowId, automateParam);
         return AjaxResult.success();
@@ -247,6 +257,7 @@ public class FlowExecuteController implements JulietFlowClient {
 
 
     @Override
+    @RedisLock(key = "#flowId", prefix = "flowIdLock", timeOutMs = 10000L, expireTimeoutMs = 30000L)
     public AjaxResult<Void> earlyEndFlow(Long flowId) {
         flowExecuteService.earlyEndFlow(flowId);
         return AjaxResult.success();
