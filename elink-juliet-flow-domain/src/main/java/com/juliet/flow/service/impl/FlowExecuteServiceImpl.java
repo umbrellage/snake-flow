@@ -426,15 +426,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void flowAutomate(Long flowId, Map<String, Object> automateParam) {
-        Object lock = lockMap.computeIfAbsent(flowId, id -> new Object());
-        try {
-            synchronized (lock) {
+//        Object lock = lockMap.computeIfAbsent(flowId, id -> new Object());
+//        try {
+//            synchronized (lock) {
                 Flow flow = flowRepository.queryById(flowId);
                 flowAutomate(flow, automateParam);
-            }
-        } finally {
-            lockMap.remove(flowId);
-        }
+//            }
+//        } finally {
+//            lockMap.remove(flowId);
+//        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -933,9 +933,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<HistoricTaskInstance> forward(NodeFieldDTO dto) {
-        Object lock = lockMap.computeIfAbsent(dto.getFlowId(), id -> new Object());
-        synchronized (lock) {
-            try {
+//        Object lock = lockMap.computeIfAbsent(dto.getFlowId(), id -> new Object());
+//        synchronized (lock) {
+//            try {
                 List<HistoricTaskInstance> historicTaskInstanceList = new ArrayList<>();
                 // 需要被执行的节点列表
                 List<Node> executableNode = new ArrayList<>();
@@ -986,11 +986,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 return historicTaskInstanceList.stream()
                     .distinct()
                     .collect(Collectors.toList());
-            } finally {
-                lockMap.remove(dto.getFlowId());
-            }
+//            } finally {
+//                lockMap.remove(dto.getFlowId());
+//            }
 
-        }
+//        }
     }
 
     /**
