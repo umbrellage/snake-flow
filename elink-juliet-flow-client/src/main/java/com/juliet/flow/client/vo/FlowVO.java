@@ -67,6 +67,14 @@ public class FlowVO implements Serializable {
 
     public UserExecutor userExecutorInfo(List<Long> userIdList, List<Long> postIdList, Long supplierId) {
         UserExecutor executor = new UserExecutor();
+        if (status == 4) {
+            executor.setAdjustOperator(false);
+            executor.setCanChange(false);
+            executor.setCanEdit(false);
+            executor.setWillEdit(false);
+            executor.setCurrentOperator(false);
+            return executor;
+        }
         List<NodeVO> userDoneNodeList = new ArrayList<>();
         List<NodeVO> allNodeList = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(subFlowList)) {
