@@ -107,28 +107,30 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long startFlow(BpmDTO dto) {
-        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
-        if (flowTemplate == null) {
-            throw new ServiceException("流程模版不存在");
-        }
-        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
-
-        Long flowId = flowRepository.add(flow);
-        Flow dbFlow = flowRepository.queryById(flowId);
-        Node node = dbFlow.startNode();
-        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
-        log.info("init flow:{}", JSON.toJSONString(dbFlow));
-        if (dbFlow.end()) {
-            dbFlow.setStatus(FlowStatusEnum.END);
-        }
-        flowRepository.update(dbFlow);
-        List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
-        historyRepository.add(forwardHistory);
-
-        // 流程流转完执行自动流转功能
-        flowAutomate(flowId, dto.getData());
-        callback(dbFlow.normalNotifyList());
-        return flow.getId();
+//        FlowTemplate flowTemplate = flowRepository.queryTemplateByCode(dto.getTemplateCode(), dto.getTenantId());
+//        if (flowTemplate == null) {
+//            throw new ServiceException("流程模版不存在");
+//        }
+//        Flow flow = flowTemplate.toFlowInstance(dto.getUserId());
+//
+//        Long flowId = flowRepository.add(flow);
+//        Flow dbFlow = flowRepository.queryById(flowId);
+//        Node node = dbFlow.startNode();
+//        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
+//        log.info("init flow:{}", JSON.toJSONString(dbFlow));
+//        if (dbFlow.end()) {
+//            dbFlow.setStatus(FlowStatusEnum.END);
+//        }
+//        flowRepository.update(dbFlow);
+//        List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
+//        historyRepository.add(forwardHistory);
+//
+//        // 流程流转完执行自动流转功能
+//        flowAutomate(flowId, dto.getData());
+//        callback(dbFlow.normalNotifyList());
+//        return flow.getId();
+        HistoricTaskInstance instance = startFlowV2(dto);
+        return instance.getFlowId();
     }
 
     @Transactional(rollbackFor = Exception.class)

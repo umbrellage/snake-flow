@@ -125,7 +125,7 @@ public class FlowRepositoryImpl implements FlowRepository {
     public void update(Flow flow) {
         FlowEntity flowEntity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.updateById(flowEntity);
-        updateNodes(flow.getNodes(), flow.getId(), flow.getFlowTemplateId());
+        updateNodes(flow.getNodes(), flow.getId(), 0L);
 //        deleteNodes(flow.getNodes());
 //        addNodes(flow.getNodes(), flow.getId(), 0L);
         flowCache.removeFlow(flowEntity.getId());
