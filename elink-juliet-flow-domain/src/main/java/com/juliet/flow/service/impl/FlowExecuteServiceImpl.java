@@ -1269,7 +1269,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
                 // 校准流程之后把所有流程该激活的要激活起来，排除自己
-                .filter(calibrateFlow -> !Objects.equals(calibrateFlow.getId(), errorFlow.getId()))
+//                .filter(calibrateFlow -> !Objects.equals(calibrateFlow.getId(), errorFlow.getId()))
                 .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         if (errorFlow.end() && exFlowList.stream().allMatch(Flow::end)) {
             flow.setStatus(FlowStatusEnum.END);
