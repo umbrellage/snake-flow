@@ -81,6 +81,11 @@ public class FlowRepositoryImpl implements FlowRepository {
         }
     }
 
+    private void updateNodes(List<Node> nodes, Long flowId, Long flowTemplateId) {
+        List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes, flowId, flowTemplateId);
+        nodeEntities.forEach(nodeEntity -> nodeDao.updateById(nodeEntity));
+    }
+
     private void addNodes(List<Node> nodes, Long flowId, Long flowTemplateId) {
         List<NodeEntity> nodeEntities = FlowEntityFactory.transferNodeEntities(nodes, flowId, flowTemplateId);
         nodeDao.insertBatch(nodeEntities);
@@ -120,8 +125,9 @@ public class FlowRepositoryImpl implements FlowRepository {
     public void update(Flow flow) {
         FlowEntity flowEntity = FlowEntityFactory.toFlowEntity(flow);
         flowDao.updateById(flowEntity);
-        deleteNodes(flow.getNodes());
-        addNodes(flow.getNodes(), flow.getId(), 0L);
+        updateNodes(flow.getNodes(), flow.getId(), flow.getFlowTemplateId());
+//        deleteNodes(flow.getNodes());
+//        addNodes(flow.getNodes(), flow.getId(), 0L);
         flowCache.removeFlow(flowEntity.getId());
         Flow flowInDb = queryByIdFromDb(flowEntity.getId());
         flowCache.setFlow(flowInDb);

@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldStrategy;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -122,12 +123,15 @@ public class NodeEntity extends BaseEntity {
     /**
      * 节点激活时间
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private LocalDateTime activeTime;
     /**
      * 节点认领，分配时间
      */
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private LocalDateTime claimTime;
 
+    @TableField(updateStrategy = FieldStrategy.IGNORED)
     private LocalDateTime finishTime;
 
 
