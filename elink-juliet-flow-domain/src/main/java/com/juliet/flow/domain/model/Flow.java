@@ -2,6 +2,8 @@ package com.juliet.flow.domain.model;
 
 import com.alibaba.fastjson2.JSON;
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.utils.DateUtils;
+import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
@@ -442,6 +444,7 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
+        data.setCreateDateTime(DateUtils.dateTime(getCreateTime()));
         return data;
     }
 
@@ -468,6 +471,7 @@ public class Flow extends BaseModel {
             data.setSubFlowList(subFlowVOList);
         }
         data.setTheLastProcessedBy(theLastProcessedBy());
+        data.setCreateDateTime(DateUtils.dateTime(getCreateTime()));
         return data;
     }
 

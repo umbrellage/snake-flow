@@ -59,6 +59,10 @@ public class FlowVO implements Serializable {
 
     private List<FlowVO> subFlowList = new ArrayList<>();
 
+    /**
+     * 创建日期
+     */
+    private String createDateTime;
 
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
         return userExecutorInfo(Collections.singletonList(userId), postIdList, supplierId);
