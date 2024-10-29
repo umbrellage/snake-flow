@@ -444,7 +444,9 @@ public class Flow extends BaseModel {
         data.setStatus(status.getCode());
         data.setSubFlowList(subFlowList);
         data.setTheLastProcessedBy(theLastProcessedBy());
-        data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+        if (getCreateTime() != null) {
+            data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+        }
         return data;
     }
 
@@ -471,7 +473,9 @@ public class Flow extends BaseModel {
             data.setSubFlowList(subFlowVOList);
         }
         data.setTheLastProcessedBy(theLastProcessedBy());
-        data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+        if (getCreateTime() != null) {
+            data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+        }
         return data;
     }
 
