@@ -653,6 +653,10 @@ public class Flow extends BaseModel {
                     node.setStatus(NodeStatusEnum.TO_BE_CLAIMED);
                     node.setActiveTime(LocalDateTime.now());
                     node.setClaimTime(null);
+                    // 如果是系统节点，直接激活
+                    if (StringUtils.isNotBlank(node.getFlowAutomateRuleName())) {
+                        node.setStatus(NodeStatusEnum.ACTIVE);
+                    }
                 }
                 return Collections.emptyList();
             }
