@@ -2,12 +2,12 @@ package com.juliet.flow.repository.impl;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.juliet.common.redis.service.RedisService;
 import com.juliet.flow.domain.entity.FlowEntity;
 import com.juliet.flow.domain.entity.NodeEntity;
 import com.juliet.flow.domain.model.Flow;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -39,16 +39,12 @@ public class FlowCache {
             .expireAfterWrite(10, TimeUnit.DAYS)
             .build();
 
-    @Autowired
-    private RedisService redisService;
 
     public void setFlow(Flow flow) {
         if (flow == null || flow.getId() == null) {
             return;
         }
         String key = buildFlowCacheKey(flow.getId());
-//        cache.put(key, flow);
-        redisService.<Flow>setCacheObject(key, flow, 10L, TimeUnit.MINUTES);
     }
     public void setFlowList(List<Flow> flowList) {
         for (Flow flow : flowList) {
@@ -58,11 +54,10 @@ public class FlowCache {
 
     public Flow getFlow(Long id) {
 //        return cache.getIfPresent(buildFlowCacheKey(id));
-        return redisService.<Flow>getCacheObject(buildFlowCacheKey(id));
+        return null;
     }
 
     public void removeFlow(Long id) {
-        redisService.deleteObject(buildFlowCacheKey(id));
 //        cache.invalidate(buildFlowCacheKey(id));
     }
 

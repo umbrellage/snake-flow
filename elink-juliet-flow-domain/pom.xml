@@ -57,15 +57,49 @@
         <!--            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>-->
         <!--        </dependency>-->
         <!-- Elink Common DataSource -->
+<!--        <dependency>-->
+<!--            <groupId>com.juliet.common.datasource</groupId>-->
+<!--            <artifactId>elink-common-datasource</artifactId>-->
+<!--        </dependency>-->
+        <!-- Druid -->
         <dependency>
-            <groupId>com.juliet.common.datasource</groupId>
-            <artifactId>elink-common-datasource</artifactId>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>1.2.15</version>
+        </dependency>
+        <!-- Dynamic DataSource -->
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>3.5.0</version>
+        </dependency>
+        <!-- SpringBoot Seata -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
+            <version>2021.0.1.0</version>
         </dependency>
         <!-- Elink Common DataScope -->
+<!--        <dependency>-->
+<!--            <groupId>com.juliet.common.datascope</groupId>-->
+<!--            <artifactId>elink-common-datascope</artifactId>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>com.juliet.common.datascope</groupId>
-            <artifactId>elink-common-datascope</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <version>5.3.19</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>2.6.7</version>
+        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.juliet.common.redis</groupId>-->
+<!--            <artifactId>elink-common-redis</artifactId>-->
+<!--            <version>2.0.0</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.juliet.common.swagger</groupId>
             <artifactId>elink-common-swagger</artifactId>

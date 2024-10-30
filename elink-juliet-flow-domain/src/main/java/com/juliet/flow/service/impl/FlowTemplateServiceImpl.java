@@ -2,9 +2,7 @@ package com.juliet.flow.service.impl;
 
 import com.alibaba.csp.sentinel.util.StringUtil;
 import com.alibaba.fastjson2.JSON;
-import com.juliet.api.development.domain.entity.SysUser;
 import com.juliet.common.core.exception.ServiceException;
-import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.dto.*;
 import com.juliet.flow.client.vo.NodeVO;
 import com.juliet.flow.common.StatusCode;
@@ -43,19 +41,17 @@ public class FlowTemplateServiceImpl implements FlowTemplateService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Long add(FlowTemplateAddDTO flowTemplateAddDTO) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        flowTemplateAddDTO.setCreateBy(sysUser.getUserId());
-        flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
-        flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
+        flowTemplateAddDTO.setCreateBy(flowTemplateAddDTO.getCreateBy());
+        flowTemplateAddDTO.setUpdateBy(flowTemplateAddDTO.getCreateBy());
+        flowTemplateAddDTO.setTenantId(flowTemplateAddDTO.getTenantId());
         return flowRepository.addTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void update(FlowTemplateAddDTO flowTemplateAddDTO) {
-        SysUser sysUser = SecurityUtils.getLoginUser().getSysUser();
-        flowTemplateAddDTO.setUpdateBy(sysUser.getUserId());
-        flowTemplateAddDTO.setTenantId(sysUser.getTenantId());
+        flowTemplateAddDTO.setUpdateBy(flowTemplateAddDTO.getUpdateBy());
+        flowTemplateAddDTO.setTenantId(flowTemplateAddDTO.getTenantId());
         flowRepository.updateTemplate(toFlowTemplate(flowTemplateAddDTO));
     }
 
