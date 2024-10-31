@@ -446,6 +446,7 @@ public class Flow extends BaseModel {
         data.setTheLastProcessedBy(theLastProcessedBy());
         if (getCreateTime() != null) {
             data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+            data.setTs(getCreateTime().getTime());
         }
         return data;
     }
@@ -475,6 +476,7 @@ public class Flow extends BaseModel {
         data.setTheLastProcessedBy(theLastProcessedBy());
         if (getCreateTime() != null) {
             data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+            data.setTs(getCreateTime().getTime());
         }
         return data;
     }

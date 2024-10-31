@@ -64,6 +64,11 @@ public class FlowVO implements Serializable {
      */
     private String createDate;
 
+    /**
+     * 毫秒
+     */
+    private Long ts;
+
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
         return userExecutorInfo(Collections.singletonList(userId), postIdList, supplierId);
     }
@@ -273,6 +278,17 @@ public class FlowVO implements Serializable {
      */
     public List<NodeVO> currentNode() {
         return nodes.stream()
+                .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 只有主流程, 包含异常流程
+     *
+     * @return
+     */
+    public List<NodeVO> allNodeCurrentNode() {
+        return allNodeList().stream()
                 .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
                 .collect(Collectors.toList());
     }
