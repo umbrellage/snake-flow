@@ -2,10 +2,7 @@ package com.juliet.flow.repository;
 
 import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.FlowTemplate;
-import com.juliet.flow.domain.model.Node;
-import com.juliet.flow.domain.model.NodeQuery;
+import com.juliet.flow.domain.model.*;
 import com.juliet.flow.domain.query.AssembleFlowCondition;
 
 import java.util.Collection;
@@ -65,4 +62,5 @@ public interface FlowRepository {
      */
     List<Flow> listFlow(String flowCode, Long userId, List<Long> postIdList);
 
+    Form repariForm(Flow flow, String name);
 }

@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.utils.SpringUtils;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.common.OperateTypeEnum;
@@ -19,6 +20,7 @@ import com.juliet.flow.client.vo.SupplierVO;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
+import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.Duration;
 import lombok.Data;
@@ -594,6 +596,10 @@ public class Node extends BaseModel {
             data.setStatus(status.getCode());
         }
         data.setCustomStatus(customStatus);
+        if (form == null) {
+            FlowRepository flowRepository = SpringUtils.getBean(FlowRepository.class);
+            form = flowRepository.repariForm(flow, name);
+        }
         Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         data.setTodoNotify(todoNotify == null ? null : todoNotify.getCode());

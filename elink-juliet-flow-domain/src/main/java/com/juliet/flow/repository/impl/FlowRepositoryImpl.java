@@ -427,6 +427,41 @@ public class FlowRepositoryImpl implements FlowRepository {
         return queryByIdList(operatorOfUserIdMainFlowIdList);
     }
 
+    // 暂时兜底，未来删除
+    @Deprecated
+    @Override
+    public Form repariForm(Flow flow, String name) {
+        if (flow == null || StringUtils.isBlank(name)) {
+            return null;
+        }
+        log.error("do repairForm, flowId:{}, node name:{}", flow.getId(), name);
+        if (flow.getFlowTemplateId() != null && flow.getFlowTemplateId() > 0) {
+            List<NodeEntity> nodeEntities = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
+                    .eq(NodeEntity::getFlowTemplateId, flow.getFlowTemplateId()));
+            if (CollectionUtils.isEmpty(nodeEntities)) {
+                return null;
+            }
+            NodeEntity entity = nodeEntities.stream().filter(e -> Objects.equals(e.getName(), name)).findAny().orElse(null);
+            if (entity == null) {
+                return null;
+            }
+            List<FormEntity> formEntities = formDao.selectList(Wrappers.<FormEntity>lambdaQuery()
+                    .eq(FormEntity::getNodeId, entity.getId()));
+            if (CollectionUtils.isEmpty(formEntities)) {
+                return null;
+            }
+            List<FieldEntity> fieldEntities = fieldDao.selectList(Wrappers.<FieldEntity>lambdaQuery()
+                    .eq(FieldEntity::getFormId, formEntities.get(0).getId()));
+            if (CollectionUtils.isEmpty(fieldEntities)) {
+                return null;
+            }
+            Form form = FlowEntityFactory.toForm(formEntities.get(0));
+            form.setFields(fieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+            return form;
+        }
+        return null;
+    }
+
     private void deleteNodes(List<Node> nodes) {
         if (CollectionUtils.isEmpty(nodes)) {
             return;
