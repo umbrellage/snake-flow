@@ -596,7 +596,7 @@ public class Node extends BaseModel {
             data.setStatus(status.getCode());
         }
         data.setCustomStatus(customStatus);
-        if (form == null) {
+        if (form == null || CollectionUtils.isEmpty(form.getFields())) {
             FlowRepository flowRepository = SpringUtils.getBean(FlowRepository.class);
             form = flowRepository.repariForm(flow, name);
         }
