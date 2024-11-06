@@ -232,9 +232,6 @@ public class FlowRepositoryImpl implements FlowRepository {
     private List<Flow> queryByIdListFromDb(List<Long> idList, AssembleFlowCondition condition) {
         List<FlowEntity> flowList = flowDao.selectList(
                 Wrappers.<FlowEntity>lambdaQuery().in(FlowEntity::getId, idList));
-        if (CollectionUtils.isEmpty(flowList)) {
-            return Collections.emptyList();
-        }
         return assembleFlow(flowList, condition);
     }
 
