@@ -198,6 +198,6 @@ public class NodeVO implements Serializable {
         if (nodeVO == null) {
             return false;
         }
-        return nextNameList().contains(nodeVO.getName());
+        return nodeVO.nextNameList().contains(this.name);
     }
 }
