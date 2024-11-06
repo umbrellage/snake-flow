@@ -13,6 +13,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.juliet.flow.client.config.DateTime2String;
 import com.juliet.flow.client.config.String2DateTimeDes;
+
+import java.util.Objects;
 import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.Setter;
@@ -185,5 +187,17 @@ public class NodeVO implements Serializable {
         }
         return Arrays.stream(nextName.split(","))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * 是否为指定节点的下一个节点
+     *
+     * 顺序：指定节点 -> 当前节点
+     */
+    public boolean isNextBy(NodeVO nodeVO) {
+        if (nodeVO == null) {
+            return false;
+        }
+        return nodeVO.nextNameList().contains(this.name);
     }
 }

@@ -508,4 +508,45 @@ public class FlowVO implements Serializable {
         return null;
     }
 
+    /**
+     * 获取用户id相关的所有前置节点
+     */
+    public List<NodeVO> getPreRelatedNodeList(Long userId) {
+        if (userId == null) {
+            return Lists.newArrayList();
+        }
+        // 找到跟我相关的节点
+        List<NodeVO> sourceNodeList = nodes.stream()
+                .filter(Objects::nonNull)
+                .filter(node -> Objects.equals(userId, node.getProcessedBy()))
+                .collect(Collectors.toList());
+        List<NodeVO> allPreNodeList = new ArrayList<>();
+        while (true) {
+            List<NodeVO> preNodeList = findPreNodeList(sourceNodeList);
+            if (CollectionUtils.isEmpty(preNodeList)) {
+                break;
+            }
+            allPreNodeList.addAll(preNodeList);
+            sourceNodeList = preNodeList;
+        }
+        return allPreNodeList;
+    }
+
+    /**
+     * 通过指定节点id找到这些id的前置节点
+     */
+    private List<NodeVO> findPreNodeList(List<NodeVO> sourceNodeList) {
+        if (CollectionUtils.isEmpty(sourceNodeList)) {
+            return Lists.newArrayList();
+        }
+        List<NodeVO> preNodeList = new ArrayList<>();
+        for (NodeVO sourceNode : sourceNodeList) {
+            for (NodeVO nodeVO : this.nodes) {
+                if (sourceNode.isNextBy(nodeVO)) {
+                    preNodeList.add(nodeVO);
+                }
+            }
+        }
+        return preNodeList;
+    }
 }
