@@ -641,8 +641,8 @@ public class Flow extends BaseModel {
                 node.setActiveTime(LocalDateTime.now());
                 return Collections.emptyList();
             }
-            activeNodeList.add(node);
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                activeNodeList.add(node);
                 // 规则分配
                 node.regularDistribution(param, this);
                 // 分配给流程内部节点的操作人
@@ -664,7 +664,7 @@ public class Flow extends BaseModel {
                         node.setStatus(NodeStatusEnum.ACTIVE);
                     }
                 }
-                return Collections.emptyList();
+                return activeNodeList;
             }
             if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                 node.setStatus(NodeStatusEnum.ACTIVE);
