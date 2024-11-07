@@ -7,21 +7,20 @@ import com.juliet.common.core.utils.time.JulietTimeMemo;
 import com.juliet.common.security.utils.SecurityUtils;
 import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
+import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
 import com.juliet.flow.client.vo.PostVO;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.FlowTemplate;
-import com.juliet.flow.domain.model.History;
-import com.juliet.flow.domain.model.Node;
+import com.juliet.flow.common.utils.IdGenerator;
+import com.juliet.flow.domain.dto.FlowFormFieldsUpdateDTO;
+import com.juliet.flow.domain.model.*;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
-import com.juliet.flow.domain.model.Post;
-import com.juliet.flow.domain.model.TempGraphContext;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
+import com.juliet.flow.repository.impl.FlowCache;
 import com.juliet.flow.service.FlowManagerService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -37,6 +36,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
@@ -166,6 +166,51 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         vo = JSON.toJavaObject(JSON.parseObject(json), GraphVO.class);
         return vo;
     }
+
+    @Override
+    @Transactional
+    public void updateFlowFormFields(FlowFormFieldsUpdateDTO dto) {
+        if (dto.getFlowId() == null || CollectionUtils.isEmpty(dto.getAddList()) || StringUtils.isBlank(dto.getNodeTitle())) {
+            return;
+        }
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return;
+        }
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
+        for (FieldDTO fieldDTO : dto.getAddList()) {
+            updateFormField(flow, dto.getNodeTitle(), fieldDTO);
+            if (CollectionUtils.isNotEmpty(subFlowList)) {
+                for (Flow subFlow : subFlowList) {
+                    updateFormField(subFlow, dto.getNodeTitle(), fieldDTO);
+                }
+            }
+        }
+    }
+
+    private void updateFormField(Flow flow, String nodeTitle, FieldDTO fieldDTO) {
+        for (Node node : flow.getNodes()) {
+            if (!Objects.equals(node.getTitle(), nodeTitle)) {
+                continue;
+            }
+            if (node.getForm().getFields().stream().anyMatch(e -> Objects.equals(e.getCode(), fieldDTO.getCode()))) {
+                log.error("field code already exist:{}", fieldDTO.getCode());
+                continue;
+            }
+            Field field = new Field();
+            field.setCode(fieldDTO.getCode());
+            field.setName(fieldDTO.getName());
+            field.setId(IdGenerator.getId());
+            field.setTenantId(1L);
+            field.setCreateBy(1L);
+            field.setUpdateBy(1L);
+            field.setCreateTime(new Date());
+            field.setUpdateTime(new Date());
+            node.getForm().getFields().add(field);
+        }
+        flowRepository.update(flow);
+    }
+
 
     private void fillFlowInfo(Flow flow, GraphVO vo) {
         if (vo == null || CollectionUtils.isEmpty(vo.getNodes())) {
