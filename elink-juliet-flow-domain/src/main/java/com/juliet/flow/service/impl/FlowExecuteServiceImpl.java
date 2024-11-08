@@ -451,14 +451,6 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
             flowAutomateNodeList.addAll(subFlowAutomateNodeList);
-            List<Long> nodeIdList = flowAutomateNodeList.stream()
-                .map(Node::getId)
-                .collect(Collectors.toList());
-            flow.getNodes()
-                .stream()
-                .filter(e -> nodeIdList.contains(e.getId()))
-                .forEach(e -> e.setStatus(NodeStatusEnum.ACTIVE));
-            flowRepository.update(flow);
             Flow finalFlow = flow;
             flowAutomateNodeList.forEach(node -> {
                 NodeFieldDTO fieldDTO = new NodeFieldDTO();
@@ -477,12 +469,11 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
 
         flowRepository.update(flow);
-        // TODO: 2024/8/27 这里真的需要吗？ 主流程节点在流转时会一并将异常流程的节点流转掉, 先注释掉吧
-//        List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
-//        log.info("flowAutomate subFlowIdList:{}", flowList.stream().map(Flow::getId).collect(Collectors.toList()));
-//        if (CollectionUtils.isNotEmpty(flowList)) {
-//            flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
-//        }
+        List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
+        if (CollectionUtils.isNotEmpty(flowList)) {
+            log.info("flowAutomate subFlowIdList:{}", flowList.stream().map(Flow::getId).collect(Collectors.toList()));
+            flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
+        }
 
     }
 
