@@ -1,15 +1,12 @@
 package com.juliet.flow.repository.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
 import com.juliet.flow.client.common.thread.ThreadPoolFactory;
-import com.juliet.flow.client.dto.ProcessConfigRPCDTO;
 import com.juliet.flow.common.StatusCode;
-import com.juliet.flow.client.common.FlowStatusEnum;
 import com.juliet.flow.common.enums.FlowTemplateStatusEnum;
 import com.juliet.flow.common.utils.BusinessAssert;
-import com.juliet.flow.common.utils.JulietSqlUtil;
 import com.juliet.flow.dao.*;
 import com.juliet.flow.domain.entity.*;
 import com.juliet.flow.domain.model.*;
@@ -220,7 +217,7 @@ public class FlowRepositoryImpl implements FlowRepository {
             flows.addAll(flowCacheData.getFlowList());
         }
         if (CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
-            List<Flow> flowsInDb =  queryByIdListFromDb(flowCacheData.getMissKeyList(), new AssembleFlowCondition());
+            List<Flow> flowsInDb = queryByIdListFromDb(flowCacheData.getMissKeyList(), new AssembleFlowCondition());
             if (CollectionUtils.isNotEmpty(flowsInDb)) {
                 flows.addAll(flowsInDb);
                 flowCache.setFlowList(flowsInDb);
@@ -248,13 +245,22 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> listFlowByFlowTemplateId(Long flowTemplateId) {
-        List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
-                .eq(FlowEntity::getFlowTemplateId, flowTemplateId));
-        if (CollectionUtils.isEmpty(flowEntities)) {
-            return Lists.newArrayList();
+        int pageNum = 1;
+        int pageSize = 50;
+        List<Flow> flowList = new ArrayList<>();
+        while (true) {
+            Page<FlowEntity> page = new Page<>(pageNum, pageSize);
+            flowDao.selectPage(page, Wrappers.<FlowEntity>lambdaQuery()
+                    .eq(FlowEntity::getFlowTemplateId, flowTemplateId));
+            List<FlowEntity> flowEntities = page.getRecords();
+            if (CollectionUtils.isEmpty(flowEntities)) {
+                break;
+            }
+            List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
+            flowList.addAll(queryByIdList(flowIdList, AssembleFlowCondition.noExcludeFields()));
+            pageNum++;
         }
-        List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
-        return queryByIdList(flowIdList, AssembleFlowCondition.noExcludeFields());
+        return flowList;
     }
 
     @Override
@@ -312,8 +318,8 @@ public class FlowRepositoryImpl implements FlowRepository {
     public FlowTemplate queryTemplateByCode(String code) {
         FlowTemplateEntity flowTemplateEntity = flowTemplateDao.selectOne(Wrappers.<FlowTemplateEntity>lambdaQuery()
                 .eq(FlowTemplateEntity::getCode, code)
-            .orderByDesc(FlowTemplateEntity::getCreateTime)
-            .last("limit 1"));
+                .orderByDesc(FlowTemplateEntity::getCreateTime)
+                .last("limit 1"));
         if (flowTemplateEntity == null) {
             return null;
         }
@@ -396,45 +402,45 @@ public class FlowRepositoryImpl implements FlowRepository {
             return Collections.emptyList();
         }
         List<FlowTemplateEntity> flowTemplateEntityList = flowTemplateDao.selectList(
-            Wrappers.<FlowTemplateEntity>lambdaQuery()
-                .eq(FlowTemplateEntity::getCode, flowCode));
+                Wrappers.<FlowTemplateEntity>lambdaQuery()
+                        .eq(FlowTemplateEntity::getCode, flowCode));
         if (CollectionUtils.isEmpty(flowTemplateEntityList)) {
             log.error("找不到流程模版");
             return Collections.emptyList();
         }
         List<Long> templateIdList = flowTemplateEntityList.stream()
-            .map(FlowTemplateEntity::getId)
-            .collect(Collectors.toList());
+                .map(FlowTemplateEntity::getId)
+                .collect(Collectors.toList());
 
         List<FlowEntity> flowEntityList = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
-            .in(FlowEntity::getFlowTemplateId, templateIdList));
+                .in(FlowEntity::getFlowTemplateId, templateIdList));
         if (CollectionUtils.isEmpty(flowEntityList)) {
             return Collections.emptyList();
         }
         List<Long> flowIdList = flowEntityList.stream()
-            .map(FlowEntity::getId)
-            .collect(Collectors.toList());
+                .map(FlowEntity::getId)
+                .collect(Collectors.toList());
         List<Flow> flowList = queryByIdList(flowIdList);
         /*
          * 这里的operatorOfUserIdList里包含了异常流程和主流程，需要过滤一下
          * 这些数据里有异常流程不一定有主流程，为什么呢，因为变更的原因但是分支节点本来走A不走B，现在走B不走A，会进行流程校准
          */
         List<Flow> operatorOfUserIdList = flowList.stream()
-            .filter(flow -> flow.isFlowOperator(userId, postIdList))
-            .collect(Collectors.toList());
+                .filter(flow -> flow.isFlowOperator(userId, postIdList))
+                .collect(Collectors.toList());
         if (CollectionUtils.isEmpty(operatorOfUserIdList)) {
             return Collections.emptyList();
         }
 
         // 这里是要过滤出主流程id
         List<Long> operatorOfUserIdMainFlowIdList = operatorOfUserIdList.stream()
-            .map(flow -> {
-                if (flow.hasParentFlow()) {
-                    return flow.getParentId();
-                }
-                return flow.getId();
-            })
-            .collect(Collectors.toList());
+                .map(flow -> {
+                    if (flow.hasParentFlow()) {
+                        return flow.getParentId();
+                    }
+                    return flow.getId();
+                })
+                .collect(Collectors.toList());
         return queryByIdList(operatorOfUserIdMainFlowIdList);
     }
 
@@ -502,7 +508,7 @@ public class FlowRepositoryImpl implements FlowRepository {
 //            .map(Supplier::getId)
 //            .filter(Objects::nonNull)
 //            .collect(Collectors.toList());
-        if (CollectionUtils.isNotEmpty(nodeIds)){
+        if (CollectionUtils.isNotEmpty(nodeIds)) {
             supplierDao.delete(Wrappers.<SupplierEntity>lambdaUpdate().in(SupplierEntity::getNodeId, nodeIds));
         }
 
