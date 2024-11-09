@@ -444,13 +444,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
     @Transactional(rollbackFor = Exception.class)
     public void flowAutomate(Flow flow, Map<String, Object> automateParam) {
         do {
-            List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
             List<Node> flowAutomateNodeList = flow.canFlowAutomate(automateParam);
-            List<Node> subFlowAutomateNodeList = flowList.stream()
-                .map(subFlow -> subFlow.canFlowAutomate(automateParam))
-                .flatMap(Collection::stream)
-                .collect(Collectors.toList());
-            flowAutomateNodeList.addAll(subFlowAutomateNodeList);
             Flow finalFlow = flow;
             flowAutomateNodeList.forEach(node -> {
                 NodeFieldDTO fieldDTO = new NodeFieldDTO();
