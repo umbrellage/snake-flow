@@ -247,6 +247,17 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     @Override
+    public List<Flow> listFlowByFlowTemplateId(Long flowTemplateId) {
+        List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
+                .eq(FlowEntity::getFlowTemplateId, flowTemplateId));
+        if (CollectionUtils.isEmpty(flowEntities)) {
+            return Lists.newArrayList();
+        }
+        List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
+        return queryByIdList(flowIdList, AssembleFlowCondition.noExcludeFields());
+    }
+
+    @Override
     public List<Flow> listFlowByParentId(Collection<Long> idList) {
         return listFlowByParentId(idList, new AssembleFlowCondition());
     }

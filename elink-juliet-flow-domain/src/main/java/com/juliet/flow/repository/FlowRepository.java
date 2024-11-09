@@ -32,6 +32,8 @@ public interface FlowRepository {
 
     List<Flow> listFlowByParentId(Long id);
 
+    List<Flow> listFlowByFlowTemplateId(Long flowTemplateId);
+
     List<Flow> listFlowByParentId(Collection<Long> idList);
 
     List<Flow> listFlowByParentId(Collection<Long> idList,  AssembleFlowCondition condition);

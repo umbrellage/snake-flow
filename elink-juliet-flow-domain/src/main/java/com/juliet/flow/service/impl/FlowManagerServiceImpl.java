@@ -15,6 +15,7 @@ import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.dto.FlowFormFieldsUpdateDTO;
+import com.juliet.flow.domain.dto.FlowNodeSupervisorUpdateDTO;
 import com.juliet.flow.domain.model.*;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
@@ -210,6 +211,39 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         }
         flowRepository.update(flow);
     }
+
+    @Override
+    @Transactional
+    public void updateFlowNodeSupervisor(FlowNodeSupervisorUpdateDTO dto) {
+        List<Flow> flowList = null;
+        if (dto.getFlowId() != null) {
+            flowList = flowRepository.queryByIdList(Collections.singletonList(dto.getFlowId()));
+        } else if (dto.getFlowTemplateId() != null) {
+            flowList = flowRepository.listFlowByFlowTemplateId(dto.getFlowTemplateId());
+        }
+        if (CollectionUtils.isEmpty(flowList)) {
+            return;
+        }
+        for (Flow flow : flowList) {
+            updateNodeSupervisor(flow, dto.getNodeTitle(), dto.getSupervisorIdList());
+        }
+    }
+
+
+    private void updateNodeSupervisor(Flow flow, String nodeTitle, List<Long> supervisorIdList) {
+        for (Node node : flow.getNodes()) {
+            if (!Objects.equals(node.getTitle(), nodeTitle)) {
+                continue;
+            }
+            node.setSupervisorIds(supervisorIdList);
+            if (CollectionUtils.isEmpty(supervisorIdList)) {
+                node.setSupervisorAssignment(false);
+            } else {
+                node.setSelfAndSupervisorAssignment(true);
+            }
+        }
+    }
+
 
 
     private void fillFlowInfo(Flow flow, GraphVO vo) {
