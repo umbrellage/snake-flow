@@ -242,6 +242,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 node.setSelfAndSupervisorAssignment(true);
             }
         }
+        flowRepository.update(flow);
     }
 
 
