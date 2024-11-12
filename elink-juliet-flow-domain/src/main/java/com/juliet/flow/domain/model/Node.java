@@ -598,9 +598,11 @@ public class Node extends BaseModel {
         data.setCustomStatus(customStatus);
         if (form == null || CollectionUtils.isEmpty(form.getFields())) {
             FlowRepository flowRepository = SpringUtils.getBean(FlowRepository.class);
-            form = flowRepository.repariForm(flow, name);
+            Form tempForm = flowRepository.repariForm(flow, name);
+            Optional.ofNullable(tempForm).ifPresent(e -> data.setForm(e.toForm()));
+        } else {
+            Optional.ofNullable(form).ifPresent(e -> data.setForm(e.toForm()));
         }
-        Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
         data.setProcessedBy(processedBy);
         data.setTodoNotify(todoNotify == null ? null : todoNotify.getCode());
         if (CollectionUtils.isNotEmpty(bindPosts)) {
