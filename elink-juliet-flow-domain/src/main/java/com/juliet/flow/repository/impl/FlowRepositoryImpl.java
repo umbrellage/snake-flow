@@ -1,5 +1,6 @@
 package com.juliet.flow.repository.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.google.common.collect.Lists;
@@ -456,9 +457,17 @@ public class FlowRepositoryImpl implements FlowRepository {
     // 暂时兜底，未来删除
     @Deprecated
     @Override
-    public Form repariForm(Flow flow, String name) {
+    public Form repariForm(Flow flow, Form form, String name) {
         if (flow == null || StringUtils.isBlank(name)) {
             return null;
+        }
+        if (form != null) {
+            List<Field> fields = flowCache.getFormFields(form.getId());
+            if (CollectionUtils.isNotEmpty(fields)) {
+                Form tempForm = JSON.parseObject(JSON.toJSONString(form), Form.class);
+                tempForm.setFields(fields);
+                return tempForm;
+            }
         }
         log.error("do repairForm, flowId:{}, node name:{}", flow.getId(), name);
         if (flow.getFlowTemplateId() != null && flow.getFlowTemplateId() > 0) {
@@ -481,8 +490,12 @@ public class FlowRepositoryImpl implements FlowRepository {
             if (CollectionUtils.isEmpty(fieldEntities)) {
                 return null;
             }
-            Form form = FlowEntityFactory.toForm(formEntities.get(0));
-            form.setFields(fieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList()));
+            Form newForm = FlowEntityFactory.toForm(formEntities.get(0));
+            List<Field> fields = fieldEntities.stream().map(FlowEntityFactory::toField).collect(Collectors.toList());
+            newForm.setFields(fields);
+            if (form != null) {
+                flowCache.setFormFields(form.getId(), fields);
+            }
             return form;
         }
         return null;

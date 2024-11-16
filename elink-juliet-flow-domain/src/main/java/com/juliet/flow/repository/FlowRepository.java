@@ -64,5 +64,5 @@ public interface FlowRepository {
      */
     List<Flow> listFlow(String flowCode, Long userId, List<Long> postIdList);
 
-    Form repariForm(Flow flow, String name);
+    Form repariForm(Flow flow, Form form, String name);
 }

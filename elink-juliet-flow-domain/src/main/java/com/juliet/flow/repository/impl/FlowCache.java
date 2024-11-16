@@ -5,6 +5,7 @@ import com.google.common.cache.CacheBuilder;
 import com.juliet.common.redis.service.RedisService;
 import com.juliet.flow.domain.entity.FlowEntity;
 import com.juliet.flow.domain.entity.NodeEntity;
+import com.juliet.flow.domain.model.Field;
 import com.juliet.flow.domain.model.Flow;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,8 @@ public class FlowCache {
     private static final String NODE_CACHE_PREFIX = "node_id_";
 
     private static final String FLOW_NODE_CACHE_PREFIX = "flow_node_id_";
+
+    private static final String FORM_FIELDS_CACHE_PREFIX = "form_fields:";
 
 //    private static Cache<String, Flow> cache = CacheBuilder.newBuilder()
 //            .maximumSize(1000)
@@ -105,6 +108,14 @@ public class FlowCache {
 
     private String buildFlowNodeCacheKey(Long flowId) {
         return FLOW_NODE_CACHE_PREFIX + flowId;
+    }
+
+    public void setFormFields(Long formId, List<Field> fields) {
+        redisService.setCacheObject(String.valueOf(formId), fields, 60L, TimeUnit.MINUTES);
+    }
+
+    public List<Field> getFormFields(Long formId) {
+        return redisService.getCacheList(String.valueOf(formId));
     }
 
     @Data
