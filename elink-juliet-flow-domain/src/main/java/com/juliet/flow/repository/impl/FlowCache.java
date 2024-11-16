@@ -111,11 +111,11 @@ public class FlowCache {
     }
 
     public void setFormFields(Long formId, List<Field> fields) {
-        redisService.setCacheObject(String.valueOf(formId), fields, 60L, TimeUnit.MINUTES);
+        redisService.setCacheList(buildFormFieldsKey(formId), fields);
     }
 
     public List<Field> getFormFields(Long formId) {
-        return redisService.getCacheList(String.valueOf(formId));
+        return redisService.getCacheList(buildFormFieldsKey(formId));
     }
 
     @Data
@@ -124,5 +124,9 @@ public class FlowCache {
         List<Long> missKeyList;
 
         List<Flow> flowList;
+    }
+
+    private String buildFormFieldsKey(Long id) {
+        return FORM_FIELDS_CACHE_PREFIX + id;
     }
 }
