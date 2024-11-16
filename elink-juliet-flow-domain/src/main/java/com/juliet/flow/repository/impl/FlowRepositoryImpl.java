@@ -271,20 +271,26 @@ public class FlowRepositoryImpl implements FlowRepository {
 
     @Override
     public List<Flow> listFlowByParentId(Collection<Long> idList, AssembleFlowCondition condition) {
+        StopWatch sw = new StopWatch("listFlowByParentId");
         List<Flow> flowList = new ArrayList<>();
         if (CollectionUtils.isEmpty(idList)) {
             return Collections.emptyList();
         }
+        sw.start("flowDao.selectList");
         List<FlowEntity> flowEntities = flowDao.selectList(Wrappers.<FlowEntity>lambdaQuery()
                 .in(FlowEntity::getParentId, idList));
+        sw.stop();
         if (CollectionUtils.isEmpty(flowEntities)) {
             return Lists.newArrayList();
         }
         List<Long> flowIdList = flowEntities.stream().map(FlowEntity::getId).collect(Collectors.toList());
+        sw.start("flowCache.getFlowList");
         FlowCache.FlowCacheData flowCacheData = flowCache.getFlowList(flowIdList);
         if (CollectionUtils.isNotEmpty(flowCacheData.getFlowList())) {
             flowList.addAll(flowCacheData.getFlowList());
         }
+        sw.stop();
+        sw.start("flowCacheData.getMissKeyList");
         if (CollectionUtils.isNotEmpty(flowCacheData.getMissKeyList())) {
             List<Flow> flowListInDb = assembleFlow(flowEntities.stream()
                             .filter(flowEntity -> flowCacheData.getMissKeyList().contains(flowEntity.getId())).collect(Collectors.toList()),
@@ -292,6 +298,8 @@ public class FlowRepositoryImpl implements FlowRepository {
             flowCache.setFlowList(flowListInDb);
             flowList.addAll(flowListInDb);
         }
+        sw.stop();
+        log.info("listFlowByParentId_perf:{}", sw.prettyPrint());
         return flowList;
     }
 
@@ -556,13 +564,16 @@ public class FlowRepositoryImpl implements FlowRepository {
     }
 
     public List<Flow> assembleFlow(List<FlowEntity> flowList, AssembleFlowCondition condition) {
+        StopWatch sw = new StopWatch("assembleFlow");
         if (CollectionUtils.isEmpty(flowList)) {
             return Collections.emptyList();
         }
         List<Long> flowIdList = flowList.stream().map(FlowEntity::getId).collect(Collectors.toList());
+        sw.start("nodeDao.selectList");
         List<NodeEntity> nodeEntityList = nodeDao.selectList(Wrappers.<NodeEntity>lambdaQuery()
                 .in(NodeEntity::getFlowId, flowIdList)
         );
+        sw.stop();
         Map<Long, List<NodeEntity>> nodeMap = nodeEntityList.stream()
                 .collect(Collectors.groupingBy(NodeEntity::getFlowId));
         List<Long> nodeIdList = nodeEntityList.stream().map(NodeEntity::getId).collect(Collectors.toList());
@@ -588,9 +599,15 @@ public class FlowRepositoryImpl implements FlowRepository {
                             .in(FormEntity::getNodeId, nodeIdList)));
         }
 
+        sw.start("futurePostEntities");
         List<PostEntity> postEntities = ThreadPoolFactory.get(futurePostEntities);
+        sw.stop();
+        sw.start("futureSupplierEntities");
         List<SupplierEntity> supplierEntities = ThreadPoolFactory.get(futureSupplierEntities);
+        sw.stop();
+        sw.start("futureFormEntities");
         List<FormEntity> formEntities = ThreadPoolFactory.get(futureFormEntities);
+        sw.stop();
         List<FieldEntity> fieldEntities;
         if (CollectionUtils.isNotEmpty(formEntities) && !Boolean.TRUE.equals(condition.getExcludeFields())) {
             List<Long> formIdList = formEntities.stream().map(FormEntity::getId).distinct().collect(Collectors.toList());
@@ -599,9 +616,13 @@ public class FlowRepositoryImpl implements FlowRepository {
             fieldEntities = null;
         }
         List<Long> flowTemplateIds = flowList.stream().map(FlowEntity::getFlowTemplateId).collect(Collectors.toList());
+        sw.start("flowTemplateDao.selectBatchIds");
         List<FlowTemplateEntity> flowTemplateEntities = flowTemplateDao.selectBatchIds(flowTemplateIds);
+        sw.stop();
         Map<Long, String> flowTemplateCodeMap = flowTemplateEntities.stream()
                 .collect(Collectors.toMap(FlowTemplateEntity::getId, FlowTemplateEntity::getCode));
+
+        log.info("assembleFlow_perf:{}", sw.prettyPrint());
 
         return flowList.stream()
                 .map(flowEntity -> {
