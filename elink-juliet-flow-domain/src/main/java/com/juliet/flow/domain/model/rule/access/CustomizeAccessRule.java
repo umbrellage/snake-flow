@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model.rule.access;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.flow.client.common.ConditionTypeEnum;
 import com.juliet.flow.client.common.CustomizeRuleEnum;
 import com.juliet.flow.client.dto.AccessRuleDTO;
@@ -12,6 +13,7 @@ import com.juliet.flow.domain.model.Node;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Geweilang
  * @date 2024/3/6
  */
+@Slf4j
 @Component
 public class CustomizeAccessRule extends BaseRule {
 
@@ -37,6 +40,9 @@ public class CustomizeAccessRule extends BaseRule {
         }
         Node node = flow.findNode(nodeId);
         List<AccessRuleDTO> ruleList = node.getAccessRuleList();
-        return ruleList.stream().allMatch(e -> RuleUtil.matchRule(params, e.getRules()));
+        boolean access = ruleList.stream().allMatch(e -> RuleUtil.matchRule(params, e.getRules()));
+        log.info("CustomizeAssignRule access:{}, nodeId:{}, rule:{}, param:{}",
+            access, nodeId, JSON.toJSONString(ruleList), JSON.toJSONString(params));
+        return access;
     }
 }
