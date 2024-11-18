@@ -24,6 +24,7 @@ import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.Duration;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
  * @author xujianjie
  * @date 2023-05-06
  */
+@Slf4j
 @Data
 public class Node extends BaseModel {
 
@@ -235,6 +237,7 @@ public class Node extends BaseModel {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
             if (assignProcessedBy != null) {
+                log.info("setNodeUserId regularDistribution nodeId:{}, setProcessedBy:{}", id, assignProcessedBy);
                 processedBy = assignProcessedBy;
                 processedTime = LocalDateTime.now();
                 claimTime = LocalDateTime.now();
@@ -248,6 +251,7 @@ public class Node extends BaseModel {
                     String oldSupplierId = String.valueOf(bindSuppliers.get(0).getSupplierId());
                     String newSupplierId = supplierDTO.getSupplierId();
                     if (!StringUtils.equals(oldSupplierId, newSupplierId)) {
+                        log.info("setNodeUserId regularDistribution null nodeId:{}, setProcessedBy:{}", id, null);
                         processedBy = null;
                     }
                 }
@@ -274,6 +278,7 @@ public class Node extends BaseModel {
                         StringUtils.equals(node.getName(), distributeNode))
                 .findAny()
                 .ifPresent(node -> {
+                    log.info("setNodeUserId regularFlowInnerOperator nodeId:{}, setProcessedBy:{}", id, node.getProcessedBy());
                     this.processedBy = node.getProcessedBy();
                     this.processedTime = LocalDateTime.now();
                     this.claimTime = LocalDateTime.now();

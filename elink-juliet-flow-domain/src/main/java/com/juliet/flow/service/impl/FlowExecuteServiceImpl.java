@@ -713,6 +713,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
         BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR,
                 "当前操作人没有权限调整");
+        log.info("setNodeUserId claimTask nodeId:{}, setProcessedBy:{}", node.getId(), dto.getUserId());
         node.setProcessedBy(dto.getUserId());
         node.setProcessedTime(LocalDateTime.now());
         if (flow.hasParentFlow()) {
