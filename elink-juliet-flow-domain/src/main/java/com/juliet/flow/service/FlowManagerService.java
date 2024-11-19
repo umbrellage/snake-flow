@@ -1,6 +1,9 @@
 package com.juliet.flow.service;
 
 import com.juliet.flow.client.vo.GraphVO;
+import com.juliet.flow.domain.dto.FlowFormFieldsUpdateDTO;
+import com.juliet.flow.domain.dto.FlowNodeSupervisorUpdateDTO;
+
 import java.util.List;
 
 /**
@@ -16,4 +19,8 @@ public interface FlowManagerService {
     GraphVO getGraph(Long flowId, Long userId, List<Long> postIdList);
 
     GraphVO getTemplateGraph(Long templateId, String templateCode);
+
+    void updateFlowFormFields(FlowFormFieldsUpdateDTO dto);
+
+    void updateFlowNodeSupervisor(FlowNodeSupervisorUpdateDTO dto);
 }

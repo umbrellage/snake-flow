@@ -116,13 +116,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Long flowId = flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
-        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
+        List<Node> nodes = dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
         if (dbFlow.end()) {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
         flowRepository.update(dbFlow);
         List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
+        List<History> histories = dbFlow.activeHistory(dto.getUserId(), node.getId(), nodes);
+        forwardHistory.addAll(histories);
         historyRepository.add(forwardHistory);
 
         // 流程流转完执行自动流转功能
@@ -143,13 +145,15 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         Long flowId = flowRepository.add(flow);
         Flow dbFlow = flowRepository.queryById(flowId);
         Node node = dbFlow.startNode();
-        dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
+        List<Node> nodes = dbFlow.modifyNextNodeStatus(node.getId(), dto.getUserId(), dto.getData());
         log.info("init flow:{}", JSON.toJSONString(dbFlow));
         if (dbFlow.end()) {
             dbFlow.setStatus(FlowStatusEnum.END);
         }
         flowRepository.update(dbFlow);
         List<History> forwardHistory = dbFlow.forwardHistory(node.getId(), dto.getUserId());
+        List<History> histories = dbFlow.activeHistory(dto.getUserId(), node.getId(), nodes);
+        forwardHistory.addAll(histories);
         historyRepository.add(forwardHistory);
 
         // 流程流转完执行自动流转功能
@@ -467,9 +471,9 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
 
         flowRepository.update(flow);
-        // TODO: 2024/8/27 这里真的需要吗？ 主流程节点在流转时会一并将异常流程的节点流转掉, 先注释掉吧
         List<Flow> flowList = flowRepository.listFlowByParentId(flow.getId());
         if (CollectionUtils.isNotEmpty(flowList)) {
+            log.info("flowAutomate subFlowIdList:{}", flowList.stream().map(Flow::getId).collect(Collectors.toList()));
             flowList.forEach(subFlow -> flowAutomate(subFlow, automateParam));
         }
 
@@ -602,11 +606,12 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         newFlow.cleanParentId();
         Node executeNode = newFlow.findNode(node.getName());
         newFlow.modifyNodeStatus(executeNode);
-        newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getUserId(), redo.getParam());
+        List<Node> nodes = newFlow.modifyNextNodeStatus(executeNode.getId(), redo.getUserId(), redo.getParam());
         Long newFlowId = flowRepository.add(newFlow);
         newFlow = flowRepository.queryById(newFlowId);
-
         List<History> historyList = newFlow.forwardHistory(executeNode.getId(), redo.getUserId());
+        List<History> histories = newFlow.activeHistory(redo.getUserId(), node.getId(), nodes);
+        historyList.addAll(histories);
         historyRepository.add(historyList);
         callback(newFlow.normalNotifyList());
         callback(Collections.singletonList(flow.flowEndNotify()));
@@ -708,6 +713,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         }
         BusinessAssert.assertTrue(node.ifLeaderAdjust(dto.getLocalUser()), StatusCode.SERVICE_ERROR,
                 "当前操作人没有权限调整");
+        log.info("setNodeUserId claimTask nodeId:{}, setProcessedBy:{}", node.getId(), dto.getUserId());
         node.setProcessedBy(dto.getUserId());
         node.setProcessedTime(LocalDateTime.now());
         if (flow.hasParentFlow()) {
@@ -1172,7 +1178,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         log.info("mamba new subFlow:{}", JSON.toJSONString(subFlow));
         subFlow.modifyNodeStatus(node);
         Node subNode = subFlow.findNode(node.getName());
-        subFlow.modifyNextNodeStatus(subNode.getId(), dto.getExecuteId(), dto.getData());
+        List<Node> nodes = subFlow.modifyNextNodeStatus(subNode.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, subFlow);
         if (subFlow.end()) {
             subFlow.setStatus(FlowStatusEnum.END);
@@ -1182,6 +1188,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
                 .forEach(calibrateFlow -> flowRepository.update(calibrateFlow));
         List<History> forwardHistory = subFlow.forwardHistory(subNode.getId(), dto.getExecuteId());
+        List<History> histories = subFlow.activeHistory(dto.getExecuteId(), node.getId(), nodes);
+        forwardHistory.addAll(histories);
         historyRepository.add(forwardHistory);
         // 发送消息提醒
 //        List<NotifyDTO> notifyDTOList = Stream.of(flow.anomalyNotifyList(), subFlow.normalNotifyList())
@@ -1262,7 +1270,7 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
         if (errorNode.getStatus() != NodeStatusEnum.ACTIVE) {
             throw new ServiceException("该节点未被认领");
         }
-        errorFlow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
+        List<Node> nodes = errorFlow.modifyNextNodeStatus(node.getId(), dto.getExecuteId(), dto.getData());
         syncFlow(calibrateFlowList, errorFlow);
         calibrateFlowList.stream()
                 .peek(calibrateFlow -> calibrateFlow.flowSelfCheck(dto.getData()))
@@ -1281,6 +1289,8 @@ public class FlowExecuteServiceImpl implements FlowExecuteService, TaskService {
             flowRepository.update(errorFlow);
         }
         List<History> forwardHistory = errorFlow.forwardHistory(node.getId(), dto.getExecuteId());
+        List<History> histories = errorFlow.activeHistory(dto.getExecuteId(), node.getId(), nodes);
+        forwardHistory.addAll(histories);
         historyRepository.add(forwardHistory);
 
         if (end) {

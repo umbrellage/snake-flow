@@ -253,6 +253,7 @@ public class Flow extends BaseModel {
     public void designationOperator(List<String> nodeName, Long operator) {
         getNodes().forEach(node -> {
             if (nodeName.contains(node.getName())) {
+                log.info("setNodeUserId designationOperator nodeId:{}, setProcessedBy:{}", node.getId(), operator);
                 node.setProcessedBy(operator);
                 node.setProcessedTime(LocalDateTime.now());
                 if (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
@@ -413,12 +414,14 @@ public class Flow extends BaseModel {
         Node currentNode = findNode(nodeName);
         boolean preHandled = ifPreNodeIsHandle(nodeName);
         if (preHandled && currentNode.getStatus() == NodeStatusEnum.TO_BE_CLAIMED) {
+            log.info("setNodeUserId claimNode 1 nodeId:{}, setProcessedBy:{}", currentNode.getId(), userId);
             currentNode.setProcessedBy(userId);
             currentNode.setStatus(NodeStatusEnum.ACTIVE);
             currentNode.setClaimTime(LocalDateTime.now());
             currentNode.setProcessedTime(LocalDateTime.now());
         } else {
             if (!Objects.equals(currentNode.getProcessedBy(), userId)) {
+                log.info("setNodeUserId claimNode 2 nodeId:{}, setProcessedBy:{}", currentNode.getId(), userId);
                 currentNode.setProcessedBy(userId);
                 currentNode.setProcessedTime(LocalDateTime.now());
                 currentNode.setClaimTime(LocalDateTime.now());
@@ -446,6 +449,7 @@ public class Flow extends BaseModel {
         data.setTheLastProcessedBy(theLastProcessedBy());
         if (getCreateTime() != null) {
             data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+            data.setTs(getCreateTime().getTime());
         }
         return data;
     }
@@ -475,6 +479,7 @@ public class Flow extends BaseModel {
         data.setTheLastProcessedBy(theLastProcessedBy());
         if (getCreateTime() != null) {
             data.setCreateDate(DateUtils.dateTime(getCreateTime()));
+            data.setTs(getCreateTime().getTime());
         }
         return data;
     }
@@ -639,8 +644,8 @@ public class Flow extends BaseModel {
                 node.setActiveTime(LocalDateTime.now());
                 return Collections.emptyList();
             }
-            activeNodeList.add(node);
             if (node.getStatus() == NodeStatusEnum.NOT_ACTIVE) {
+                activeNodeList.add(node);
                 // 规则分配
                 node.regularDistribution(param, this);
                 // 分配给流程内部节点的操作人
@@ -662,7 +667,7 @@ public class Flow extends BaseModel {
                         node.setStatus(NodeStatusEnum.ACTIVE);
                     }
                 }
-                return Collections.emptyList();
+                return activeNodeList;
             }
             if (node.getStatus() == NodeStatusEnum.PROCESSED) {
                 node.setStatus(NodeStatusEnum.ACTIVE);
@@ -671,7 +676,7 @@ public class Flow extends BaseModel {
                 node.setFinishTime(null);
             }
         } else {
-            log.error("node is not active, nodeId:{}", node.getId());
+            log.info("node is not active, nodeId:{}", node.getId());
         }
         return activeNodeList;
     }
@@ -693,6 +698,7 @@ public class Flow extends BaseModel {
                 node.setStatus(NodeStatusEnum.PROCESSED);
                 node.setUpdateTime(new Date());
                 node.setProcessedTime(LocalDateTime.now());
+                log.info("setNodeUserId modifyNextNodeStatus nodeId:{}, setProcessedBy:{}", node.getId(), userId);
                 node.setProcessedBy(userId);
                 node.setFinishTime(LocalDateTime.now());
             }
@@ -817,7 +823,8 @@ public class Flow extends BaseModel {
                     node.setStatus(NodeStatusEnum.PROCESSED);
                     node.setProcessedTime(LocalDateTime.now());
                 }
-                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                if (node.isNotBeExecuted()) {
+                    log.info("setNodeUserId calibrateFlowV2 1 nodeId:{}, setProcessedBy:{}", node.getId(), standardNode.getProcessedBy());
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
                 }
@@ -832,6 +839,7 @@ public class Flow extends BaseModel {
                         })
                         .collect(Collectors.toList());
                     node.setBindSuppliers(supplierList);
+                    log.info("setNodeUserId calibrateFlowV2 2 nodeId:{}, setProcessedBy:{}", node.getId(), standardNode.getProcessedBy());
                     node.setProcessedBy(standardNode.getProcessedBy());
                 }
             }
