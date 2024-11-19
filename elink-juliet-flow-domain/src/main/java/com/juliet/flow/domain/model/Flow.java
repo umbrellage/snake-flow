@@ -825,8 +825,10 @@ public class Flow extends BaseModel {
                 }
                 if (node.isNotBeExecuted()) {
                     log.info("setNodeUserId calibrateFlowV2 1 nodeId:{}, setProcessedBy:{}", node.getId(), standardNode.getProcessedBy());
+                    if (!Objects.equals(node.getProcessedBy(), standardNode.getProcessedBy())) {
+                        node.setClaimTime(LocalDateTime.now());
+                    }
                     node.setProcessedBy(standardNode.getProcessedBy());
-                    node.setProcessedTime(LocalDateTime.now());
                 }
                 // TODO: 2024/7/23 这个地方得再斟酌一下 
                 if (CollectionUtils.isNotEmpty(standardNode.getBindSuppliers())) {
