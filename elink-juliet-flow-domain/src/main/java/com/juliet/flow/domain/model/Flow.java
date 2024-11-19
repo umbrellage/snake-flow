@@ -823,7 +823,7 @@ public class Flow extends BaseModel {
                     node.setStatus(NodeStatusEnum.PROCESSED);
                     node.setProcessedTime(LocalDateTime.now());
                 }
-                if (node.getStatus() == NodeStatusEnum.ACTIVE) {
+                if (node.isNotBeExecuted()) {
                     log.info("setNodeUserId calibrateFlowV2 1 nodeId:{}, setProcessedBy:{}", node.getId(), standardNode.getProcessedBy());
                     node.setProcessedBy(standardNode.getProcessedBy());
                     node.setProcessedTime(LocalDateTime.now());
