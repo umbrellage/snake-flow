@@ -49,7 +49,7 @@ public class DefaultNotifyCallback implements MsgNotifyCallback {
 
     @Override
     public void message(List<NotifyDTO> list) {
-        log.info("mq message:{}", JSON.toJSONString(list));
+        log.debug("mq message:{}", JSON.toJSONString(list));
         if (CollectionUtils.isEmpty(list)) {
             return;
         }
