@@ -676,7 +676,7 @@ public class Flow extends BaseModel {
                 node.setFinishTime(null);
             }
         } else {
-            log.error("node is not active, nodeId:{}", node.getId());
+            log.info("node is not active, nodeId:{}", node.getId());
         }
         return activeNodeList;
     }
