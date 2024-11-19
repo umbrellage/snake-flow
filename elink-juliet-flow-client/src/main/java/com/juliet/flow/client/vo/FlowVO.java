@@ -59,6 +59,15 @@ public class FlowVO implements Serializable {
 
     private List<FlowVO> subFlowList = new ArrayList<>();
 
+    /**
+     * 创建日期
+     */
+    private String createDate;
+
+    /**
+     * 毫秒
+     */
+    private Long ts;
 
     public UserExecutor userExecutorInfo(Long userId, List<Long> postIdList, Long supplierId) {
         return userExecutorInfo(Collections.singletonList(userId), postIdList, supplierId);
@@ -124,6 +133,8 @@ public class FlowVO implements Serializable {
             // 1. 节点操作人为该用户，但未被激活
             if (userIdList.contains(nodeVO.getProcessedBy()) && (nodeVO.getStatus() == 1)) {
                 executor.setWillEdit(true);
+                // 操作人已经操作过了，还会重新操作
+                executor.setWillReEdit(true);
             }
             // 2. 用户属于该节点的岗位下，但未激活
             if (samePostId && nodeVO.getStatus() == 1 && noClaimUsersOrContain) {
@@ -159,25 +170,25 @@ public class FlowVO implements Serializable {
 //                );
         // 已经完成的节点,如果他们的子流程对应的节点只要不是状态等于3就可以变更
         boolean canChange = userDoneNodeList.stream()
-            .anyMatch(nodeVO -> subFlowList.stream()
-                .allMatch(flowVO -> flowVO.nodeIsNotActive(nodeVO.getName()))
-            );
+                .anyMatch(nodeVO -> subFlowList.stream()
+                        .allMatch(flowVO -> flowVO.nodeIsNotActive(nodeVO.getName()))
+                );
         executor.setCanChange(canChange);
         return executor;
     }
 
     private NodeVO findNode(String distributeNode) {
         return nodes.stream()
-            .filter(e -> StringUtils.equals(e.getExternalNodeId(), distributeNode))
-            .findAny()
-            .orElse(null);
+                .filter(e -> StringUtils.equals(e.getExternalNodeId(), distributeNode))
+                .findAny()
+                .orElse(null);
     }
 
     private NodeVO findNode(Long nodeId) {
         return nodes.stream()
-            .filter(e -> Objects.equals(e.getId(), nodeId))
-            .findAny()
-            .orElse(null);
+                .filter(e -> Objects.equals(e.getId(), nodeId))
+                .findAny()
+                .orElse(null);
     }
 
 
@@ -220,9 +231,9 @@ public class FlowVO implements Serializable {
 
     public Boolean nodeIsNotActive(String nodeName) {
         NodeVO node = nodes.stream()
-            .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
-            .findAny()
-            .orElseThrow(() -> new ServiceException("找不到节点"));
+                .filter(nodeVO -> StringUtils.equals(nodeVO.getName(), nodeName))
+                .findAny()
+                .orElseThrow(() -> new ServiceException("找不到节点"));
         return node.getStatus() != 3;
     }
 
@@ -233,7 +244,7 @@ public class FlowVO implements Serializable {
 
     public boolean allNodeEnd() {
         return nodes.stream()
-            .allMatch(node -> node.getStatus() == 4 || node.getStatus() == 5 || node.getTodoNotify() == 0);
+                .allMatch(node -> node.getStatus() == 4 || node.getStatus() == 5 || node.getTodoNotify() == 0);
     }
 
     @Deprecated
@@ -269,6 +280,17 @@ public class FlowVO implements Serializable {
      */
     public List<NodeVO> currentNode() {
         return nodes.stream()
+                .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * 只有主流程, 包含异常流程
+     *
+     * @return
+     */
+    public List<NodeVO> allNodeCurrentNode() {
+        return allNodeList().stream()
                 .filter(nodeVO -> nodeVO.getStatus() == 3 || nodeVO.getStatus() == 2)
                 .collect(Collectors.toList());
     }
@@ -404,7 +426,6 @@ public class FlowVO implements Serializable {
     }
 
 
-
     public boolean existOperator(NodeVO node, List<Long> userIdList) {
         // 如果节点都没激活或者已完成或者已忽略那么直接返回true，没必要校验
         if (node.getStatus() == 1 || node.getStatus() == 4 || node.getStatus() == 5) {
@@ -420,7 +441,7 @@ public class FlowVO implements Serializable {
         }
         boolean supervisorExist = node.getSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) && !Collections.disjoint(userIdList, node.getSupervisorIds());
         boolean selfAndSupervisorAssignmentExist = node.getSelfAndSupervisorAssignment() && CollectionUtils.isNotEmpty(userIdList) &&
-            (CollectionUtils.isEmpty(node.getClaimableUserIds()) || !Collections.disjoint(userIdList, node.getClaimableUserIds()));
+                (CollectionUtils.isEmpty(node.getClaimableUserIds()) || !Collections.disjoint(userIdList, node.getClaimableUserIds()));
         boolean ruleAssignmentExist = node.getProcessedBy() != null && node.getProcessedBy() != 0;
         boolean flowInnerExist = node.getFlowInnerAssignment() != null && node.getFlowInnerAssignment() && StringUtils.isNotBlank(node.getDistributeNode()) && findNode(node.getDistributeNode()) != null && findNode(node.getDistributeNode()).getProcessedBy() != null && findNode(node.getDistributeNode()).getProcessedBy() != 0;
         return supervisorExist || selfAndSupervisorAssignmentExist || ruleAssignmentExist || flowInnerExist;
@@ -430,6 +451,7 @@ public class FlowVO implements Serializable {
 
     /**
      * 获取节点后的所有节点
+     *
      * @param nodeId
      * @return
      */
@@ -446,8 +468,8 @@ public class FlowVO implements Serializable {
             }
         }
         return nodeList.stream()
-            .distinct()
-            .collect(Collectors.toList());
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     private List<NodeVO> findNextNodeList(NodeVO nodeVO) {
@@ -457,22 +479,22 @@ public class FlowVO implements Serializable {
 
         List<String> nextNameList = nodeVO.nextNameList();
         return nextNameList.stream()
-            .map(this::findByNode)
-            .collect(Collectors.toList());
+                .map(this::findByNode)
+                .collect(Collectors.toList());
     }
 
     private NodeVO findByNode(String nodeName) {
         return nodes.stream()
-            .filter(e -> StringUtils.equals(e.getName(), nodeName))
-            .findAny()
-            .orElse(null);
+                .filter(e -> StringUtils.equals(e.getName(), nodeName))
+                .findAny()
+                .orElse(null);
     }
 
     public List<NodeVO> needOperatorNodeList(Long userId) {
         return getNodes().stream()
-            .filter(e -> Objects.equals(e.getProcessedBy(), userId))
-            .filter(e -> e.getStatus() == 3)
-            .collect(Collectors.toList());
+                .filter(e -> Objects.equals(e.getProcessedBy(), userId))
+                .filter(e -> e.getStatus() == 3)
+                .collect(Collectors.toList());
     }
 
     // 获取主流程节中指定节点提交时间
@@ -488,4 +510,45 @@ public class FlowVO implements Serializable {
         return null;
     }
 
+    /**
+     * 获取用户id相关的所有前置节点
+     */
+    public List<NodeVO> getPreRelatedNodeList(Long userId) {
+        if (userId == null) {
+            return Lists.newArrayList();
+        }
+        // 找到跟我相关的节点
+        List<NodeVO> sourceNodeList = nodes.stream()
+                .filter(Objects::nonNull)
+                .filter(node -> Objects.equals(userId, node.getProcessedBy()))
+                .collect(Collectors.toList());
+        List<NodeVO> allPreNodeList = new ArrayList<>();
+        while (true) {
+            List<NodeVO> preNodeList = findPreNodeList(sourceNodeList);
+            if (CollectionUtils.isEmpty(preNodeList)) {
+                break;
+            }
+            allPreNodeList.addAll(preNodeList);
+            sourceNodeList = preNodeList;
+        }
+        return allPreNodeList;
+    }
+
+    /**
+     * 通过指定节点id找到这些id的前置节点
+     */
+    private List<NodeVO> findPreNodeList(List<NodeVO> sourceNodeList) {
+        if (CollectionUtils.isEmpty(sourceNodeList)) {
+            return Lists.newArrayList();
+        }
+        List<NodeVO> preNodeList = new ArrayList<>();
+        for (NodeVO sourceNode : sourceNodeList) {
+            for (NodeVO nodeVO : this.nodes) {
+                if (sourceNode.isNextBy(nodeVO)) {
+                    preNodeList.add(nodeVO);
+                }
+            }
+        }
+        return preNodeList;
+    }
 }

@@ -1,5 +1,6 @@
 package com.juliet.flow.domain.model.rule;
 
+import com.alibaba.fastjson2.JSON;
 import com.juliet.flow.client.common.ConditionTypeEnum;
 import com.juliet.flow.client.common.CustomizeRuleEnum;
 import com.juliet.flow.client.dto.AssignmentRuleDTO;
@@ -14,6 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
  * @author Geweilang
  * @date 2024/1/24
  */
+@Slf4j
 @Component
 public class CustomizeAssignRule extends BaseAssignRule {
 
@@ -37,7 +40,7 @@ public class CustomizeAssignRule extends BaseAssignRule {
         }
         Node node = flow.findNode(nodeId);
         List<AssignmentRuleDTO> ruleList = node.getRuleList();
-        return ruleList.stream()
+        Long userId = ruleList.stream()
             .filter(e -> RuleUtil.matchRule(params, e.getRules()))
             .map(AssignmentRuleDTO::getOperatorUser)
             .filter(Objects::nonNull)
@@ -46,6 +49,9 @@ public class CustomizeAssignRule extends BaseAssignRule {
             .filter(Objects::nonNull)
             .findAny()
             .orElse(null);
+        log.info("CustomizeAssignRule userId:{}, nodeId:{}, rule:{}, param:{}",
+            userId, nodeId, JSON.toJSONString(ruleList), JSON.toJSONString(params));
+        return userId;
     }
 
 }

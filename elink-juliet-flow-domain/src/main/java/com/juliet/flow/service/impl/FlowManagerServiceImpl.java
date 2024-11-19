@@ -4,41 +4,39 @@ import com.alibaba.fastjson.JSON;
 import com.juliet.common.core.exception.ServiceException;
 import com.juliet.common.core.utils.DateUtils;
 import com.juliet.common.core.utils.time.JulietTimeMemo;
-import com.juliet.common.security.utils.SecurityUtils;
+import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.OperateTypeEnum;
 import com.juliet.flow.client.common.TodoNotifyEnum;
+import com.juliet.flow.client.dto.FieldDTO;
 import com.juliet.flow.client.vo.GraphEdgeVO;
 import com.juliet.flow.client.vo.GraphEdgeVO.Property;
-import com.juliet.flow.client.vo.PostVO;
-import com.juliet.flow.client.common.NodeStatusEnum;
-import com.juliet.flow.common.enums.NodeTypeEnum;
-import com.juliet.flow.domain.model.Flow;
-import com.juliet.flow.domain.model.FlowTemplate;
-import com.juliet.flow.domain.model.History;
-import com.juliet.flow.domain.model.Node;
 import com.juliet.flow.client.vo.GraphNodeVO;
 import com.juliet.flow.client.vo.GraphVO;
-import com.juliet.flow.domain.model.Post;
-import com.juliet.flow.domain.model.TempGraphContext;
+import com.juliet.flow.client.vo.PostVO;
+import com.juliet.flow.common.enums.NodeTypeEnum;
+import com.juliet.flow.common.utils.IdGenerator;
+import com.juliet.flow.domain.dto.FlowFormFieldsUpdateDTO;
+import com.juliet.flow.domain.dto.FlowNodeSupervisorUpdateDTO;
+import com.juliet.flow.domain.model.*;
 import com.juliet.flow.repository.FlowRepository;
 import com.juliet.flow.repository.HistoryRepository;
 import com.juliet.flow.service.FlowManagerService;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author xujianjie
@@ -110,7 +108,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     public GraphVO getGraph(Long flowId, Long userId, List<Long> postIdList) {
         Flow flow = flowRepository.queryById(flowId);
         Map<Long, Node> nodeMap = flow.getNodes().stream()
-            .collect(Collectors.toMap(Node::getId, Function.identity()));
+                .collect(Collectors.toMap(Node::getId, Function.identity()));
         GraphVO graphVO = getGraph(flowId);
         for (GraphNodeVO graphNodeVO : graphVO.getNodes()) {
             graphNodeVO.getProperties().setCanClick(canClick(graphNodeVO, flow, userId, graphNodeVO.getProperties()::setClickRemark, graphNodeVO.getProperties()::setCanClickError));
@@ -125,9 +123,9 @@ public class FlowManagerServiceImpl implements FlowManagerService {
                 List<Post> postList = nodeMap.get(nodeId).getBindPosts();
                 if (org.apache.commons.collections4.CollectionUtils.isNotEmpty(postList)) {
                     List<PostVO> postVOList = postList.stream()
-                        .filter(Objects::nonNull)
-                        .map(Post::toPost)
-                        .collect(Collectors.toList());
+                            .filter(Objects::nonNull)
+                            .map(Post::toPost)
+                            .collect(Collectors.toList());
                     graphNodeVO.getProperties().setBindPost(postVOList);
                 }
                 graphNodeVO.getProperties().setProcessBy(processBy);
@@ -167,6 +165,87 @@ public class FlowManagerServiceImpl implements FlowManagerService {
         return vo;
     }
 
+    @Override
+    @Transactional
+    public void updateFlowFormFields(FlowFormFieldsUpdateDTO dto) {
+        if (dto.getFlowId() == null || CollectionUtils.isEmpty(dto.getAddList()) || StringUtils.isBlank(dto.getNodeTitle())) {
+            return;
+        }
+        Flow flow = flowRepository.queryById(dto.getFlowId());
+        if (flow == null) {
+            return;
+        }
+        List<Flow> subFlowList = flowRepository.listFlowByParentId(dto.getFlowId());
+        updateFormField(flow, dto.getNodeTitle(), dto.getAddList());
+        if (CollectionUtils.isNotEmpty(subFlowList)) {
+            for (Flow subFlow : subFlowList) {
+                updateFormField(subFlow, dto.getNodeTitle(), dto.getAddList());
+            }
+        }
+    }
+
+    private void updateFormField(Flow flow, String nodeTitle, List<FieldDTO> addList) {
+        for (Node node : flow.getNodes()) {
+            if (!Objects.equals(node.getTitle(), nodeTitle)) {
+                continue;
+            }
+            for (FieldDTO fieldDTO : addList) {
+                if (CollectionUtils.isNotEmpty(node.getForm().getFields()) && node.getForm().getFields().stream().anyMatch(e -> Objects.equals(e.getCode(), fieldDTO.getCode()))) {
+                    log.error("field code already exist:{}", fieldDTO.getCode());
+                    continue;
+                }
+                if (node.getForm().getFields() == null) {
+                    node.getForm().setFields(Lists.newArrayList());
+                }
+                Field field = new Field();
+                field.setCode(fieldDTO.getCode());
+                field.setName(fieldDTO.getName());
+                field.setId(IdGenerator.getId());
+                field.setTenantId(1L);
+                field.setCreateBy(1L);
+                field.setUpdateBy(1L);
+                field.setCreateTime(new Date());
+                field.setUpdateTime(new Date());
+                node.getForm().getFields().add(field);
+            }
+        }
+        flowRepository.update(flow);
+    }
+
+    @Override
+    @Transactional
+    public void updateFlowNodeSupervisor(FlowNodeSupervisorUpdateDTO dto) {
+        List<Flow> flowList = null;
+        if (dto.getFlowId() != null) {
+            flowList = flowRepository.queryByIdList(Collections.singletonList(dto.getFlowId()));
+        } else if (dto.getFlowTemplateId() != null) {
+            flowList = flowRepository.listFlowByFlowTemplateId(dto.getFlowTemplateId());
+        }
+        if (CollectionUtils.isEmpty(flowList)) {
+            return;
+        }
+        for (Flow flow : flowList) {
+            updateNodeSupervisor(flow, dto.getNodeTitle(), dto.getSupervisorIdList());
+        }
+    }
+
+
+    private void updateNodeSupervisor(Flow flow, String nodeTitle, List<Long> supervisorIdList) {
+        for (Node node : flow.getNodes()) {
+            if (!Objects.equals(node.getTitle(), nodeTitle)) {
+                continue;
+            }
+            node.setSupervisorIds(supervisorIdList);
+            if (CollectionUtils.isEmpty(supervisorIdList)) {
+                node.setSupervisorAssignment(false);
+            } else {
+                node.setSelfAndSupervisorAssignment(true);
+            }
+        }
+        flowRepository.update(flow);
+    }
+
+
     private void fillFlowInfo(Flow flow, GraphVO vo) {
         if (vo == null || CollectionUtils.isEmpty(vo.getNodes())) {
             return;
@@ -188,28 +267,28 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private void fillEdgeInfo(Flow flow, GraphVO vo, List<History> historyList) {
         if (org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getEdges()) ||
-            org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getNodes())) {
+                org.apache.commons.collections4.CollectionUtils.isEmpty(vo.getNodes())) {
             return;
         }
-        for (GraphEdgeVO edge: vo.getEdges()) {
+        for (GraphEdgeVO edge : vo.getEdges()) {
             String sourceNodeId = edge.getSourceNodeId();
             String targetNodeId = edge.getTargetNodeId();
             GraphNodeVO sourceNodeGraph = vo.getNodes().stream()
-                .filter(node -> StringUtils.equals(sourceNodeId, node.getId()))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
+                    .filter(node -> StringUtils.equals(sourceNodeId, node.getId()))
+                    .findAny()
+                    .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
             GraphNodeVO targetNodeGraph = vo.getNodes().stream()
-                .filter(node -> StringUtils.equals(targetNodeId, node.getId()))
-                .findAny()
-                .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
+                    .filter(node -> StringUtils.equals(targetNodeId, node.getId()))
+                    .findAny()
+                    .orElseThrow(() -> new ServiceException("流程图配置有问题，你再去检查下"));
             Node sourceNode = flow.getNodes().stream()
-                .filter(node -> isNodeMatched(node, sourceNodeGraph))
-                .findAny()
-                .orElse(null);
+                    .filter(node -> isNodeMatched(node, sourceNodeGraph))
+                    .findAny()
+                    .orElse(null);
             Node targetNode = flow.getNodes().stream()
-                .filter(node -> isNodeMatched(node, targetNodeGraph))
-                .findAny()
-                .orElse(null);
+                    .filter(node -> isNodeMatched(node, targetNodeGraph))
+                    .findAny()
+                    .orElse(null);
             Property property = edge.getProperties();
             if (property == null) {
                 property = new Property();
@@ -319,33 +398,33 @@ public class FlowManagerServiceImpl implements FlowManagerService {
     private boolean canEdit(GraphNodeVO graphNodeVO, Flow flow, Long userId, List<Long> postIdList) {
         List<Flow> subList = flowRepository.listFlowByParentId(flow.getId());
         Node currentNode = flow.getNodes()
-            .stream()
-            .filter(node -> isNodeMatched(node, graphNodeVO))
-            .findAny()
-            .orElse(null);
+                .stream()
+                .filter(node -> isNodeMatched(node, graphNodeVO))
+                .findAny()
+                .orElse(null);
 
         if (currentNode == null) {
             return false;
         }
         List<Long> bindPostIdList = currentNode.getBindPosts().stream()
-            .filter(Objects::nonNull)
-            .map(Post::getPostId)
-            .filter(Objects::nonNull)
-            .map(Long::valueOf)
-            .collect(Collectors.toList());
+                .filter(Objects::nonNull)
+                .map(Post::getPostId)
+                .filter(Objects::nonNull)
+                .map(Long::valueOf)
+                .collect(Collectors.toList());
         List<Node> allSubNodeList = subList.stream()
-            .map(Flow::getNodes)
-            .flatMap(Collection::stream)
-            .filter(subNode -> StringUtils.equals(subNode.getName(), currentNode.getName()))
-            .collect(Collectors.toList());
+                .map(Flow::getNodes)
+                .flatMap(Collection::stream)
+                .filter(subNode -> StringUtils.equals(subNode.getName(), currentNode.getName()))
+                .collect(Collectors.toList());
         allSubNodeList.add(currentNode);
 
 
         return allSubNodeList.stream()
-            .anyMatch(node -> {
-                return (node.getStatus() == NodeStatusEnum.ACTIVE && Objects.equals(userId, node.getProcessedBy())) ||
-                    (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && !Collections.disjoint(postIdList, bindPostIdList));
-            });
+                .anyMatch(node -> {
+                    return (node.getStatus() == NodeStatusEnum.ACTIVE && Objects.equals(userId, node.getProcessedBy())) ||
+                            (node.getStatus() == NodeStatusEnum.TO_BE_CLAIMED && !Collections.disjoint(postIdList, bindPostIdList));
+                });
     }
 
     private boolean canAdjustment(GraphNodeVO graphNodeVO, Flow flow, Long userId) {
@@ -396,7 +475,7 @@ public class FlowManagerServiceImpl implements FlowManagerService {
 
     private boolean isNodeMatched(Node node, GraphNodeVO graphNodeVO) {
         return node.getName().equals(graphNodeVO.getId()) ||
-            node.getName().equals(graphNodeVO.getProperties().getName());
+                node.getName().equals(graphNodeVO.getProperties().getName());
     }
 
     /**

@@ -438,7 +438,7 @@ public class FlowEntityFactory {
         }
     }
 
-    private static Form toForm(FormEntity formEntity) {
+    public static Form toForm(FormEntity formEntity) {
         Form form = new Form();
         form.setId(formEntity.getId());
         form.setName(formEntity.getName());

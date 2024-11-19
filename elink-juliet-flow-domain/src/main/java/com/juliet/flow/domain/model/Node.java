@@ -1,6 +1,7 @@
 package com.juliet.flow.domain.model;
 
 import com.juliet.common.core.exception.ServiceException;
+import com.juliet.common.core.utils.SpringUtils;
 import com.juliet.flow.client.common.NodeStatusEnum;
 import com.juliet.flow.client.common.NotifyTypeEnum;
 import com.juliet.flow.client.common.OperateTypeEnum;
@@ -19,9 +20,11 @@ import com.juliet.flow.client.vo.SupplierVO;
 import com.juliet.flow.common.enums.NodeTypeEnum;
 import com.juliet.flow.common.utils.IdGenerator;
 import com.juliet.flow.domain.entity.NodeEntity;
+import com.juliet.flow.repository.FlowRepository;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.Duration;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +38,7 @@ import java.util.stream.Collectors;
  * @author xujianjie
  * @date 2023-05-06
  */
+@Slf4j
 @Data
 public class Node extends BaseModel {
 
@@ -233,6 +237,7 @@ public class Node extends BaseModel {
         if (Boolean.TRUE.equals(ruleAssignment) && assignRule != null) {
             Long assignProcessedBy = assignRule.getAssignUserId(params, flow, id);
             if (assignProcessedBy != null) {
+                log.info("setNodeUserId regularDistribution nodeId:{}, setProcessedBy:{}", id, assignProcessedBy);
                 processedBy = assignProcessedBy;
                 processedTime = LocalDateTime.now();
                 claimTime = LocalDateTime.now();
@@ -246,6 +251,7 @@ public class Node extends BaseModel {
                     String oldSupplierId = String.valueOf(bindSuppliers.get(0).getSupplierId());
                     String newSupplierId = supplierDTO.getSupplierId();
                     if (!StringUtils.equals(oldSupplierId, newSupplierId)) {
+                        log.info("setNodeUserId regularDistribution null nodeId:{}, setProcessedBy:{}", id, null);
                         processedBy = null;
                     }
                 }
@@ -272,6 +278,7 @@ public class Node extends BaseModel {
                         StringUtils.equals(node.getName(), distributeNode))
                 .findAny()
                 .ifPresent(node -> {
+                    log.info("setNodeUserId regularFlowInnerOperator nodeId:{}, setProcessedBy:{}", id, node.getProcessedBy());
                     this.processedBy = node.getProcessedBy();
                     this.processedTime = LocalDateTime.now();
                     this.claimTime = LocalDateTime.now();
@@ -594,7 +601,13 @@ public class Node extends BaseModel {
             data.setStatus(status.getCode());
         }
         data.setCustomStatus(customStatus);
-        Optional.ofNullable(form).ifPresent(form -> data.setForm(form.toForm()));
+        if (form == null || CollectionUtils.isEmpty(form.getFields())) {
+            FlowRepository flowRepository = SpringUtils.getBean(FlowRepository.class);
+            Form tempForm = flowRepository.repariForm(flow, form, name);
+            Optional.ofNullable(tempForm).ifPresent(e -> data.setForm(e.toForm()));
+        } else {
+            Optional.ofNullable(form).ifPresent(e -> data.setForm(e.toForm()));
+        }
         data.setProcessedBy(processedBy);
         data.setTodoNotify(todoNotify == null ? null : todoNotify.getCode());
         if (CollectionUtils.isNotEmpty(bindPosts)) {
